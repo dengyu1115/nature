@@ -119,7 +119,7 @@ public class ClickUtil {
                 }
             } catch (Warn e) {
                 // 进行消息提示
-                handler.sendMessage(message(e.getMsg()));
+                handler.sendMessage(message(e.getMessage()));
             } catch (Exception e) {
                 e.printStackTrace();
                 // 进行消息提示

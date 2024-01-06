@@ -17,15 +17,35 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
+/**
+ * DB操作工具类
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/6
+ */
 public class DB {
 
+    /**
+     * 全局路径
+     */
     private static final File INTERNAL = Environment.getExternalStorageDirectory();
-
+    /**
+     * DB实例map
+     */
     private static final Map<String, DB> DB_MAP = new ConcurrentHashMap<>();
-
+    /**
+     * 读操作
+     */
     private final List<SQLiteDatabase> readDbs;
+    /**
+     * 写操作
+     */
     private final SQLiteDatabase writeDb;
 
+    /**
+     * 获取DB实例
+     * @param path 路径
+     */
     private DB(String path) {
         File file = new File(INTERNAL, path);
         FileUtil.createIfNotExists(file);

@@ -25,6 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * 规则页面
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/6
+ */
 @PageView(name = "规则", group = "", col = 0, row = 0)
 public class RuleListPage extends ListPage<Rule> {
 
@@ -201,7 +207,7 @@ public class RuleListPage extends ListPage<Rule> {
     }
 
     private String statusName(String i) {
-        return "1".equals(i) ? "启用" : "未启用";
+        return "1".equals(i) ? "启用" : "暂停";
     }
 
     private String typeName(String i) {

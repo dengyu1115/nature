@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.view.View;
 import android.widget.Toast;
+import org.nature.common.exception.Warn;
 
 import java.util.function.Consumer;
 
@@ -41,13 +42,20 @@ public class PopUtil {
         buildAlertDialog(context, title, builder -> builder.setView(view), runnable);
     }
 
+    /**
+     * 构建确认框
+     * @param context  context
+     * @param title    标题
+     * @param consumer 框处理
+     * @param runnable 执行逻辑
+     */
     private static void buildAlertDialog(Context context, String title, Consumer<AlertDialog.Builder> consumer,
                                          Runnable runnable) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
         consumer.accept(builder);
         builder.setPositiveButton("确定", null);
-        builder.setNegativeButton("取消", (dialogInterface, i) -> {
+        builder.setNegativeButton("取消", (di, i) -> {
         });
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -55,8 +63,10 @@ public class PopUtil {
             try {
                 runnable.run();
                 dialog.dismiss();
-            } catch (Exception e) {
+            } catch (Warn e) {
                 alert(context, e.getMessage());
+            } catch (Exception e) {
+                alert(context, "系统错误");
             }
         });
     }
