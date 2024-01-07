@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.nature.biz.model.Kline;
-import org.nature.common.constant.Const;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.util.HttpUtil;
 import org.nature.common.util.TextUtil;
@@ -13,8 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.nature.common.constant.Const.*;
+
 /**
- * etf day detail net
+ * K线获取
  * @author nature
  * @version 1.0.0
  * @since 2020/4/4 18:20
@@ -27,10 +28,7 @@ public class KlineHttp {
      */
     private static final String URL_KLINE = "http://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s.%s" +
             "&fields1=f1,f2,f3,f4,f5&fields2=f51,f52,f53,f54,f55,f56,f57&klt=101&fqt=1&beg=%s&end=%s";
-    /**
-     * CHARSET
-     */
-    private static final String CHARSET = "utf8";
+
 
     /**
      * 获取k线数据
@@ -41,24 +39,42 @@ public class KlineHttp {
      * @return list
      */
     public List<Kline> list(String code, String type, String start, String end) {
+        // 填充参数生成完整URL
         String uri = String.format(URL_KLINE, type, code, start, end);
-        String response = HttpUtil.doGet(uri, CHARSET, lines -> lines.collect(Collectors.toList()).get(0));
+        // 发起请求调用得到返回
+        String response = HttpUtil.doGet(uri, UTF_8, lines -> lines.collect(Collectors.toList()).get(0));
+        // 解析返回数据，转换为json对象
         JSONObject jo = JSON.parseObject(response);
+        // 获取所需字段
         JSONObject data = jo.getJSONObject("data");
-        if (data == null) throw new RuntimeException("历史K线数据缺失：" + code + ":" + type);
+        if (data == null) {
+            throw new RuntimeException("历史K线数据缺失：" + code + ":" + type);
+        }
         JSONArray ks = data.getJSONArray("klines");
-        if (ks == null) throw new RuntimeException("历史K线数据缺失：" + code + ":" + type);
+        if (ks == null) {
+            throw new RuntimeException("历史K线数据缺失：" + code + ":" + type);
+        }
         List<Kline> list = new ArrayList<>();
-        for (Object datum : ks) list.add(this.genKline(code, type, (String) datum));
+        // 遍历json数组，生成Kline对象
+        for (Object datum : ks) {
+            list.add(this.genKline(code, type, (String) datum));
+        }
         return list;
     }
 
+    /**
+     * 生成K线
+     * @param code 项目编号
+     * @param type 项目类型
+     * @param line K线String数据
+     * @return Kline
+     */
     private Kline genKline(String code, String type, String line) {
         String[] s = line.split(",");
         Kline kline = new Kline();
         kline.setCode(code);
         kline.setType(type);
-        kline.setDate(s[0].replace("-", Const.EMPTY));
+        kline.setDate(s[0].replace(HYPHEN, EMPTY));
         kline.setOpen(TextUtil.getDecimal(s[1]));
         kline.setLatest(TextUtil.getDecimal(s[2]));
         kline.setHigh(TextUtil.getDecimal(s[3]));

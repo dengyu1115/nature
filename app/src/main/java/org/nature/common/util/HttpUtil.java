@@ -12,6 +12,8 @@ import java.util.concurrent.*;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static org.nature.common.constant.Const.UTF_8;
+
 /**
  * http util
  * @author nature
@@ -20,7 +22,6 @@ import java.util.stream.Stream;
  */
 public class HttpUtil {
 
-    private static final String UTF_8 = "utf8";
 
     private static final Map<String, String> HEADER = null;
 
