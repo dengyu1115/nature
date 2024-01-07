@@ -9,6 +9,12 @@ import org.nature.common.db.builder.util.TextUtil;
 
 import java.util.List;
 
+/**
+ * 查询所有数据处理source
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/7
+ */
 public class ListAllSource implements FunctionalSource {
 
     @Override

@@ -11,13 +11,28 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * 按注解处理的source
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/6
+ */
 public abstract class BaseAnnotatedSource implements AnnotatedSource {
 
-
+    /**
+     * 生成sql
+     * @param cls    类
+     * @param where  where条件语句
+     * @param method mapper方法
+     * @param args   参数
+     * @return SqlBuilder
+     */
     protected SqlBuilder genSql(Class<?> cls, String where, Method method, Object... args) {
+        // 参数校验
         if (args == null || args.length == 0) {
             throw new IllegalArgumentException("no args");
         }
+        // 获取参数名
         String[] names = MethodUtil.listName(method);
         JSONObject o = new JSONObject();
         if (args.length == 1) {

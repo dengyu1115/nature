@@ -11,6 +11,12 @@ import org.nature.common.db.builder.util.TextUtil;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 根据ids查询数据处理source
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/7
+ */
 public class ListByIdsSource implements FunctionalSource {
 
     @Override

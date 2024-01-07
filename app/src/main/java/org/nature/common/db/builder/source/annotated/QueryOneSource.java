@@ -7,6 +7,12 @@ import org.nature.common.db.builder.util.TextUtil;
 
 import java.lang.reflect.Method;
 
+/**
+ * 单挑数据查询处理source
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/7
+ */
 public class QueryOneSource extends BaseAnnotatedSource {
 
     @Override

@@ -6,6 +6,12 @@ import org.nature.common.db.builder.util.ModelUtil;
 import org.nature.common.db.builder.util.SqlAppender;
 import org.nature.common.db.builder.util.SqlBuilder;
 
+/**
+ * 根据id删除处理source
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/7
+ */
 public class DeleteByIdSource implements FunctionalSource {
 
     @Override

@@ -18,15 +18,37 @@ import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * mapper代理
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/6
+ */
 public class MapperProxy {
 
+    /**
+     * 上下文
+     */
     private static final Map<Class<?>, FunctionalSource> CONTEXT = new HashMap<>();
+    /**
+     * 建表source
+     */
     private static final CreateSource CREATE_SOURCE = new CreateSource();
+    /**
+     * 查询单个source
+     */
     private static final QueryOneSource QUERY_ONE_SOURCE = new QueryOneSource();
+    /**
+     * 查询列表source
+     */
     private static final QueryListSource QUERY_LIST_SOURCE = new QueryListSource();
+    /**
+     * 删除source
+     */
     private static final DeleteSource DELETE_SOURCE = new DeleteSource();
 
     static {
+        //  初始化
         CONTEXT.put(BatchMerge.class, new BatchMergeSource());
         CONTEXT.put(BatchSave.class, new BatchSaveSource());
         CONTEXT.put(DeleteAll.class, new DeleteAllSource());
@@ -40,18 +62,32 @@ public class MapperProxy {
         CONTEXT.put(Update.class, new UpdateSource());
     }
 
+    /**
+     * 实例化mapper
+     * @param mapper mapper
+     * @return mapper实例
+     */
     @SuppressWarnings("unchecked")
     public static <T> T instant(Class<T> mapper) {
+        // 获取classLoader
         ClassLoader classLoader = MapperProxy.class.getClassLoader();
+        // 获取对应的Model
         TableModel tableModel = mapper.getAnnotation(TableModel.class);
         if (tableModel == null) {
             throw new RuntimeException(String.format("class %s should be marked with TableModel", mapper));
         }
+        // 获取对应的Source
         Class<?> cls = tableModel.value();
         CREATE_SOURCE.execute(cls, ModelUtil.getModel(cls).recreate());
+        // 实例化mapper（创建代理对象）
         return (T) Proxy.newProxyInstance(classLoader, new Class<?>[]{mapper}, MapperProxy.getInvocationHandler(cls));
     }
 
+    /**
+     * 获取对应的Source
+     * @param cls 类
+     * @return InvocationHandler
+     */
     private static InvocationHandler getInvocationHandler(Class<?> cls) {
         return (proxy, method, args) -> {
             Class<?> dCls = method.getDeclaringClass();

@@ -12,6 +12,12 @@ import org.nature.common.db.builder.util.ValueUtil;
 
 import java.util.List;
 
+/**
+ * 更新处理source
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/7
+ */
 public class UpdateSource implements FunctionalSource {
 
     @Override
@@ -28,9 +34,11 @@ public class UpdateSource implements FunctionalSource {
                 .append(ModelUtil.table(cls)).append("set")
                 .append(TextUtil.conditions(nonIdMappings)).append("where")
                 .append(TextUtil.conditions(idMappings));
+        // 拼接set字段部分
         for (Mapping mapping : nonIdMappings) {
             builder.appendArg(ValueUtil.get(o, mapping.getProperty()));
         }
+        // 拼接where条件部分（id）
         for (Mapping mapping : idMappings) {
             builder.appendArg(ValueUtil.get(o, mapping.getProperty()));
         }

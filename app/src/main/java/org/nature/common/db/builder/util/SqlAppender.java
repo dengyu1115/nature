@@ -7,8 +7,19 @@ import org.nature.common.db.builder.model.Mapping;
 
 import java.util.List;
 
+/**
+ * sql拼接器
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/7
+ */
 public class SqlAppender {
 
+    /**
+     * 查询语句拼接
+     * @param cls 类
+     * @return SqlBuilder
+     */
     public static SqlBuilder selectBuilder(Class<?> cls) {
         return SqlBuilder.build().append("select")
                 .append(TextUtil.columns(ModelUtil.listMapping(cls)))
@@ -16,28 +27,63 @@ public class SqlAppender {
                 .append("where");
     }
 
+    /**
+     * 删除语句拼接
+     * @param cls 类
+     * @return SqlBuilder
+     */
     public static SqlBuilder deleteBuilder(Class<?> cls) {
         return SqlBuilder.build().append("delete")
                 .append("from").append(ModelUtil.table(cls))
                 .append("where");
     }
 
+    /**
+     * 保存语句拼接
+     * @param cls 类
+     * @param o   数据
+     * @return SqlBuilder
+     */
     public static SqlBuilder saveBuilder(Class<?> cls, JSONObject o) {
         return singleBuilder(cls, o, "insert");
     }
 
+    /**
+     * 并入语句拼接
+     * @param cls 类
+     * @param o   数据
+     * @return SqlBuilder
+     */
     public static SqlBuilder mergeBuilder(Class<?> cls, JSONObject o) {
         return singleBuilder(cls, o, "replace");
     }
 
+    /**
+     * 批量保存语句拼接
+     * @param cls  类
+     * @param list 数据集
+     * @return SqlBuilder
+     */
     public static SqlBuilder batchSaveBuilder(Class<?> cls, List<?> list) {
         return batchBuilder(cls, list, "insert");
     }
 
+    /**
+     * 批量并入语句拼接
+     * @param cls  类
+     * @param list 数据集
+     * @return SqlBuilder
+     */
     public static SqlBuilder batchMergeBuilder(Class<?> cls, List<?> list) {
         return batchBuilder(cls, list, "replace");
     }
 
+    /**
+     * 拼接id条件子句
+     * @param builder    builder
+     * @param o          数据
+     * @param idMappings id映射数据集
+     */
     public static void idCondition(SqlBuilder builder, Object o, List<Mapping> idMappings) {
         if (idMappings.size() == 1) {
             // 单个ID字段的数据直接转List
@@ -55,6 +101,12 @@ public class SqlAppender {
         }
     }
 
+    /**
+     * 拼接id条件子句
+     * @param builder    builder
+     * @param ids        id集合
+     * @param idMappings id映射数据集
+     */
     public static void idsCondition(SqlBuilder builder, List<?> ids, List<Mapping> idMappings) {
         if (idMappings.size() == 1) {
             // 单个ID字段的数据直接转List
@@ -88,6 +140,13 @@ public class SqlAppender {
         }
     }
 
+    /**
+     * 批量拼接
+     * @param cls  类
+     * @param list 数据集合
+     * @param type 类型
+     * @return SqlBuilder
+     */
     private static SqlBuilder batchBuilder(Class<?> cls, List<?> list, String type) {
         JSONArray array = (JSONArray) JSON.toJSON(list);
         List<Mapping> mappings = ModelUtil.listMapping(cls);
@@ -108,6 +167,13 @@ public class SqlAppender {
         return builder;
     }
 
+    /**
+     * 单挑拼接
+     * @param cls  类
+     * @param o    数据
+     * @param type 类型
+     * @return SqlBuilder
+     */
     private static SqlBuilder singleBuilder(Class<?> cls, JSONObject o, String type) {
         List<Mapping> mappings = ModelUtil.listMapping(cls);
         SqlBuilder builder = SqlBuilder.build().append(type).append("into")
