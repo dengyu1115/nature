@@ -19,6 +19,12 @@ import java.util.function.Function;
 import static org.nature.common.view.LineChart.C;
 import static org.nature.common.view.LineChart.Q;
 
+/**
+ * K线图
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/8
+ */
 @PageView(name = "K线图", group = "", col = 0, row = 0)
 public class KlineChartPage extends Page {
 

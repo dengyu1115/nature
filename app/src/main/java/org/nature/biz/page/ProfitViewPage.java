@@ -15,6 +15,12 @@ import org.nature.common.view.SearchBar;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * 盈利总览
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/8
+ */
 @PageView(name = "盈利总览", group = "ETF", col = 2, row = 1)
 public class ProfitViewPage extends ListPage<ProfitView> {
 

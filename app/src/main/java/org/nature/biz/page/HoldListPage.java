@@ -25,6 +25,12 @@ import java.util.stream.Collectors;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 
+/**
+ * 持有数据
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/8
+ */
 @PageView(name = "最新操作", group = "ETF", col = 1, row = 3)
 public class HoldListPage extends ListPage<Hold> {
 
@@ -131,14 +137,29 @@ public class HoldListPage extends ListPage<Hold> {
         return 11;
     }
 
+    /**
+     * 获取项目
+     * @param d 持有数据
+     * @return String
+     */
     private String getItem(Hold d) {
         return itemNameMap.get(String.join(":", d.getCode(), d.getType()));
     }
 
+    /**
+     * 获取操作类型
+     * @param d 持有数据
+     * @return String
+     */
     private String getHandle(Hold d) {
         return d.getDateSell() == null ? "买" : "卖";
     }
 
+    /**
+     * 获取数量
+     * @param d 持有数据
+     * @return String
+     */
     private BigDecimal getAmount(Hold d) {
         return (d.getPriceSell() == null ? d.getPriceBuy() : d.getPriceSell()).multiply(d.getShareBuy());
     }

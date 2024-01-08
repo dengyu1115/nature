@@ -72,11 +72,18 @@ public class GroupListPage extends ListPage<Group> {
         add.setOnClickListener(v -> this.add());
     }
 
+    /**
+     * 添加操作
+     */
     private void add() {
         this.makeWindowStructure();
         PopUtil.confirm(context, "新增项目", page, () -> this.doEdit(groupManager::save));
     }
 
+    /**
+     * 编辑操作
+     * @return 编辑操作
+     */
     private Consumer<Group> edit() {
         return d -> {
             this.makeWindowStructure();
@@ -86,6 +93,10 @@ public class GroupListPage extends ListPage<Group> {
         };
     }
 
+    /**
+     * 执行编辑操作
+     * @param consumer 处理逻辑
+     */
     private void doEdit(Consumer<Group> consumer) {
         String code = this.code.getText().toString();
         if (code.isEmpty()) {
@@ -103,6 +114,10 @@ public class GroupListPage extends ListPage<Group> {
         PopUtil.alert(context, "编辑成功！");
     }
 
+    /**
+     * 删除操作
+     * @return 删除逻辑
+     */
     private Consumer<Group> delete() {
         return d -> PopUtil.confirm(context, "删除项目-" + d.getName(), "确认删除吗？", () -> {
             groupManager.delete(d.getCode());
@@ -111,8 +126,10 @@ public class GroupListPage extends ListPage<Group> {
         });
     }
 
+    /**
+     * 创建弹窗
+     */
     private void makeWindowStructure() {
-        ViewTemplate template = ViewTemplate.build(context);
         page = template.linearPage();
         page.setGravity(Gravity.CENTER);
         LinearLayout cl = template.line(300, 30);

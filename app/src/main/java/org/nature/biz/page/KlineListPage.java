@@ -15,6 +15,12 @@ import org.nature.common.view.SearchBar;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * K线列表
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/8
+ */
 @PageView(name = "K线列表", group = "", col = 0, row = 0)
 public class KlineListPage extends ListPage<Kline> {
 

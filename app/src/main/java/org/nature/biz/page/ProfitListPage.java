@@ -24,6 +24,12 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * 收益列表
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/8
+ */
 @PageView(name = "收益列表", group = "ETF", col = 2, row = 2)
 public class ProfitListPage extends ListPage<Profit> {
 
@@ -109,6 +115,9 @@ public class ProfitListPage extends ListPage<Profit> {
                 .collect(Collectors.toMap(i -> String.join(Const.DELIMITER, i.getCode(), i.getType()), Item::getName));
     }
 
+    /**
+     * 日期按钮展示控制
+     */
     private void toggleDateBtn() {
         String value = dateRule.getValue();
         if ("".equals(value)) {
@@ -123,6 +132,11 @@ public class ProfitListPage extends ListPage<Profit> {
         }
     }
 
+    /**
+     * 合并收益数据处理
+     * @param profits 原集合
+     * @return 合并后集合
+     */
     private List<Profit> merge(List<Profit> profits) {
         boolean itemFlag = StringUtils.isNotBlank(this.item.getHint());
         boolean ruleFlag = StringUtils.isNotBlank(this.rule.getHint());
@@ -213,6 +227,11 @@ public class ProfitListPage extends ListPage<Profit> {
         throw new Warn("日期规则不支持：" + dateRule);
     }
 
+    /**
+     * 获取项目名称
+     * @param i 收益对象
+     * @return String
+     */
     private String getItemName(Profit i) {
         return nameMap.get(String.join(Const.DELIMITER, i.getCode(), i.getType()));
     }

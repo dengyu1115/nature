@@ -84,11 +84,18 @@ public class RuleListPage extends ListPage<Rule> {
         return 11;
     }
 
+    /**
+     * 添加操作
+     */
     private void add() {
         this.makeWindowStructure();
         PopUtil.confirm(context, "新增", page, () -> this.doEdit(ruleManager::save));
     }
 
+    /**
+     * 编辑操作
+     * @return 操作逻辑
+     */
     private Consumer<Rule> edit() {
         return d -> {
             this.makeWindowStructure();
@@ -102,6 +109,10 @@ public class RuleListPage extends ListPage<Rule> {
         };
     }
 
+    /**
+     * 执行编辑操作
+     * @param consumer 处理逻辑
+     */
     private void doEdit(Consumer<Rule> consumer) {
         String name = this.name.getText().toString();
         if (name.isEmpty()) {
@@ -147,6 +158,10 @@ public class RuleListPage extends ListPage<Rule> {
         PopUtil.alert(context, "编辑成功！");
     }
 
+    /**
+     * 删除操作
+     * @return 操作逻辑
+     */
     private Consumer<Rule> delete() {
         return d -> PopUtil.confirm(context, "删除项目-" + d.getName(), "确认删除吗？", () -> {
             ruleManager.delete(d);
@@ -155,6 +170,10 @@ public class RuleListPage extends ListPage<Rule> {
         });
     }
 
+    /**
+     * 计算收益
+     * @return 操作逻辑
+     */
     private Consumer<Rule> calcProfit() {
         return d -> {
             int i = holdManager.calc(d);
@@ -162,14 +181,25 @@ public class RuleListPage extends ListPage<Rule> {
         };
     }
 
+    /**
+     * 展示持有数据
+     * @return 操作逻辑
+     */
     private Consumer<Rule> showHold() {
         return d -> this.show(HoldListPage.class, d);
     }
 
+    /**
+     * 展示收益数据
+     * @return 操作逻辑
+     */
     private Consumer<Rule> showProfit() {
         return d -> this.show(ProfitListPage.class, d);
     }
 
+    /**
+     * 构建弹窗
+     */
     private void makeWindowStructure() {
         ViewTemplate template = ViewTemplate.build(context);
         page = template.linearPage();
@@ -206,10 +236,20 @@ public class RuleListPage extends ListPage<Rule> {
         page.addView(l7);
     }
 
+    /**
+     * 获取状态名称
+     * @param i 状态code
+     * @return String
+     */
     private String statusName(String i) {
         return "1".equals(i) ? "启用" : "暂停";
     }
 
+    /**
+     * 获取类型名称
+     * @param i 类型code
+     * @return String
+     */
     private String typeName(String i) {
         return Map.of("0", "网格", "1", "网格定投", "2", "复利").get(i);
     }
