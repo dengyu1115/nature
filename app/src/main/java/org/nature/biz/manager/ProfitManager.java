@@ -69,6 +69,12 @@ public class ProfitManager {
         return rules.stream().map(rule -> this.list(rule, dates)).flatMap(List::stream).collect(Collectors.toList());
     }
 
+    /**
+     * 按日期查询单个规则收益
+     * @param rule  规则
+     * @param dates 日期集合
+     * @return list
+     */
     public List<Profit> list(Rule rule, List<String> dates) {
         List<Profit> profits = this.calc(rule, dates);
         for (Profit p : profits) {
