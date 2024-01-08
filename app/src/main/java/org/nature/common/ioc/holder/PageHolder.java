@@ -16,10 +16,20 @@ public class PageHolder {
 
     private static final Map<String, List<List<PageInfo>>> CTX = new HashMap<>();
 
+    /**
+     * 获取实例
+     * @param name 菜单名称
+     * @return list
+     */
     public static List<List<PageInfo>> get(String name) {
         return CTX.get(name);
     }
 
+    /**
+     * 注册实例
+     * @param cls      类
+     * @param pageView 注解
+     */
     @SuppressWarnings("unchecked")
     public synchronized static void register(Class<?> cls, PageView pageView) {
         String group = pageView.group();

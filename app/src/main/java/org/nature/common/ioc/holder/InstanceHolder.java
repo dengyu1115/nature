@@ -22,6 +22,11 @@ public class InstanceHolder {
      */
     private static final Map<Class<?>, Object> map = new HashMap<>();
 
+    /**
+     * 设置实例
+     * @param cls 实例类
+     * @param o   实例
+     */
     public static <T> void put(Class<T> cls, T o) {
         map.put(cls, o);
     }
@@ -29,7 +34,6 @@ public class InstanceHolder {
     /**
      * 获取实例
      * @param cls 实例class
-     * @param <T> 类型
      * @return 实例
      */
     @SuppressWarnings("all")

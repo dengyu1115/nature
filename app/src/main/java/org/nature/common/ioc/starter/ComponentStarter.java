@@ -18,7 +18,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 /**
- * components init processor
+ * 组件初始化处理器
  * @author nature
  * @version 1.0.0
  * @since 2019/8/6 12:41
@@ -26,11 +26,11 @@ import java.util.List;
 public class ComponentStarter {
 
     /**
-     * an singleton
+     * 单例
      */
     private static ComponentStarter instance;
     /**
-     * start ran flag
+     * 启动标识
      */
     private boolean ran;
 
@@ -38,8 +38,8 @@ public class ComponentStarter {
     }
 
     /**
-     * gain the instance
-     * @return instance
+     * 获取实例
+     * @return 实例
      */
     public static ComponentStarter getInstance() {
         if (instance != null) {
@@ -54,7 +54,7 @@ public class ComponentStarter {
     }
 
     /**
-     * start doing injection(once only)
+     * 开始注入/实例化处理
      * @param ctx projection context
      */
     public synchronized void start(Context ctx) {
@@ -88,6 +88,10 @@ public class ComponentStarter {
         }
     }
 
+    /**
+     * 注入
+     * @param cls 类
+     */
     private void inject(Class<?> cls) {
         Component component = cls.getAnnotation(Component.class);
         if (component != null) {
@@ -110,6 +114,11 @@ public class ComponentStarter {
         }
     }
 
+    /**
+     * 注入
+     * @param cls 类
+     * @param o   实例
+     */
     private void inject(Class<?> cls, Object o) {
         Field[] fields = cls.getDeclaredFields();
         for (Field field : fields) {
@@ -129,6 +138,11 @@ public class ComponentStarter {
         }
     }
 
+    /**
+     * 判断是否需要扫描
+     * @param element 元素
+     * @return boolean
+     */
     private boolean isNeededPath(String element) {
         List<String> paths = Arrays.asList(".page", ".job", ".manager", ".service", ".mapper");
         for (String path : paths) {
@@ -139,6 +153,11 @@ public class ComponentStarter {
         return false;
     }
 
+    /**
+     * 判断是否满足类型
+     * @param cls 类
+     * @return boolean
+     */
     private boolean isNeedType(Class<?> cls) {
         int modifiers = cls.getModifiers();
         return !Modifier.isAbstract(modifiers) && Modifier.isPublic(modifiers);
