@@ -22,6 +22,12 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+/**
+ * 项目分组
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/8
+ */
 @PageView(name = "分组", group = "ETF", col = 1, row = 1)
 public class GroupListPage extends ListPage<Group> {
 

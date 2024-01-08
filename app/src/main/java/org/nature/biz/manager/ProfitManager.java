@@ -90,6 +90,11 @@ public class ProfitManager {
         return results;
     }
 
+    /**
+     * 合并收益数据
+     * @param list 数据集合
+     * @return Profit
+     */
     public Profit merge(List<Profit> list) {
         return list.stream().reduce(new Profit(), this::merge);
     }
@@ -135,6 +140,12 @@ public class ProfitManager {
         return simulator.profit();
     }
 
+    /**
+     * 按规则计算收益
+     * @param rule  规则
+     * @param dates 日期集合
+     * @return list
+     */
     private List<Profit> calc(Rule rule, List<String> dates) {
         List<Kline> list = klineMapper.listByItem(rule.getCode(), rule.getType());
         list.sort(Comparator.comparing(Kline::getDate));
@@ -143,6 +154,12 @@ public class ProfitManager {
         return simulator.profits();
     }
 
+    /**
+     * 合并收益
+     * @param a a
+     * @param b b
+     * @return Profit
+     */
     private Profit merge(Profit a, Profit b) {
         String dateStart = a.getDateStart();
         String start = b.getDateStart();
@@ -169,6 +186,12 @@ public class ProfitManager {
         return a;
     }
 
+    /**
+     * 求差值
+     * @param a a
+     * @param b b
+     * @return Profit
+     */
     private Profit diff(Profit a, Profit b) {
         Profit profit = new Profit();
         profit.setCode(a.getCode());
