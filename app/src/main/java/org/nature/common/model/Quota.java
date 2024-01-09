@@ -3,6 +3,12 @@ package org.nature.common.model;
 import lombok.Getter;
 import lombok.Setter;
 
+/**
+ * 指标
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/9
+ */
 @Getter
 @Setter
 public class Quota extends BaseModel {

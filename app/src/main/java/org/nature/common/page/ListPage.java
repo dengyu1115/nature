@@ -17,6 +17,12 @@ import org.nature.common.view.ViewTemplate;
 
 import java.util.List;
 
+/**
+ * 列表页面
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/9
+ */
 public abstract class ListPage<T> extends Page {
 
     protected Context context;
@@ -45,6 +51,9 @@ public abstract class ListPage<T> extends Page {
         this.refreshData();
     }
 
+    /**
+     * 布局页面
+     */
     private void makeStructure() {
         template = ViewTemplate.build(context);
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
@@ -56,12 +65,18 @@ public abstract class ListPage<T> extends Page {
         this.footer();
     }
 
+    /**
+     * 初始化按钮行为
+     */
     private void initBehaviours() {
         this.button.setOnClickListener(v -> this.refreshData());
         this.excel.define(this.define());
         this.initHeaderBehaviours();
     }
 
+    /**
+     * 头部布局
+     */
     private void header() {
         LinearLayout header = new LinearLayout(context);
         page.addView(header);
@@ -73,6 +88,9 @@ public abstract class ListPage<T> extends Page {
         this.initHeaderViews(searchBar);
     }
 
+    /**
+     * 主体布局
+     */
     private void body() {
         LinearLayout body = new LinearLayout(context);
         page.addView(body);
@@ -81,6 +99,9 @@ public abstract class ListPage<T> extends Page {
         body.addView(this.excel);
     }
 
+    /**
+     * 底部布局
+     */
     private void footer() {
         LinearLayout footer = new LinearLayout(context);
         page.addView(footer);
@@ -91,6 +112,9 @@ public abstract class ListPage<T> extends Page {
         total.setGravity(Gravity.CENTER);
     }
 
+    /**
+     * 刷新数据
+     */
     protected void refreshData() {
         new Thread(() -> {
             try {
@@ -109,20 +133,42 @@ public abstract class ListPage<T> extends Page {
         }).start();
     }
 
+    /**
+     * 刷新汇总值
+     */
     private void refreshTotal() {
         handler.sendMessage(new Message());
     }
 
+    /**
+     * 表格列数
+     * @return int
+     */
     protected int getExcelColumns() {
         return 9;
     }
 
+    /**
+     * 表格定义
+     * @return 表格定义信息
+     */
     protected abstract List<ExcelView.D<T>> define();
 
+    /**
+     * 查询数据
+     * @return list
+     */
     protected abstract List<T> listData();
 
+    /**
+     * 初始化头部视图
+     * @param searchBar 搜索组件
+     */
     protected abstract void initHeaderViews(SearchBar searchBar);
 
+    /**
+     * 初始化头部按钮行为
+     */
     protected abstract void initHeaderBehaviours();
 
 }

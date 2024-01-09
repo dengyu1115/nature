@@ -1,5 +1,11 @@
 package org.nature.common.constant;
 
+/**
+ * 常量
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/8
+ */
 public interface Const {
     /**
      * 分隔符
