@@ -24,13 +24,25 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 工作日
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/10
+ */
 @PageView(name = "工作日", group = "基础", col = 1, row = 1)
 @SuppressLint("DefaultLocale")
 public class WorkdayPage extends ListPage<Month> {
 
     @Injection
     private WorkdayManager workDayManager;
+    /**
+     * 重载、加载最新
+     */
     private Button reload, loadLatest;
+    /**
+     * 年份选择器
+     */
     private Selector<String> year;
 
     @Override
@@ -42,12 +54,6 @@ public class WorkdayPage extends ListPage<Month> {
             ds.add(ExcelView.row(day, d -> TextUtil.text(this.getDateType(d, day)), C, C));
         }
         return ds;
-    }
-
-    private String getDateType(Month m, String day) {
-        String date = String.format("%s%s", m.getMonth(), day);
-        String type = m.getDateType(date);
-        return DateType.codeToName(type);
     }
 
     @Override
@@ -69,26 +75,20 @@ public class WorkdayPage extends ListPage<Month> {
     protected void initHeaderBehaviours() {
         year.mapper(i -> i).init().refreshData(this.initYears());
         year.setValue(DateFormatUtils.format(new Date(), Const.FORMAT_YEAR));
-        reload.setOnClickListener(v ->
-                PopUtil.confirm(context, "重新加载数据", "确定重新加载吗？",
-                        () -> {
-                            String year = this.year.getValue();
-                            if (StringUtils.isBlank(year)) {
-                                throw new RuntimeException("请选择年份");
-                            }
-                            ClickUtil.asyncClick(v, () -> String.format("加载完成,共%s条",
-                                    workDayManager.reload(year)));
-                        }
-                )
-        );
-        loadLatest.setOnClickListener(v ->
-                ClickUtil.asyncClick(v, () -> {
-                    String year = this.year.getValue();
-                    if (StringUtils.isBlank(year)) {
-                        throw new RuntimeException("请选择年份");
-                    }
-                    return String.format("加载完成,共%s条", workDayManager.load(year));
-                }));
+        ClickUtil.onPopConfirm(reload, "重新加载数据", "确定重新加载吗？", () -> {
+            String year = this.year.getValue();
+            if (StringUtils.isBlank(year)) {
+                throw new RuntimeException("请选择年份");
+            }
+            return String.format("加载完成,共%s条", workDayManager.reload(year));
+        });
+        ClickUtil.onAsyncClick(loadLatest, () -> {
+            String year = this.year.getValue();
+            if (StringUtils.isBlank(year)) {
+                throw new RuntimeException("请选择年份");
+            }
+            return String.format("加载完成,共%s条", workDayManager.load(year));
+        });
     }
 
     @Override
@@ -96,6 +96,22 @@ public class WorkdayPage extends ListPage<Month> {
         return 14;
     }
 
+    /**
+     * 获取日期类型
+     * @param m   月份
+     * @param day 日期
+     * @return String
+     */
+    private String getDateType(Month m, String day) {
+        String date = String.format("%s%s", m.getMonth(), day);
+        String type = m.getDateType(date);
+        return DateType.codeToName(type);
+    }
+
+    /**
+     * 初始化年份
+     * @return list
+     */
     private List<String> initYears() {
         List<String> years = new ArrayList<>();
         Date now = new Date();

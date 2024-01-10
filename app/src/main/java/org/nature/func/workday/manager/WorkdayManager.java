@@ -6,6 +6,7 @@ import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.nature.common.constant.Const;
+import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.util.HttpUtil;
@@ -44,7 +45,7 @@ public class WorkdayManager {
     public int load(String year) {
         List<Workday> list = workdayMapper.listByYear(year);
         if (!list.isEmpty()) {
-            throw new RuntimeException("已存在数据");
+            throw new Warn("已存在数据");
         }
         return workdayMapper.batchSave(this.getYearWorkDays(year));
     }

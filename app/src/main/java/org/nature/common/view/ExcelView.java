@@ -207,7 +207,7 @@ public class ExcelView<T> extends BasicView {
     }
 
     private void sortClick(View v) {
-        ClickUtil.doClick(v, () -> {
+        ClickUtil.click(v, () -> {
             if (sc.get() == this.sortCol) {
                 sc.set(-1);
                 this.list.sort(this.comparator.reversed());

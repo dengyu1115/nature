@@ -5,7 +5,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import org.apache.commons.lang3.StringUtils;
-import org.nature.biz.manager.*;
+import org.nature.biz.manager.GroupManager;
+import org.nature.biz.manager.HoldManager;
+import org.nature.biz.manager.ItemManager;
+import org.nature.biz.manager.KlineManager;
 import org.nature.biz.model.Group;
 import org.nature.biz.model.Item;
 import org.nature.common.ioc.annotation.Injection;
@@ -41,8 +44,6 @@ public class ItemListPage extends ListPage<Item> {
     private GroupManager groupManager;
     @Injection
     private KlineManager klineManager;
-    @Injection
-    private RuleManager ruleManager;
     @Injection
     private HoldManager holdManager;
 
@@ -129,7 +130,7 @@ public class ItemListPage extends ListPage<Item> {
     protected void initHeaderBehaviours() {
         add.setOnClickListener(v -> this.add());
         ClickUtil.onAsyncClick(loadKline, this::loadKlineAll);
-        ClickUtil.onAsyncClick(reloadKline, this::reloadKlineAll);
+        ClickUtil.onPopConfirm(reloadKline, "K线重载", "确定重新加载全部K线数据？", this::reloadKlineAll);
         ClickUtil.onAsyncClick(calcRule, this::calcHold);
         List<Group> groups = groupManager.listAll();
         groupMap = groups.stream().collect(Collectors.toMap(Group::getCode, Group::getName));

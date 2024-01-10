@@ -28,11 +28,71 @@ public class ClickUtil {
     private static long millis;
 
     /**
+     * 给view设置点击事件，并处理点击事件（主线程执行）
+     * @param view     view
+     * @param runnable 执行逻辑
+     */
+    public static void onClick(View view, Runnable runnable) {
+        view.setOnClickListener(v -> click(v, runnable));
+    }
+
+    /**
+     * 给view设置点击事件，并处理点击事件（主线程执行）
+     * @param view     view
+     * @param runnable 执行逻辑
+     * @param handled  执行完毕后下一步执行
+     */
+    public static void onClick(View view, Runnable runnable, Runnable handled) {
+        view.setOnClickListener(v -> click(v, runnable, handled));
+    }
+
+    /**
+     * 给view设置点击事件，并处理点击事件（主线程执行）
+     * @param view     view
+     * @param supplier 执行逻辑
+     * @param handled  执行完毕后下一步执行
+     */
+    public static void onAsyncClick(View view, Supplier<String> supplier, Runnable handled) {
+        view.setOnClickListener(v -> asyncClick(v, supplier, handled));
+    }
+
+    /**
+     * 给view设置点击事件，并处理点击事件（主线程执行）
+     * @param view     view
+     * @param supplier 执行逻辑
+     */
+    public static void onAsyncClick(View view, Supplier<String> supplier) {
+        view.setOnClickListener(v -> asyncClick(v, supplier));
+    }
+
+    /**
+     * 给view设置点击弹确认框事件
+     * @param view     view
+     * @param title    标题
+     * @param content  内容
+     * @param supplier 处理逻辑
+     */
+    public static void onPopConfirm(View view, String title, String content, Supplier<String> supplier) {
+        onClick(view, () -> PopUtil.confirmAsync(view.getContext(), title, content, supplier));
+    }
+
+    /**
      * 点击处理（主线程执行）
      * @param view     view
      * @param runnable 执行逻辑
      */
-    public static void doClick(View view, Runnable runnable) {
+    public static void click(View view, Runnable runnable) {
+        click(view, runnable, () -> {
+        });
+    }
+
+    /**
+     * 点击处理（主线程执行）
+     * @param view     view
+     * @param runnable 执行逻辑
+     * @param handled  执行完毕后下一步执行
+     */
+    public static void click(View view, Runnable runnable, Runnable handled) {
         // 设置view不可点击
         try {
             view.setClickable(false);
@@ -41,6 +101,7 @@ public class ClickUtil {
                 throw new Warn("点击过于频繁");
             }
             runnable.run();
+            handled.run();
         } catch (Warn e) {
             // 弹出提示
             PopUtil.alert(view.getContext(), e.getMessage());
@@ -54,15 +115,6 @@ public class ClickUtil {
             // 上次点击时间重置
             millis = System.currentTimeMillis();
         }
-    }
-
-    /**
-     * 给view设置点击事件，并处理点击事件（主线程执行）
-     * @param view     view
-     * @param supplier 执行逻辑
-     */
-    public static void onAsyncClick(View view, Supplier<String> supplier) {
-        view.setOnClickListener(v -> asyncClick(v, supplier));
     }
 
     /**
@@ -100,8 +152,9 @@ public class ClickUtil {
             String message = msg.getData().getString("data");
             if (message != null) {
                 PopUtil.alert(view.getContext(), message);
+            } else {
+                handled.run();
             }
-            handled.run();
             return false;
         });
         new Thread(() -> {
@@ -117,6 +170,8 @@ public class ClickUtil {
                     // 有处理结果信息则提示
                     handler.sendMessage(message(s));
                 }
+                // 通知执行后续步骤
+                handler.sendMessage(new Message());
             } catch (Warn e) {
                 // 进行消息提示
                 handler.sendMessage(message(e.getMessage()));
@@ -127,8 +182,6 @@ public class ClickUtil {
             } finally {
                 view.setClickable(true);
                 VIEW_TIME_MAP.remove(view);
-                // 通知执行后续步骤
-                handler.sendMessage(new Message());
             }
         }).start();
     }

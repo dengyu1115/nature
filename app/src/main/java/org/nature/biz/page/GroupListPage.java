@@ -15,7 +15,6 @@ import org.nature.common.util.PopUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.ExcelView;
 import org.nature.common.view.SearchBar;
-import org.nature.common.view.ViewTemplate;
 
 import java.util.Arrays;
 import java.util.List;
