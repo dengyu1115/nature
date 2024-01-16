@@ -44,6 +44,10 @@ public interface Const {
      */
     String FORMAT_DATE = "yyyy-MM-dd";
     /**
+     * 格式化：月-日
+     */
+    String FORMAT_MONTH_DAY = "MM-dd";
+    /**
      * 格式化：年月日时分秒
      */
     String FORMAT_DATETIME = "yyyy-MM-dd HH:mm:ss";

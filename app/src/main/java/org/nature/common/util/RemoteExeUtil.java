@@ -56,6 +56,14 @@ public class RemoteExeUtil {
     }
 
     /**
+     * 提交任务
+     * @param runnable 执行逻辑
+     */
+    public static void submit(Runnable runnable) {
+        EXECUTOR.submit(runnable);
+    }
+
+    /**
      * 执行处理
      * @param run   执行逻辑
      * @param i     待处理数据

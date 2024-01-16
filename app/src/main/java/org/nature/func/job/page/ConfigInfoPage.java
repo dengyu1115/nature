@@ -11,6 +11,7 @@ import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.ioc.holder.JobHolder;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.CommonUtil;
+import org.nature.common.util.Md5Util;
 import org.nature.common.util.PopUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.ExcelView;
@@ -26,6 +27,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * 任务配置
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/10
+ */
 @PageView(name = "任务配置", group = "基础", col = 2, row = 1)
 @SuppressLint("DefaultLocale")
 public class ConfigInfoPage extends ListPage<ConfigInfo> {
@@ -34,20 +41,20 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
     private ConfigInfoManager configInfoManager;
     private Button start, stop, add;
     private LinearLayout editPop;
-    private Selector<String> jobSel, typeSel, statusSel, unitSel;
-    private Button startBtn, endBtn;
-    private EditText period;
+    private Selector<String> jobSel, typeSel, statusSel;
+    private EditText year, month, day, hour, minute, second;
 
     private final List<ExcelView.D<ConfigInfo>> DS = Arrays.asList(
             ExcelView.row("", C, Arrays.asList(
                     ExcelView.row("名称", d -> JobHolder.getName(d.getCode()), C, S, CommonUtil.nullsLast(d -> JobHolder.getName(d.getCode()))),
                     ExcelView.row("编号", d -> TextUtil.text(d.getCode()), C, C, CommonUtil.nullsLast(ConfigInfo::getCode)))
             ),
-            ExcelView.row("类型", d -> Type.name(d.getType()), C, C, CommonUtil.nullsLast(ConfigInfo::getType)),
-            ExcelView.row("开始时间", d -> TextUtil.text(d.getStartTime()), C, C, CommonUtil.nullsLast(ConfigInfo::getStartTime)),
-            ExcelView.row("结束时间", d -> TextUtil.text(d.getEndTime()), C, C, CommonUtil.nullsLast(ConfigInfo::getEndTime)),
-            ExcelView.row("间隔", d -> TextUtil.text(d.getPeriod()), C, C, CommonUtil.nullsLast(ConfigInfo::getPeriod)),
-            ExcelView.row("单位", d -> Type.name(d.getUnit()), C, C, CommonUtil.nullsLast(ConfigInfo::getUnit)),
+            ExcelView.row("年", d -> TextUtil.text(d.getYear()), C, C, CommonUtil.nullsLast(ConfigInfo::getYear)),
+            ExcelView.row("月", d -> TextUtil.text(d.getMonth()), C, C, CommonUtil.nullsLast(ConfigInfo::getMonth)),
+            ExcelView.row("日", d -> TextUtil.text(d.getDay()), C, C, CommonUtil.nullsLast(ConfigInfo::getDay)),
+            ExcelView.row("时", d -> TextUtil.text(d.getHour()), C, C, CommonUtil.nullsLast(ConfigInfo::getHour)),
+            ExcelView.row("分", d -> TextUtil.text(d.getMinute()), C, C, CommonUtil.nullsLast(ConfigInfo::getMinute)),
+            ExcelView.row("秒", d -> TextUtil.text(d.getSecond()), C, C, CommonUtil.nullsLast(ConfigInfo::getSecond)),
             ExcelView.row("状态", d -> TextUtil.text(d.getStatus()), C, C, CommonUtil.nullsLast(ConfigInfo::getStatus)),
             ExcelView.row("编辑", d -> "+", C, C, this.edit()),
             ExcelView.row("删除", d -> "-", C, C, this.delete())
@@ -79,6 +86,9 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         add.setOnClickListener(i -> this.add());
     }
 
+    /**
+     * 构建弹窗
+     */
     private void makeWindowStructure() {
         editPop = template.linearPage();
         editPop.setGravity(Gravity.CENTER);
@@ -89,24 +99,28 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         LinearLayout l5 = template.line(300, 30);
         LinearLayout l6 = template.line(300, 30);
         LinearLayout l7 = template.line(300, 30);
+        LinearLayout l8 = template.line(300, 30);
+        LinearLayout l9 = template.line(300, 30);
         l1.addView(template.textView("任务：", 100, 30));
         l1.addView(jobSel = template.selector(200, 30));
         l2.addView(template.textView("类型：", 100, 30));
         l2.addView(typeSel = template.selector(200, 30));
-        l3.addView(template.textView("开始时间：", 100, 30));
-        l3.addView(startBtn = template.timePiker(200, 30));
-        l4.addView(template.textView("开始时间：", 100, 30));
-        l4.addView(endBtn = template.timePiker(200, 30));
-        l5.addView(template.textView("间隔：", 100, 30));
-        l5.addView(period = template.numeric(200, 30));
-        l6.addView(template.textView("单位：", 100, 30));
-        l6.addView(unitSel = template.selector(200, 30));
-        l7.addView(template.textView("状态：", 100, 30));
-        l7.addView(statusSel = template.selector(200, 30));
+        l3.addView(template.textView("年：", 100, 30));
+        l3.addView(year = template.editText(200, 30));
+        l4.addView(template.textView("月：", 100, 30));
+        l4.addView(month = template.editText(200, 30));
+        l5.addView(template.textView("日：", 100, 30));
+        l5.addView(day = template.editText(200, 30));
+        l6.addView(template.textView("时：", 100, 30));
+        l6.addView(hour = template.editText(200, 30));
+        l7.addView(template.textView("分：", 100, 30));
+        l7.addView(minute = template.editText(200, 30));
+        l8.addView(template.textView("秒：", 100, 30));
+        l8.addView(second = template.editText(200, 30));
+        l9.addView(template.textView("状态：", 100, 30));
+        l9.addView(statusSel = template.selector(200, 30));
         jobSel.mapper(JobHolder::getName).init().refreshData(JobHolder.jobs());
-        unitSel.mapper(Type::name).init();
-        typeSel.mapper(Type::name).onChangeRun(() -> unitSel.refreshData(Type.units(typeSel.getValue())))
-                .init().refreshData(Type.codes());
+        typeSel.mapper(Type::name).init().refreshData(Type.codes());
         statusSel.mapper(Status::name).init().refreshData(Status.codes());
         editPop.addView(l1);
         editPop.addView(l2);
@@ -115,23 +129,43 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         editPop.addView(l5);
         editPop.addView(l6);
         editPop.addView(l7);
+        editPop.addView(l8);
+        editPop.addView(l9);
     }
 
+    /**
+     * 添加操作
+     */
     private void add() {
         this.makeWindowStructure();
         PopUtil.confirm(context, "新增", editPop, () -> this.doEdit(configInfoManager::save));
     }
 
+    /**
+     * 编辑操作
+     * @return 操作逻辑
+     */
     private Consumer<ConfigInfo> edit() {
         return d -> {
             this.makeWindowStructure();
             this.jobSel.setValue(d.getCode());
             this.typeSel.setValue(d.getType());
+            this.year.setText(d.getYear());
+            this.month.setText(d.getMonth());
+            this.day.setText(d.getDay());
+            this.hour.setText(d.getHour());
+            this.minute.setText(d.getMinute());
+            this.second.setText(d.getSecond());
+            this.statusSel.setValue(d.getStatus());
             String name = JobHolder.getName(d.getCode());
             PopUtil.confirm(context, "编辑-" + name, editPop, () -> this.doEdit(configInfoManager::edit));
         };
     }
 
+    /**
+     * 删除操作
+     * @return 操作逻辑
+     */
     private Consumer<ConfigInfo> delete() {
         return d -> {
             String name = JobHolder.getName(d.getCode());
@@ -143,8 +177,13 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         };
     }
 
+    /**
+     * 编辑
+     * @param consumer 处理逻辑
+     */
     private void doEdit(Consumer<ConfigInfo> consumer) {
         String code = this.jobSel.getValue();
+
         if (code == null) {
             throw new RuntimeException("请选择任务");
         }
@@ -156,18 +195,23 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         if (status.isEmpty()) {
             throw new RuntimeException("请选择状态");
         }
-        String startTime = this.startBtn.getText().toString();
-        String endTime = this.endBtn.getText().toString();
-        Integer period = Integer.parseInt(this.period.getText().toString());
-        String unit = this.unitSel.getValue();
+        String year = this.year.getText().toString();
+        String month = this.month.getText().toString();
+        String day = this.day.getText().toString();
+        String hour = this.hour.getText().toString();
+        String minute = this.minute.getText().toString();
+        String second = this.second.getText().toString();
         ConfigInfo d = new ConfigInfo();
         d.setCode(code);
         d.setType(type);
-        d.setStartTime(startTime);
-        d.setEndTime(endTime);
-        d.setPeriod(period);
-        d.setUnit(unit);
         d.setStatus(status);
+        d.setYear(year);
+        d.setMonth(month);
+        d.setDay(day);
+        d.setHour(hour);
+        d.setMinute(minute);
+        d.setSecond(second);
+        d.setSignature(Md5Util.md5(code, type, year, month, day, hour, minute, second));
         consumer.accept(d);
         this.refreshData();
         PopUtil.alert(context, "编辑成功！");

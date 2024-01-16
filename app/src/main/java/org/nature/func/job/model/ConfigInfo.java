@@ -14,11 +14,14 @@ public class ConfigInfo extends BaseModel {
     @Id(order = 1)
     private String code;
     @Id(order = 2)
+    private String signature;
     private String type;
-    private String startTime;
-    private String endTime;
-    private Integer period;
-    private String unit;
+    private String year;
+    private String month;
+    private String day;
+    private String hour;
+    private String minute;
+    private String second;
     private String status;
 
 }

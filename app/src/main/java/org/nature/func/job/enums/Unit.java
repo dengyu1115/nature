@@ -11,18 +11,21 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Getter
-public enum Type {
+public enum Unit {
 
-    ONCE("0", "一次"),
-    REPEAT("1", "重复");
+    SECOND("1", "秒"),
+    MINUTE("2", "分"),
+    HOUR("3", "时"),
+    DAY("4", "日"),
+    MONTH("5", "月");
 
     private final String code;
     private final String name;
 
     private static final Map<String, String> CODE_NAME = Arrays.stream(values())
-            .collect(Collectors.toMap(Type::getCode, Type::getName));
+            .collect(Collectors.toMap(Unit::getCode, Unit::getName));
 
-    private static final List<String> CODES = Arrays.stream(values()).map(Type::getCode)
+    private static final List<String> CODES = Arrays.stream(values()).map(Unit::getCode)
             .collect(Collectors.toList());
 
     public static String name(String code) {
@@ -30,7 +33,7 @@ public enum Type {
     }
 
     public static List<String> codes() {
-        return CODES;
+        return new ArrayList<>(CODES);
     }
 
 }

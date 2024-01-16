@@ -73,10 +73,10 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.R)
+    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
     private void verifyStoragePermissions(Activity activity) {
         // 检测是否有写的权限
-        int permission = ActivityCompat.checkSelfPermission(activity, WRITE_EXTERNAL_STORAGE);
+        int permission = ActivityCompat.checkSelfPermission(activity, MANAGE_EXTERNAL_STORAGE);
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // 没有写的权限，去申请写的权限，会弹出对话框
             String[] permissions = {MANAGE_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE};

@@ -5,8 +5,11 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.speech.tts.TextToSpeech;
 import androidx.core.app.NotificationCompat;
 import org.nature.R;
+
+import java.util.Locale;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
@@ -44,6 +47,8 @@ public class NotifyUtil {
      */
     private static NotificationManager manager;
 
+    private static TextToSpeech tts;
+
     /**
      * 初始化
      * @param context 安卓上下文
@@ -56,6 +61,14 @@ public class NotifyUtil {
             throw new RuntimeException("there is no notification manager");
         }
         NotifyUtil.manager.createNotificationChannel(NotifyUtil.channel);
+        NotifyUtil.tts = new TextToSpeech(context, status -> {
+            if (status == TextToSpeech.SUCCESS) {
+                int result = tts.setLanguage(Locale.CHINA);
+                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    throw new RuntimeException("init tts failed");
+                }
+            }
+        });
     }
 
     /**
@@ -65,6 +78,24 @@ public class NotifyUtil {
      */
     public static void notify(String title, String content) {
         NotifyUtil.manager.notify(NOTIFICATION_ID, NotifyUtil.notification(title, content));
+    }
+
+    /**
+     * 通知
+     * @param id      id
+     * @param title   标题
+     * @param content 内容
+     */
+    public static void notify(int id, String title, String content) {
+        NotifyUtil.manager.notify(id, NotifyUtil.notification(title, content));
+    }
+
+    /**
+     * 语音提示
+     * @param text 文本
+     */
+    public static void speak(String text) {
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
     }
 
     /**

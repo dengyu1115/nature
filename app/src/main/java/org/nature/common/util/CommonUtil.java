@@ -29,6 +29,10 @@ public class CommonUtil {
         return DateFormatUtils.format(new Date(), Const.FORMAT_DAY);
     }
 
+    public static String now() {
+        return DateFormatUtils.format(new Date(), Const.FORMAT_DATETIME);
+    }
+
     public static String addDays(String date, int days) {
         Date parseDate = parseDate(date, Const.FORMAT_DAY);
         Date resultDate = DateUtils.addDays(parseDate, days);

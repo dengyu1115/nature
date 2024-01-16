@@ -17,7 +17,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-
+/**
+ * 下拉选择器
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/14
+ */
 public class Selector<T> extends BasicView {
 
     private final Context context;
@@ -80,7 +85,7 @@ public class Selector<T> extends BasicView {
     }
 
     @SuppressWarnings("unchecked")
-    @SuppressLint("ResourceAsColor")
+    @SuppressLint({"ResourceAsColor", "UseCompatLoadingForDrawables"})
     private void makeStructure() {
         Drawable drawable = context.getDrawable(R.drawable.common_background);
         popupWindow = new PopupWindow(context);

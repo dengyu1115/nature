@@ -9,7 +9,9 @@ import android.os.PowerManager;
 import androidx.annotation.Nullable;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.nature.common.constant.Const;
+import org.nature.common.ioc.holder.InstanceHolder;
 import org.nature.common.util.NotifyUtil;
+import org.nature.func.job.manager.ExecManager;
 
 import java.util.Date;
 import java.util.concurrent.ScheduledExecutorService;
@@ -29,6 +31,9 @@ public class JobService extends Service {
      * 执行间隔
      */
     private static final int PERIOD = 1000;
+    /**
+     * 计数器
+     */
     private static final AtomicInteger counter = new AtomicInteger();
     /**
      * 定时器
@@ -54,7 +59,7 @@ public class JobService extends Service {
                 return;
             }
         }
-        this.getService().scheduleAtFixedRate(this.task(), this.calculateDelay(), PERIOD, TimeUnit.MILLISECONDS);
+        this.getService().scheduleAtFixedRate(this::task, this.calculateDelay(), PERIOD, TimeUnit.MILLISECONDS);
     }
 
     @Nullable
@@ -89,7 +94,7 @@ public class JobService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        this.stopForeground(true);
+        this.stopForeground(STOP_FOREGROUND_REMOVE);
         this.releaseWakeLock();
         service.shutdown();
         service = null;
@@ -112,19 +117,19 @@ public class JobService extends Service {
 
     /**
      * 定时任务执行的逻辑
-     * @return TimerTask
      */
-    private Runnable task() {
-        return () -> {
-            try {
-                String date = DateFormatUtils.format(new Date(), Const.FORMAT_DATETIME);
-                String s = String.format("%s:%s", date, counter.incrementAndGet());
-                NotifyUtil.notify("NATURE正在运行", s);
-//                service.execute(taskManager::execute);
-            } catch (Exception e) {
-                e.printStackTrace();
+    private void task() {
+        try {
+            String date = DateFormatUtils.format(new Date(), Const.FORMAT_DATETIME);
+            String s = String.format("%s:%s", date, counter.incrementAndGet());
+            NotifyUtil.notify("NATURE正在运行", s);
+            ExecManager execManager = InstanceHolder.get(ExecManager.class);
+            if (execManager != null) {
+                execManager.exec();
             }
-        };
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -143,6 +148,7 @@ public class JobService extends Service {
      */
     private void releaseWakeLock() {
         wl.release();
+        wl = null;
     }
 
 }

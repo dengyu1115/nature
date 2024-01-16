@@ -17,6 +17,7 @@ import org.nature.common.util.CommonUtil;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 
 public class ViewTemplate {
 
@@ -136,6 +137,18 @@ public class ViewTemplate {
         return page;
     }
 
+    public LinearLayout checkbox(Map<String, String> map) {
+        LinearLayout page = new LinearLayout(context);
+        page.setOrientation(LinearLayout.VERTICAL);
+        map.forEach((k, v) -> {
+            CheckBox checkBox = new CheckBox(context);
+            checkBox.setHint(k);
+            checkBox.setText(v);
+            page.addView(checkBox);
+        });
+        return page;
+    }
+
     public Button radio(String name, int w, int h) {
         Button button = this.button(name, w, h);
         button.setTextColor(Color.DKGRAY);
@@ -156,10 +169,10 @@ public class ViewTemplate {
             Calendar c = Calendar.getInstance();
             c.setTime(date);
             @SuppressLint("ResourceType")
-            DatePickerDialog datePicker = new DatePickerDialog(context, 3,
+            DatePickerDialog picker = new DatePickerDialog(context, 3,
                     (view, year, month, dayOfMonth) -> button.setText(this.getDate(view)),
                     c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
-            datePicker.show();
+            picker.show();
         });
         button.setOnLongClickListener(v -> {
             button.setText("");
@@ -168,7 +181,7 @@ public class ViewTemplate {
         return button;
     }
 
-    public Button timePiker(int w,int h) {
+    public Button timePiker(int w, int h) {
         Button button = this.button(w, h);
         button.setOnClickListener(l -> {
             String s = button.getText().toString();
@@ -176,10 +189,10 @@ public class ViewTemplate {
             Calendar c = Calendar.getInstance();
             c.setTime(date);
             @SuppressLint("ResourceType")
-            TimePickerDialog datePicker = new TimePickerDialog(context, 3,
+            TimePickerDialog picker = new TimePickerDialog(context, 3,
                     (view, hour, min) -> button.setText(this.getTime(view)),
                     c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true);
-            datePicker.show();
+            picker.show();
         });
         button.setOnLongClickListener(v -> {
             button.setText("");

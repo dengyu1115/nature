@@ -19,10 +19,7 @@ public class ConfigInfoManager {
     }
 
     public void edit(ConfigInfo d) {
-        ConfigInfo exists = configInfoMapper.findById(d);
-        if (exists == null) {
-            throw new Warn("数据不存在");
-        }
+        // 更新数据
         configInfoMapper.merge(d);
     }
 
