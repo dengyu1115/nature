@@ -128,6 +128,8 @@ public class HoldListPage extends ListPage<Hold> {
             return "请选择";
         }).init().refreshData(Arrays.asList("0", "1", "2"));
         countSel.mapper(Object::toString).init().refreshData(Arrays.asList(1, 2, 3, 4, 5));
+        // 默认展示3条
+        countSel.setValue(3);
         countSel.setVisibility("0".equals(typeSel.getValue()) ? GONE : VISIBLE);
         typeSel.onChangeRun(() -> countSel.setVisibility("0".equals(typeSel.getValue()) ? GONE : VISIBLE));
     }

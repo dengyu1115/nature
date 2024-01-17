@@ -14,7 +14,7 @@ import java.math.BigDecimal;
  * @version 1.0.0
  * @since 2024/1/6
  */
-@Model(db = "nature/biz.db", table = "hold", recreate = true)
+@Model(db = "nature/biz.db", table = "hold")
 @Getter
 @Setter
 public class Hold extends BaseModel {

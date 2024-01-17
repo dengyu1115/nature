@@ -46,7 +46,9 @@ public class NotifyUtil {
      * 消息发送管理器
      */
     private static NotificationManager manager;
-
+    /**
+     * TTS语音处理
+     */
     private static TextToSpeech tts;
 
     /**
