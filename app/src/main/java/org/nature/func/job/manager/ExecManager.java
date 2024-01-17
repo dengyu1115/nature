@@ -4,6 +4,7 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.holder.JobHolder;
+import org.nature.common.util.NotifyUtil;
 import org.nature.common.util.RemoteExeUtil;
 import org.nature.func.job.enums.Status;
 import org.nature.func.job.mapper.ConfigInfoMapper;
@@ -57,14 +58,30 @@ public class ExecManager {
             if (!this.meet(i, year, month, day, hour, minute, second)) {
                 continue;
             }
-            // 执行任务
-            Job job = JobHolder.get(i.getCode());
-            if (job != null) {
-                job.exec(null);
+            try {
+                // 执行任务
+                Job job = JobHolder.get(i.getCode());
+                if (job != null) {
+                    job.exec(null);
+                }
+            } catch (Exception e) {
+                // 执行异常，发送通知
+                NotifyUtil.notifyOne("定时任务执行异常", e.getMessage());
             }
         }
     }
 
+    /**
+     * 判断是否满足执行条件
+     * @param info   任务配置数据
+     * @param year   年
+     * @param month  月
+     * @param day    日
+     * @param hour   时
+     * @param minute 分
+     * @param second 秒
+     * @return boolean
+     */
     private boolean meet(ConfigInfo info, String year, String month, String day, String hour, String minute, String second) {
         if (!this.meet(info.getYear(), year)) {
             return false;
@@ -84,6 +101,12 @@ public class ExecManager {
         return this.meet(info.getSecond(), second);
     }
 
+    /**
+     * 判断是否满足执行条件
+     * @param condition 条件
+     * @param time      时间
+     * @return boolean
+     */
     private boolean meet(String condition, String time) {
         String[] split = condition.split(":");
         String type = split[0];

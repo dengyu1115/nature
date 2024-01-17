@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat;
 import org.nature.R;
 
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
@@ -50,6 +51,10 @@ public class NotifyUtil {
      * TTS语音处理
      */
     private static TextToSpeech tts;
+    /**
+     * ID计数器
+     */
+    private static AtomicInteger counter;
 
     /**
      * 初始化
@@ -71,6 +76,7 @@ public class NotifyUtil {
                 }
             }
         });
+        counter = new AtomicInteger(1);
     }
 
     /**
@@ -84,12 +90,11 @@ public class NotifyUtil {
 
     /**
      * 通知
-     * @param id      id
      * @param title   标题
      * @param content 内容
      */
-    public static void notify(int id, String title, String content) {
-        NotifyUtil.manager.notify(id, NotifyUtil.notification(title, content));
+    public static void notifyOne(String title, String content) {
+        NotifyUtil.manager.notify(counter.incrementAndGet(), NotifyUtil.notification(title, content));
     }
 
     /**

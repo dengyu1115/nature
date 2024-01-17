@@ -18,7 +18,6 @@ import org.nature.common.view.ExcelView;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
 import org.nature.func.job.enums.Status;
-import org.nature.func.job.enums.Type;
 import org.nature.func.job.manager.ConfigInfoManager;
 import org.nature.func.job.model.ConfigInfo;
 import org.nature.func.job.service.JobService;
@@ -41,7 +40,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
     private ConfigInfoManager configInfoManager;
     private Button start, stop, add;
     private LinearLayout editPop;
-    private Selector<String> jobSel, typeSel, statusSel;
+    private Selector<String> jobSel, statusSel;
     private EditText year, month, day, hour, minute, second;
 
     private final List<ExcelView.D<ConfigInfo>> DS = Arrays.asList(
@@ -100,27 +99,23 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         LinearLayout l6 = template.line(300, 30);
         LinearLayout l7 = template.line(300, 30);
         LinearLayout l8 = template.line(300, 30);
-        LinearLayout l9 = template.line(300, 30);
         l1.addView(template.textView("任务：", 100, 30));
         l1.addView(jobSel = template.selector(200, 30));
-        l2.addView(template.textView("类型：", 100, 30));
-        l2.addView(typeSel = template.selector(200, 30));
-        l3.addView(template.textView("年：", 100, 30));
-        l3.addView(year = template.editText(200, 30));
-        l4.addView(template.textView("月：", 100, 30));
-        l4.addView(month = template.editText(200, 30));
-        l5.addView(template.textView("日：", 100, 30));
-        l5.addView(day = template.editText(200, 30));
-        l6.addView(template.textView("时：", 100, 30));
-        l6.addView(hour = template.editText(200, 30));
-        l7.addView(template.textView("分：", 100, 30));
-        l7.addView(minute = template.editText(200, 30));
-        l8.addView(template.textView("秒：", 100, 30));
-        l8.addView(second = template.editText(200, 30));
-        l9.addView(template.textView("状态：", 100, 30));
-        l9.addView(statusSel = template.selector(200, 30));
+        l2.addView(template.textView("年：", 100, 30));
+        l2.addView(year = template.editText(200, 30));
+        l3.addView(template.textView("月：", 100, 30));
+        l3.addView(month = template.editText(200, 30));
+        l4.addView(template.textView("日：", 100, 30));
+        l4.addView(day = template.editText(200, 30));
+        l5.addView(template.textView("时：", 100, 30));
+        l5.addView(hour = template.editText(200, 30));
+        l6.addView(template.textView("分：", 100, 30));
+        l6.addView(minute = template.editText(200, 30));
+        l7.addView(template.textView("秒：", 100, 30));
+        l7.addView(second = template.editText(200, 30));
+        l8.addView(template.textView("状态：", 100, 30));
+        l8.addView(statusSel = template.selector(200, 30));
         jobSel.mapper(JobHolder::getName).init().refreshData(JobHolder.jobs());
-        typeSel.mapper(Type::name).init().refreshData(Type.codes());
         statusSel.mapper(Status::name).init().refreshData(Status.codes());
         editPop.addView(l1);
         editPop.addView(l2);
@@ -130,7 +125,6 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         editPop.addView(l6);
         editPop.addView(l7);
         editPop.addView(l8);
-        editPop.addView(l9);
     }
 
     /**
@@ -149,7 +143,6 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         return d -> {
             this.makeWindowStructure();
             this.jobSel.setValue(d.getCode());
-            this.typeSel.setValue(d.getType());
             this.year.setText(d.getYear());
             this.month.setText(d.getMonth());
             this.day.setText(d.getDay());
@@ -187,10 +180,6 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         if (code == null) {
             throw new RuntimeException("请选择任务");
         }
-        String type = this.typeSel.getValue();
-        if (type.isEmpty()) {
-            throw new RuntimeException("请选择类型");
-        }
         String status = this.statusSel.getValue();
         if (status.isEmpty()) {
             throw new RuntimeException("请选择状态");
@@ -203,7 +192,6 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         String second = this.second.getText().toString();
         ConfigInfo d = new ConfigInfo();
         d.setCode(code);
-        d.setType(type);
         d.setStatus(status);
         d.setYear(year);
         d.setMonth(month);
@@ -211,7 +199,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         d.setHour(hour);
         d.setMinute(minute);
         d.setSecond(second);
-        d.setSignature(Md5Util.md5(code, type, year, month, day, hour, minute, second));
+        d.setSignature(Md5Util.md5(code, year, month, day, hour, minute, second));
         consumer.accept(d);
         this.refreshData();
         PopUtil.alert(context, "编辑成功！");

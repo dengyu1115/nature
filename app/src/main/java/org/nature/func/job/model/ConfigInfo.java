@@ -15,7 +15,6 @@ public class ConfigInfo extends BaseModel {
     private String code;
     @Id(order = 2)
     private String signature;
-    private String type;
     private String year;
     private String month;
     private String day;
