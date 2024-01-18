@@ -2,6 +2,7 @@ package org.nature.biz.manager;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.nature.biz.http.KlineHttp;
+import org.nature.biz.mapper.KlineMapper;
 import org.nature.biz.mapper.RuleMapper;
 import org.nature.biz.model.Hold;
 import org.nature.biz.model.Item;
@@ -27,6 +28,8 @@ public class RuleManager {
 
     @Injection
     private RuleMapper ruleMapper;
+    @Injection
+    private KlineMapper klineMapper;
     @Injection
     private KlineHttp klineHttp;
 
@@ -96,8 +99,7 @@ public class RuleManager {
             String[] split = i.getKey().split(":");
             String code = split[0];
             String type = split[1];
-            // 查询K线数据
-            List<Kline> list = klineHttp.list(code, type, "", date);
+            List<Kline> list = this.listKline(code, type, date);
             for (Rule rule : i.getValue()) {
                 // 按规则计算最新操作数据
                 holds.addAll(this.latestHandle(rule, list));
@@ -128,7 +130,7 @@ public class RuleManager {
             String code = split[0];
             String type = split[1];
             // 查询K线数据
-            List<Kline> list = klineHttp.list(code, type, "", date);
+            List<Kline> list = this.listKline(code, type, date);
             for (Rule rule : i.getValue()) {
                 // 按规则计算预计操作数据
                 holds.addAll(this.nextHandle(rule, list, count));
@@ -178,6 +180,37 @@ public class RuleManager {
      */
     public List<Rule> listValid() {
         return ruleMapper.listAll().stream().filter(i -> "1".equals(i.getStatus())).collect(Collectors.toList());
+    }
+
+    /**
+     * 查询K线数据
+     * @param code code
+     * @param type 类型
+     * @param date 日期
+     * @return list
+     */
+    private List<Kline> listKline(String code, String type, String date) {
+        // 查询K线数据
+        List<Kline> kList = klineMapper.listByItem(code, type);
+        // 移除比当前日期大的数据
+        kList.removeIf(k -> k.getDate().compareTo(date) > 0);
+        // 按日期排序
+        kList.sort(Comparator.comparing(Kline::getDate));
+        // 计算开始日期
+        String start = "";
+        if (!kList.isEmpty()) {
+            Kline kline = kList.get(0);
+            // 如果有当天的数据移除掉，开始日期取当天
+            if (kline.getDate().equals(date)) {
+                kList.remove(0);
+                start = date;
+            }
+        }
+        // 网络查询最新K线数据
+        List<Kline> list = klineHttp.list(code, type, start, date);
+        // 库中数据和网络数据合并
+        kList.addAll(list);
+        return kList;
     }
 
 }
