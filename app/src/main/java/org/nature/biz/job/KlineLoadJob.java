@@ -3,6 +3,7 @@ package org.nature.biz.job;
 import org.nature.biz.manager.KlineManager;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.JobExec;
+import org.nature.common.util.NotifyUtil;
 import org.nature.func.job.protocol.Job;
 
 /**
@@ -19,7 +20,8 @@ public class KlineLoadJob implements Job {
 
     @Override
     public void exec(String param) {
-        klineManager.load();
+        int load = klineManager.load();
+        NotifyUtil.notifyOne("K线加载", "K线加载完成，共加载" + load + "条数据");
     }
 
 }

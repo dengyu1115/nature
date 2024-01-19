@@ -193,16 +193,17 @@ public class RuleManager {
         // 查询K线数据
         List<Kline> kList = klineMapper.listByItem(code, type);
         // 移除比当前日期大的数据
-        kList.removeIf(k -> k.getDate().compareTo(date) > 0);
+        kList.removeIf(i -> i.getDate().compareTo(date) > 0);
         // 按日期排序
         kList.sort(Comparator.comparing(Kline::getDate));
         // 计算开始日期
         String start = "";
         if (!kList.isEmpty()) {
-            Kline kline = kList.get(0);
+            int index = kList.size() - 1;
+            Kline kline = kList.get(index);
             // 如果有当天的数据移除掉，开始日期取当天
             if (kline.getDate().equals(date)) {
-                kList.remove(0);
+                kList.remove(index);
                 start = date;
             }
         }

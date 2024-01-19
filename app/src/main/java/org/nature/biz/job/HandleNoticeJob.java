@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 public class HandleNoticeJob implements Job {
 
     public static final BigDecimal HUNDRED = new BigDecimal("100");
+
     @Injection
     private RuleManager ruleManager;
     @Injection
@@ -35,6 +36,9 @@ public class HandleNoticeJob implements Job {
     @Injection
     private WorkdayManager workdayManager;
 
+    /**
+     * 已操作数据记录map
+     */
     private static final Map<String, Set<String>> MAP = new HashMap<>();
 
     @Override
@@ -104,8 +108,13 @@ public class HandleNoticeJob implements Job {
         Map<BigDecimal, BigDecimal> priceShare = map.computeIfAbsent(itemKey, k -> new HashMap<>())
                 .computeIfAbsent(handleKey, k -> new HashMap<>());
         // 相同价格的份额累加
-        BigDecimal decimal = priceShare.computeIfAbsent(price, k -> BigDecimal.ZERO);
-        priceShare.put(price, decimal.add(share));
+        BigDecimal decimal = priceShare.get(price);
+        if (decimal == null) {
+            decimal = share;
+        } else {
+            decimal = decimal.add(share);
+        }
+        priceShare.put(price, decimal);
     }
 
     /**
@@ -166,7 +175,7 @@ public class HandleNoticeJob implements Job {
      * @return String
      */
     private String key(Hold i) {
-        return Md5Util.md5(i.getCode(), i.getType(), i.getRule(), i.getLevel() + "");
+        return Md5Util.md5(i.getCode(), i.getType(), i.getRule(), i.getDateBuy(), i.getLevel() + "");
     }
 
 }
