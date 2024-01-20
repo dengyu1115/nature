@@ -14,11 +14,11 @@ import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.CommonUtil;
+import org.nature.common.util.DateUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.ExcelView;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
+import org.nature.common.view.TableView;
 
 import java.util.*;
 import java.util.function.Function;
@@ -41,31 +41,31 @@ public class ProfitListPage extends ListPage<Profit> {
     private Button dateStart, dateEnd, item, rule, total;
     private Selector<String> dateRule;
 
-    private final List<ExcelView.D<Profit>> ds = Arrays.asList(
-            ExcelView.row("", C, Arrays.asList(
-                    ExcelView.row("项目", d -> TextUtil.text(d.getName()), C, S, CommonUtil.nullsLast(Profit::getName)),
-                    ExcelView.row("规则", d -> TextUtil.text(d.getRule()), C, S, CommonUtil.nullsLast(Profit::getRule)))
+    private final List<TableView.D<Profit>> ds = Arrays.asList(
+            TableView.row("", C, Arrays.asList(
+                    TableView.row("项目", d -> TextUtil.text(d.getName()), C, S, Profit::getName),
+                    TableView.row("规则", d -> TextUtil.text(d.getRule()), C, S, Profit::getRule))
             ),
-            ExcelView.row("日期", C, Arrays.asList(
-                    ExcelView.row("开始", d -> TextUtil.text(d.getDateStart()), C, C, CommonUtil.nullsLast(Profit::getDateStart)),
-                    ExcelView.row("结束", d -> TextUtil.text(d.getDateEnd()), C, C, CommonUtil.nullsLast(Profit::getDateEnd)))
+            TableView.row("日期", C, Arrays.asList(
+                    TableView.row("开始", d -> TextUtil.text(d.getDateStart()), C, C, Profit::getDateStart),
+                    TableView.row("结束", d -> TextUtil.text(d.getDateEnd()), C, C, Profit::getDateEnd))
             ),
-            ExcelView.row("操作次数", C, Arrays.asList(
-                    ExcelView.row("买入", d -> TextUtil.text(d.getTimesBuy()), C, C, CommonUtil.nullsLast(Profit::getTimesBuy)),
-                    ExcelView.row("卖出", d -> TextUtil.text(d.getTimesSell()), C, C, CommonUtil.nullsLast(Profit::getTimesSell)))
+            TableView.row("操作次数", C, Arrays.asList(
+                    TableView.row("买入", d -> TextUtil.text(d.getTimesBuy()), C, C, Profit::getTimesBuy),
+                    TableView.row("卖出", d -> TextUtil.text(d.getTimesSell()), C, C, Profit::getTimesSell))
             ),
-            ExcelView.row("份额", d -> TextUtil.amount(d.getShareTotal()), C, E, CommonUtil.nullsLast(Profit::getShareTotal)),
-            ExcelView.row("资金", C, Arrays.asList(
-                    ExcelView.row("投入-最大", d -> TextUtil.amount(d.getPaidMax()), C, E, CommonUtil.nullsLast(Profit::getPaidMax)),
-                    ExcelView.row("投入-持有", d -> TextUtil.amount(d.getPaidLeft()), C, E, CommonUtil.nullsLast(Profit::getPaidTotal)),
-                    ExcelView.row("投入-总额", d -> TextUtil.amount(d.getPaidTotal()), C, E, CommonUtil.nullsLast(Profit::getTimesSell)),
-                    ExcelView.row("回收-总额", d -> TextUtil.amount(d.getReturned()), C, E, CommonUtil.nullsLast(Profit::getReturned)))
+            TableView.row("份额", d -> TextUtil.amount(d.getShareTotal()), C, E, Profit::getShareTotal),
+            TableView.row("资金", C, Arrays.asList(
+                    TableView.row("投入-最大", d -> TextUtil.amount(d.getPaidMax()), C, E, Profit::getPaidMax),
+                    TableView.row("投入-持有", d -> TextUtil.amount(d.getPaidLeft()), C, E, Profit::getPaidTotal),
+                    TableView.row("投入-总额", d -> TextUtil.amount(d.getPaidTotal()), C, E, Profit::getTimesSell),
+                    TableView.row("回收-总额", d -> TextUtil.amount(d.getReturned()), C, E, Profit::getReturned))
             ),
-            ExcelView.row("收益", C, Arrays.asList(
-                    ExcelView.row("已卖出", d -> TextUtil.amount(d.getProfitSold()), C, E, CommonUtil.nullsLast(Profit::getProfitSold)),
-                    ExcelView.row("持有中", d -> TextUtil.amount(d.getProfitHold()), C, E, CommonUtil.nullsLast(Profit::getProfitHold)),
-                    ExcelView.row("卖出+持有", d -> TextUtil.amount(d.getProfitTotal()), C, E, CommonUtil.nullsLast(Profit::getProfitTotal)),
-                    ExcelView.row("卖出/最大", d -> TextUtil.hundred(d.getProfitRatio()), C, E, CommonUtil.nullsLast(Profit::getProfitRatio)))
+            TableView.row("收益", C, Arrays.asList(
+                    TableView.row("已卖出", d -> TextUtil.amount(d.getProfitSold()), C, E, Profit::getProfitSold),
+                    TableView.row("持有中", d -> TextUtil.amount(d.getProfitHold()), C, E, Profit::getProfitHold),
+                    TableView.row("卖出+持有", d -> TextUtil.amount(d.getProfitTotal()), C, E, Profit::getProfitTotal),
+                    TableView.row("卖出/最大", d -> TextUtil.hundred(d.getProfitRatio()), C, E, Profit::getProfitRatio))
             )
     );
 
@@ -81,7 +81,7 @@ public class ProfitListPage extends ListPage<Profit> {
     private Map<String, String> nameMap;
 
     @Override
-    protected List<ExcelView.D<Profit>> define() {
+    protected List<TableView.D<Profit>> define() {
         return ds;
     }
 
@@ -165,7 +165,7 @@ public class ProfitListPage extends ListPage<Profit> {
     }
 
     private List<String> buildDates(String dateRule) {
-        String today = CommonUtil.today();
+        String today = DateUtil.today();
         String dateEnd = this.dateEnd.getText().toString();
         if ("".equals(dateRule)) {
             if (StringUtils.isBlank(dateEnd)) {
@@ -189,7 +189,7 @@ public class ProfitListPage extends ListPage<Profit> {
         List<String> dates = new LinkedList<>();
         if ("1".equals(dateRule)) {
             for (int i = 0; i < 32; i++) {
-                dates.add(0, CommonUtil.addDays(today, -i));
+                dates.add(0, DateUtil.addDays(today, -i));
             }
             return dates;
         }
@@ -200,7 +200,7 @@ public class ProfitListPage extends ListPage<Profit> {
                 date = DateUtils.addWeeks(date, -1);
                 calendar.setTime(date);
                 calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-                dates.add(0, CommonUtil.formatDay(calendar.getTime()));
+                dates.add(0, DateUtil.formatDay(calendar.getTime()));
             }
             return dates;
         }
@@ -210,7 +210,7 @@ public class ProfitListPage extends ListPage<Profit> {
                 date = DateUtils.addMonths(date, -1);
                 calendar.setTime(date);
                 calendar.set(Calendar.DAY_OF_MONTH, 0);
-                dates.add(0, CommonUtil.formatDay(calendar.getTime()));
+                dates.add(0, DateUtil.formatDay(calendar.getTime()));
             }
             return dates;
         }
@@ -220,7 +220,7 @@ public class ProfitListPage extends ListPage<Profit> {
                 date = DateUtils.addYears(date, -1);
                 calendar.setTime(date);
                 calendar.set(Calendar.DAY_OF_YEAR, 0);
-                dates.add(0, CommonUtil.formatDay(calendar.getTime()));
+                dates.add(0, DateUtil.formatDay(calendar.getTime()));
             }
             return dates;
         }

@@ -14,11 +14,8 @@ import org.nature.biz.model.Item;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.ClickUtil;
-import org.nature.common.util.CommonUtil;
-import org.nature.common.util.PopUtil;
-import org.nature.common.util.TextUtil;
-import org.nature.common.view.ExcelView;
+import org.nature.common.util.*;
+import org.nature.common.view.TableView;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
 
@@ -82,23 +79,23 @@ public class ItemListPage extends ListPage<Item> {
     /**
      * 表头
      */
-    private final List<ExcelView.D<Item>> ds = Arrays.asList(
-            ExcelView.row("", C, Arrays.asList(
-                    ExcelView.row("名称", d -> TextUtil.text(d.getName()), C, S, CommonUtil.nullsLast(Item::getName)),
-                    ExcelView.row("编号", d -> TextUtil.text(d.getCode()), C, C, CommonUtil.nullsLast(Item::getCode)))
+    private final List<TableView.D<Item>> ds = Arrays.asList(
+            TableView.row("", C, Arrays.asList(
+                    TableView.row("名称", d -> TextUtil.text(d.getName()), C, S, Item::getName),
+                    TableView.row("编号", d -> TextUtil.text(d.getCode()), C, C, Item::getCode))
             ),
-            ExcelView.row("类型", d -> TextUtil.text(d.getType()), C, C, CommonUtil.nullsLast(Item::getType)),
-            ExcelView.row("分组", d -> TextUtil.text(groupMap.get(d.getGroup())), C, C, CommonUtil.nullsLast(d -> groupMap.get(d.getGroup()))),
-            ExcelView.row("编辑", d -> "+", C, C, this.edit()),
-            ExcelView.row("删除", d -> "-", C, C, this.delete()),
-            ExcelView.row("K线加载", d -> "加载", C, C, this.loadKline()),
-            ExcelView.row("K线重载", d -> "加载", C, C, this.reloadKline()),
-            ExcelView.row("K线查看", d -> "查看", C, C, this.showKline()),
-            ExcelView.row("规则查看", d -> "查看", C, C, this.showRule())
+            TableView.row("类型", d -> TextUtil.text(d.getType()), C, C, Item::getType),
+            TableView.row("分组", d -> TextUtil.text(groupMap.get(d.getGroup())), C, C, Sorter.nullsLast(d -> groupMap.get(d.getGroup()))),
+            TableView.row("编辑", d -> "+", C, C, this.edit()),
+            TableView.row("删除", d -> "-", C, C, this.delete()),
+            TableView.row("K线加载", d -> "加载", C, C, this.loadKline()),
+            TableView.row("K线重载", d -> "加载", C, C, this.reloadKline()),
+            TableView.row("K线查看", d -> "查看", C, C, this.showKline()),
+            TableView.row("规则查看", d -> "查看", C, C, this.showRule())
     );
 
     @Override
-    protected List<ExcelView.D<Item>> define() {
+    protected List<TableView.D<Item>> define() {
         return ds;
     }
 

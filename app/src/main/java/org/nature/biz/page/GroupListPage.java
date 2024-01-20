@@ -10,11 +10,10 @@ import org.nature.biz.model.Group;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.CommonUtil;
 import org.nature.common.util.PopUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.ExcelView;
 import org.nature.common.view.SearchBar;
+import org.nature.common.view.TableView;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,15 +37,15 @@ public class GroupListPage extends ListPage<Group> {
     private EditText code, name;
     private Button add;
 
-    private final List<ExcelView.D<Group>> ds = Arrays.asList(
-            ExcelView.row("名称", d -> TextUtil.text(d.getName()), C, S, CommonUtil.nullsLast(Group::getName)),
-            ExcelView.row("code", d -> TextUtil.text(d.getCode()), C, C, CommonUtil.nullsLast(Group::getCode)),
-            ExcelView.row("编辑", d -> "+", C, C, this.edit()),
-            ExcelView.row("删除", d -> "-", C, C, this.delete())
+    private final List<TableView.D<Group>> ds = Arrays.asList(
+            TableView.row("名称", d -> TextUtil.text(d.getName()), C, S, Group::getName),
+            TableView.row("code", d -> TextUtil.text(d.getCode()), C, C, Group::getCode),
+            TableView.row("编辑", d -> "+", C, C, this.edit()),
+            TableView.row("删除", d -> "-", C, C, this.delete())
     );
 
     @Override
-    protected List<ExcelView.D<Group>> define() {
+    protected List<TableView.D<Group>> define() {
         return ds;
     }
 

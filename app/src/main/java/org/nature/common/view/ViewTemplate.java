@@ -13,7 +13,7 @@ import android.widget.*;
 import android.widget.LinearLayout.LayoutParams;
 import org.nature.R;
 import org.nature.common.constant.Const;
-import org.nature.common.util.CommonUtil;
+import org.nature.common.util.DateUtil;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -165,7 +165,7 @@ public class ViewTemplate {
         Button button = this.button(w, h);
         button.setOnClickListener(l -> {
             String s = button.getText().toString();
-            Date date = s.isEmpty() ? new Date() : CommonUtil.parseDate(s, Const.FORMAT_DAY);
+            Date date = s.isEmpty() ? new Date() : DateUtil.parseDate(s, Const.FORMAT_DAY);
             Calendar c = Calendar.getInstance();
             c.setTime(date);
             @SuppressLint("ResourceType")
@@ -185,7 +185,7 @@ public class ViewTemplate {
         Button button = this.button(w, h);
         button.setOnClickListener(l -> {
             String s = button.getText().toString();
-            Date date = s.isEmpty() ? new Date() : CommonUtil.parseDate(s, Const.FORMAT_TIME);
+            Date date = s.isEmpty() ? new Date() : DateUtil.parseDate(s, Const.FORMAT_TIME);
             Calendar c = Calendar.getInstance();
             c.setTime(date);
             @SuppressLint("ResourceType")

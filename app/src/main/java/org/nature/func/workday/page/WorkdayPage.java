@@ -11,10 +11,8 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.ClickUtil;
-import org.nature.common.util.CommonUtil;
-import org.nature.common.util.PopUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.ExcelView;
+import org.nature.common.view.TableView;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
 import org.nature.func.workday.manager.WorkdayManager;
@@ -46,12 +44,12 @@ public class WorkdayPage extends ListPage<Month> {
     private Selector<String> year;
 
     @Override
-    protected List<ExcelView.D<Month>> define() {
-        List<ExcelView.D<Month>> ds = new ArrayList<>();
-        ds.add(ExcelView.row("月份", i -> TextUtil.text(i.getMonth()), C, C, CommonUtil.nullsLast(Month::getMonth)));
+    protected List<TableView.D<Month>> define() {
+        List<TableView.D<Month>> ds = new ArrayList<>();
+        ds.add(TableView.row("月份", i -> TextUtil.text(i.getMonth()), C, C, Month::getMonth));
         for (int i = 1; i < 32; i++) {
             String day = String.format("%02d", i);
-            ds.add(ExcelView.row(day, d -> TextUtil.text(this.getDateType(d, day)), C, C));
+            ds.add(TableView.row(day, d -> TextUtil.text(this.getDateType(d, day)), C, C));
         }
         return ds;
     }

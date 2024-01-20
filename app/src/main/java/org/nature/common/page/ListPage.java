@@ -11,7 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import org.apache.commons.lang3.StringUtils;
 import org.nature.common.util.PopUtil;
-import org.nature.common.view.ExcelView;
+import org.nature.common.view.TableView;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.ViewTemplate;
 
@@ -28,7 +28,7 @@ public abstract class ListPage<T> extends Page {
     protected Context context;
     protected ViewTemplate template;
     private LinearLayout page;
-    private ExcelView<T> excel;
+    private TableView<T> excel;
     private Button button;
     private TextView total;
     private final Handler handler = new Handler(msg -> {
@@ -95,7 +95,7 @@ public abstract class ListPage<T> extends Page {
         LinearLayout body = new LinearLayout(context);
         page.addView(body);
         body.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, height - (int) (60 * density)));
-        this.excel = new ExcelView<>(context, this.getExcelColumns());
+        this.excel = new TableView<>(context, this.getExcelColumns());
         body.addView(this.excel);
     }
 
@@ -152,7 +152,7 @@ public abstract class ListPage<T> extends Page {
      * 表格定义
      * @return 表格定义信息
      */
-    protected abstract List<ExcelView.D<T>> define();
+    protected abstract List<TableView.D<T>> define();
 
     /**
      * 查询数据

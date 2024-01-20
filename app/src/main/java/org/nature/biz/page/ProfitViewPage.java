@@ -7,9 +7,9 @@ import org.nature.biz.model.Rule;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.CommonUtil;
+import org.nature.common.util.DateUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.ExcelView;
+import org.nature.common.view.TableView;
 import org.nature.common.view.SearchBar;
 
 import java.util.Arrays;
@@ -27,20 +27,20 @@ public class ProfitViewPage extends ListPage<ProfitView> {
     @Injection
     private ProfitManager profitManager;
 
-    private final List<ExcelView.D<ProfitView>> ds = Arrays.asList(
-            ExcelView.row("项目", d -> TextUtil.text(d.getTitle()), C, C),
-            ExcelView.row("子项目1", d -> TextUtil.text(d.getTitle1()), C, C),
-            ExcelView.row("值", d -> TextUtil.text(d.getValue1()), C, E),
-            ExcelView.row("子项目2", d -> TextUtil.text(d.getTitle2()), C, C),
-            ExcelView.row("值", d -> TextUtil.text(d.getValue2()), C, E),
-            ExcelView.row("子项目3", d -> TextUtil.text(d.getTitle3()), C, C),
-            ExcelView.row("值", d -> TextUtil.text(d.getValue3()), C, E)
+    private final List<TableView.D<ProfitView>> ds = Arrays.asList(
+            TableView.row("项目", d -> TextUtil.text(d.getTitle()), C, C),
+            TableView.row("子项目1", d -> TextUtil.text(d.getTitle1()), C, C),
+            TableView.row("值", d -> TextUtil.text(d.getValue1()), C, E),
+            TableView.row("子项目2", d -> TextUtil.text(d.getTitle2()), C, C),
+            TableView.row("值", d -> TextUtil.text(d.getValue2()), C, E),
+            TableView.row("子项目3", d -> TextUtil.text(d.getTitle3()), C, C),
+            TableView.row("值", d -> TextUtil.text(d.getValue3()), C, E)
     );
 
     private Button dateBtn;
 
     @Override
-    protected List<ExcelView.D<ProfitView>> define() {
+    protected List<TableView.D<ProfitView>> define() {
         return ds;
     }
 
@@ -49,7 +49,7 @@ public class ProfitViewPage extends ListPage<ProfitView> {
         Rule rule = this.getParam();
         String date = this.dateBtn.getText().toString();
         if ("".equals(date)) {
-            date = CommonUtil.today();
+            date = DateUtil.today();
         }
         if (rule == null) {
             return profitManager.view(date);

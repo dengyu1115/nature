@@ -9,7 +9,7 @@ import org.nature.biz.model.Item;
 import org.nature.biz.model.Kline;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
-import org.nature.common.util.CommonUtil;
+import org.nature.common.util.DateUtil;
 import org.nature.common.util.RemoteExeUtil;
 
 import java.util.Date;
@@ -102,7 +102,7 @@ public class KlineManager {
      * @return String
      */
     private String getLastDate(Kline kline) {
-        return kline == null ? "" : CommonUtil.addDays(kline.getDate(), 1).replace("-", "");
+        return kline == null ? "" : DateUtil.addDays(kline.getDate(), 1).replace("-", "");
     }
 
 }

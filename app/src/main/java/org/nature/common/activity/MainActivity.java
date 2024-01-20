@@ -14,7 +14,6 @@ import org.nature.common.ioc.starter.ComponentStarter;
 import org.nature.common.page.BasicPage;
 import org.nature.common.page.MainPage;
 import org.nature.common.util.NotifyUtil;
-import org.nature.common.util.ViewUtil;
 
 import static android.Manifest.permission.*;
 
@@ -39,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         // 初始化处理
-        ViewUtil.initActivity(this);
         super.onCreate(savedInstanceState);
         //  请求全局存储权限
         this.verifyStoragePermissions(this);
@@ -73,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    @RequiresApi(api = Build.VERSION_CODES.R)
     private void verifyStoragePermissions(Activity activity) {
         // 检测是否有写的权限
         int permission = ActivityCompat.checkSelfPermission(activity, MANAGE_EXTERNAL_STORAGE);

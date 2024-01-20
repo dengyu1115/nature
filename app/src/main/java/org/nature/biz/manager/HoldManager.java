@@ -10,7 +10,7 @@ import org.nature.biz.simulator.Simulator;
 import org.nature.biz.simulator.SimulatorBuilder;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
-import org.nature.common.util.CommonUtil;
+import org.nature.common.util.DateUtil;
 import org.nature.common.util.RemoteExeUtil;
 
 import java.util.Collections;
@@ -54,7 +54,7 @@ public class HoldManager {
         // 按时间正序排序
         list.sort(Comparator.comparing(Kline::getDate));
         // 创建模拟器
-        Simulator simulator = SimulatorBuilder.instance(rule, list, Collections.singletonList(CommonUtil.today()));
+        Simulator simulator = SimulatorBuilder.instance(rule, list, Collections.singletonList(DateUtil.today()));
         // 计算
         simulator.calc();
         // 获取持有数据

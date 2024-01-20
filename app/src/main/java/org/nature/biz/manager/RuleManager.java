@@ -10,9 +10,10 @@ import org.nature.biz.model.Kline;
 import org.nature.biz.model.Rule;
 import org.nature.biz.simulator.Simulator;
 import org.nature.biz.simulator.SimulatorBuilder;
+import org.nature.common.constant.Const;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
-import org.nature.common.util.CommonUtil;
+import org.nature.common.util.DateUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -91,9 +92,9 @@ public class RuleManager {
         }
         // 按项目分组
         Map<String, List<Rule>> map = rules.stream()
-                .collect(Collectors.groupingBy(i -> String.join(":", i.getCode(), i.getType())));
+                .collect(Collectors.groupingBy(i -> String.join(Const.DELIMITER, i.getCode(), i.getType())));
         // 当前日期
-        String date = DateFormatUtils.format(new Date(), "yyyyMMdd");
+        String date = DateFormatUtils.format(new Date(), Const.FORMAT_DAY);
         List<Hold> holds = new ArrayList<>();
         for (Map.Entry<String, List<Rule>> i : map.entrySet()) {
             String[] split = i.getKey().split(":");
@@ -147,7 +148,7 @@ public class RuleManager {
      */
     public List<Hold> latestHandle(Rule rule, List<Kline> list) {
         list.sort(Comparator.comparing(Kline::getDate));
-        Simulator simulator = SimulatorBuilder.instance(rule, list, Collections.singletonList(CommonUtil.today()));
+        Simulator simulator = SimulatorBuilder.instance(rule, list, Collections.singletonList(DateUtil.today()));
         simulator.calc();
         List<Hold> holds = simulator.latestHandle();
         for (Hold i : holds) {
@@ -165,7 +166,7 @@ public class RuleManager {
      */
     public List<Hold> nextHandle(Rule rule, List<Kline> list, int count) {
         list.sort(Comparator.comparing(Kline::getDate));
-        Simulator simulator = SimulatorBuilder.instance(rule, list, Collections.singletonList(CommonUtil.today()));
+        Simulator simulator = SimulatorBuilder.instance(rule, list, Collections.singletonList(DateUtil.today()));
         simulator.calc();
         List<Hold> holds = simulator.nextHandle(count);
         for (Hold i : holds) {
@@ -201,10 +202,13 @@ public class RuleManager {
         if (!kList.isEmpty()) {
             int index = kList.size() - 1;
             Kline kline = kList.get(index);
-            // 如果有当天的数据移除掉，开始日期取当天
-            if (kline.getDate().equals(date)) {
+            String lastDate = kline.getDate();
+            if (lastDate.compareTo(date) == 0) {
+                // 如果有当天的数据移除掉，开始日期取当天
                 kList.remove(index);
                 start = date;
+            } else {
+                start = DateUtil.addDays(lastDate, 1);
             }
         }
         // 网络查询最新K线数据

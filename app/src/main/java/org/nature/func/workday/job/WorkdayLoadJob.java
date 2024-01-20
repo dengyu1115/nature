@@ -17,7 +17,7 @@ import java.util.Date;
  * @version 1.0.0
  * @since 2024/1/7
  */
-@JobExec(code = "workday_load_job", name = "K线加载")
+@JobExec(code = "workday_load_job", name = "工作日加载")
 public class WorkdayLoadJob implements Job {
 
     @Injection

@@ -7,7 +7,7 @@ import org.nature.biz.model.Item;
 import org.nature.common.constant.Const;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.JobExec;
-import org.nature.common.util.CommonUtil;
+import org.nature.common.util.DateUtil;
 import org.nature.common.util.Md5Util;
 import org.nature.common.util.NotifyUtil;
 import org.nature.func.job.protocol.Job;
@@ -50,7 +50,7 @@ public class HandleNoticeJob implements Job {
         // 查询最新操作数据
         List<Hold> holds = ruleManager.latestHandle();
         // 转换买入、卖出数据
-        String today = CommonUtil.today();
+        String today = DateUtil.today();
         String keyBuy = today + ":buy";
         String keySell = today + ":sell";
         Set<String> buyExists = MAP.computeIfAbsent(keyBuy, k -> new HashSet<>());

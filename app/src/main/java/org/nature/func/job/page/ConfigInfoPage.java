@@ -10,11 +10,8 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.ioc.holder.JobHolder;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.CommonUtil;
-import org.nature.common.util.Md5Util;
-import org.nature.common.util.PopUtil;
-import org.nature.common.util.TextUtil;
-import org.nature.common.view.ExcelView;
+import org.nature.common.util.*;
+import org.nature.common.view.TableView;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
 import org.nature.func.job.enums.Status;
@@ -43,24 +40,24 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
     private Selector<String> jobSel, statusSel;
     private EditText year, month, day, hour, minute, second;
 
-    private final List<ExcelView.D<ConfigInfo>> DS = Arrays.asList(
-            ExcelView.row("", C, Arrays.asList(
-                    ExcelView.row("名称", d -> JobHolder.getName(d.getCode()), C, S, CommonUtil.nullsLast(d -> JobHolder.getName(d.getCode()))),
-                    ExcelView.row("编号", d -> TextUtil.text(d.getCode()), C, C, CommonUtil.nullsLast(ConfigInfo::getCode)))
+    private final List<TableView.D<ConfigInfo>> DS = Arrays.asList(
+            TableView.row("", C, Arrays.asList(
+                    TableView.row("名称", d -> JobHolder.getName(d.getCode()), C, S, Sorter.nullsLast(d -> JobHolder.getName(d.getCode()))),
+                    TableView.row("编号", d -> TextUtil.text(d.getCode()), C, C, ConfigInfo::getCode))
             ),
-            ExcelView.row("年", d -> TextUtil.text(d.getYear()), C, C, CommonUtil.nullsLast(ConfigInfo::getYear)),
-            ExcelView.row("月", d -> TextUtil.text(d.getMonth()), C, C, CommonUtil.nullsLast(ConfigInfo::getMonth)),
-            ExcelView.row("日", d -> TextUtil.text(d.getDay()), C, C, CommonUtil.nullsLast(ConfigInfo::getDay)),
-            ExcelView.row("时", d -> TextUtil.text(d.getHour()), C, C, CommonUtil.nullsLast(ConfigInfo::getHour)),
-            ExcelView.row("分", d -> TextUtil.text(d.getMinute()), C, C, CommonUtil.nullsLast(ConfigInfo::getMinute)),
-            ExcelView.row("秒", d -> TextUtil.text(d.getSecond()), C, C, CommonUtil.nullsLast(ConfigInfo::getSecond)),
-            ExcelView.row("状态", d -> TextUtil.text(d.getStatus()), C, C, CommonUtil.nullsLast(ConfigInfo::getStatus)),
-            ExcelView.row("编辑", d -> "+", C, C, this.edit()),
-            ExcelView.row("删除", d -> "-", C, C, this.delete())
+            TableView.row("年", d -> TextUtil.text(d.getYear()), C, C, ConfigInfo::getYear),
+            TableView.row("月", d -> TextUtil.text(d.getMonth()), C, C, ConfigInfo::getMonth),
+            TableView.row("日", d -> TextUtil.text(d.getDay()), C, C, ConfigInfo::getDay),
+            TableView.row("时", d -> TextUtil.text(d.getHour()), C, C, ConfigInfo::getHour),
+            TableView.row("分", d -> TextUtil.text(d.getMinute()), C, C, ConfigInfo::getMinute),
+            TableView.row("秒", d -> TextUtil.text(d.getSecond()), C, C, ConfigInfo::getSecond),
+            TableView.row("状态", d -> TextUtil.text(Status.name(d.getStatus())), C, C, ConfigInfo::getStatus),
+            TableView.row("编辑", d -> "+", C, C, this.edit()),
+            TableView.row("删除", d -> "-", C, C, this.delete())
     );
 
     @Override
-    protected List<ExcelView.D<ConfigInfo>> define() {
+    protected List<TableView.D<ConfigInfo>> define() {
         return DS;
     }
 

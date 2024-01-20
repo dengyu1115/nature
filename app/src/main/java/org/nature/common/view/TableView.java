@@ -13,6 +13,7 @@ import android.widget.*;
 import org.apache.commons.lang3.StringUtils;
 import org.nature.common.util.ClickUtil;
 import org.nature.common.util.PopUtil;
+import org.nature.common.util.Sorter;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -29,7 +30,7 @@ import static android.graphics.drawable.GradientDrawable.Orientation.RIGHT_LEFT;
  * @since 2024/1/5
  */
 @SuppressLint("DefaultLocale")
-public class ExcelView<T> extends BasicView {
+public class TableView<T> extends BasicView {
 
     public static final int HEIGHT = 33;
     public static final int PADDING = 8;
@@ -58,15 +59,15 @@ public class ExcelView<T> extends BasicView {
     private float clickX, clickY;
     private int titleGroup, titleCol;
 
-    public ExcelView(Context context) {
+    public TableView(Context context) {
         this(context, 3);
     }
 
-    public ExcelView(Context context, int columns) {
+    public TableView(Context context, int columns) {
         this(context, columns, 1);
     }
 
-    public ExcelView(Context context, int columns, float widthRate) {
+    public TableView(Context context, int columns, float widthRate) {
         super(context);
         this.widthRate = widthRate;
         this.context = context;
@@ -226,7 +227,7 @@ public class ExcelView<T> extends BasicView {
             if (action == MotionEvent.ACTION_DOWN) { // 手指点下时候事件处理
                 clickX = event.getX();
                 clickY = event.getY();
-                synchronized (ExcelView.this) {
+                synchronized (TableView.this) {
                     canceled.set(true);
                     if (touchView != null) {
                         touchView.fling(0);
@@ -240,7 +241,7 @@ public class ExcelView<T> extends BasicView {
                 this.sortClick(v);
                 this.sortClicked = false;
             } else if (action != MotionEvent.ACTION_MOVE) { // 其他非移动情况处理
-                synchronized (ExcelView.this) {
+                synchronized (TableView.this) {
                     canceled.set(false);
                     if (running.get()) return false;
                     Timer timer = new Timer();
@@ -260,7 +261,7 @@ public class ExcelView<T> extends BasicView {
         return new TimerTask() {
             @Override
             public void run() {
-                synchronized (ExcelView.this) {
+                synchronized (TableView.this) {
                     if (canceled.get()) {
                         timer.cancel();
                         running.set(false);
@@ -475,6 +476,11 @@ public class ExcelView<T> extends BasicView {
 
     public static <T> D<T> row(String title, Function<T, String> content, int titleAlign, int contentAlign) {
         return new D<>(title, content, titleAlign, contentAlign, null, null, null);
+    }
+
+    public static <T, U extends Comparable<? super U>> D<T> row(String title, Function<T, String> content, int titleAlign,
+                                                                int contentAlign, Function<T, U> sort) {
+        return new D<>(title, content, titleAlign, contentAlign, Sorter.nullsLast(sort), null, null);
     }
 
     public static <T> D<T> row(String title, Function<T, String> content, int titleAlign, int contentAlign,

@@ -7,10 +7,9 @@ import org.nature.biz.model.Kline;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.CommonUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.ExcelView;
 import org.nature.common.view.SearchBar;
+import org.nature.common.view.TableView;
 
 import java.util.Arrays;
 import java.util.List;
@@ -29,19 +28,19 @@ public class KlineListPage extends ListPage<Kline> {
 
     private Button chart;
 
-    private final List<ExcelView.D<Kline>> ds = Arrays.asList(
-            ExcelView.row("CODE", d -> TextUtil.text(d.getCode()), C, S, CommonUtil.nullsLast(Kline::getCode)),
-            ExcelView.row("日期", d -> TextUtil.text(d.getDate()), C, S, CommonUtil.nullsLast(Kline::getDate)),
-            ExcelView.row("交易量", d -> TextUtil.amount(d.getShare()), C, E, CommonUtil.nullsLast(Kline::getShare)),
-            ExcelView.row("交易额", d -> TextUtil.amount(d.getAmount()), C, E, CommonUtil.nullsLast(Kline::getAmount)),
-            ExcelView.row("最新", d -> TextUtil.price(d.getLatest()), C, E, CommonUtil.nullsLast(Kline::getLatest)),
-            ExcelView.row("今开", d -> TextUtil.price(d.getOpen()), C, E, CommonUtil.nullsLast(Kline::getOpen)),
-            ExcelView.row("最高", d -> TextUtil.price(d.getHigh()), C, E, CommonUtil.nullsLast(Kline::getHigh)),
-            ExcelView.row("最低", d -> TextUtil.price(d.getLow()), C, E, CommonUtil.nullsLast(Kline::getLow))
+    private final List<TableView.D<Kline>> ds = Arrays.asList(
+            TableView.row("CODE", d -> TextUtil.text(d.getCode()), C, S, Kline::getCode),
+            TableView.row("日期", d -> TextUtil.text(d.getDate()), C, S, Kline::getDate),
+            TableView.row("交易量", d -> TextUtil.amount(d.getShare()), C, E, Kline::getShare),
+            TableView.row("交易额", d -> TextUtil.amount(d.getAmount()), C, E, Kline::getAmount),
+            TableView.row("最新", d -> TextUtil.price(d.getLatest()), C, E, Kline::getLatest),
+            TableView.row("今开", d -> TextUtil.price(d.getOpen()), C, E, Kline::getOpen),
+            TableView.row("最高", d -> TextUtil.price(d.getHigh()), C, E, Kline::getHigh),
+            TableView.row("最低", d -> TextUtil.price(d.getLow()), C, E, Kline::getLow)
     );
 
     @Override
-    protected List<ExcelView.D<Kline>> define() {
+    protected List<TableView.D<Kline>> define() {
         return ds;
     }
 

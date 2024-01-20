@@ -5,7 +5,7 @@ import org.nature.biz.model.Hold;
 import org.nature.biz.model.Kline;
 import org.nature.biz.model.Profit;
 import org.nature.common.exception.Warn;
-import org.nature.common.util.CommonUtil;
+import org.nature.common.util.DateUtil;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -118,7 +118,9 @@ public class GridSimulator implements Simulator {
     }
 
     public List<Hold> latestHandle() {
+        // 最新日期
         String date = this.curr.getDate();
+        // 取最新日期的操作数据
         return holdList.stream().filter(i -> date.equals(i.getDateBuy()) || date.equals(i.getDateSell()))
                 .collect(Collectors.toList());
     }
@@ -138,7 +140,7 @@ public class GridSimulator implements Simulator {
         }
         int i = Math.min(holds.size(), count);
         for (Hold hold : holds.subList(0, i)) {
-            hold.setDateSell(CommonUtil.today());
+            hold.setDateSell(DateUtil.today());
             hold.setPriceSell(hold.getMark().multiply(percentSell).setScale(SCALE, RoundingMode.CEILING));
             hold.setProfit(hold.getPriceSell().subtract(hold.getPriceBuy()).multiply(hold.getShareBuy()));
             results.add(hold);
@@ -340,7 +342,7 @@ public class GridSimulator implements Simulator {
         hold.setType(curr.getType());
         hold.setMark(price);
         hold.setPriceBuy(price);
-        hold.setDateBuy(CommonUtil.today());
+        hold.setDateBuy(DateUtil.today());
         hold.setShareBuy(this.calcShare(price));
         return hold;
     }

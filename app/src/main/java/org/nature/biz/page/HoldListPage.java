@@ -9,11 +9,10 @@ import org.nature.biz.model.Rule;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.CommonUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.ExcelView;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
+import org.nature.common.view.TableView;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -46,28 +45,28 @@ public class HoldListPage extends ListPage<Hold> {
 
     private final Map<String, String> itemNameMap = new HashMap<>();
 
-    private final List<ExcelView.D<Hold>> ds = Arrays.asList(
-            ExcelView.row("", C, Arrays.asList(
-                    ExcelView.row("项目", d -> TextUtil.text(this.getItem(d)), C, S, CommonUtil.nullsLast(this::getItem)),
-                    ExcelView.row("规则", d -> TextUtil.text(d.getRule()), C, S, CommonUtil.nullsLast(Hold::getRule)),
-                    ExcelView.row("操作", d -> TextUtil.text(this.getHandle(d)), C, C, CommonUtil.nullsLast(this::getHandle)))
+    private final List<TableView.D<Hold>> ds = Arrays.asList(
+            TableView.row("", C, Arrays.asList(
+                    TableView.row("项目", d -> TextUtil.text(this.getItem(d)), C, S, this::getItem),
+                    TableView.row("规则", d -> TextUtil.text(d.getRule()), C, S, Hold::getRule),
+                    TableView.row("操作", d -> TextUtil.text(this.getHandle(d)), C, C, this::getHandle))
             ),
-            ExcelView.row("日期", C, Arrays.asList(
-                    ExcelView.row("买入", d -> TextUtil.text(d.getDateBuy()), C, S, CommonUtil.nullsLast(Hold::getDateBuy)),
-                    ExcelView.row("卖出", d -> TextUtil.text(d.getDateSell()), C, E, CommonUtil.nullsLast(Hold::getDateSell)))
+            TableView.row("日期", C, Arrays.asList(
+                    TableView.row("买入", d -> TextUtil.text(d.getDateBuy()), C, S, Hold::getDateBuy),
+                    TableView.row("卖出", d -> TextUtil.text(d.getDateSell()), C, E, Hold::getDateSell))
             ),
-            ExcelView.row("价格", C, Arrays.asList(
-                    ExcelView.row("标记", d -> TextUtil.price(d.getMark()), C, E, CommonUtil.nullsLast(Hold::getMark)),
-                    ExcelView.row("买入", d -> TextUtil.price(d.getPriceBuy()), C, E, CommonUtil.nullsLast(Hold::getPriceBuy)),
-                    ExcelView.row("卖出", d -> TextUtil.price(d.getPriceSell()), C, E, CommonUtil.nullsLast(Hold::getPriceSell)))
+            TableView.row("价格", C, Arrays.asList(
+                    TableView.row("标记", d -> TextUtil.price(d.getMark()), C, E, Hold::getMark),
+                    TableView.row("买入", d -> TextUtil.price(d.getPriceBuy()), C, E, Hold::getPriceBuy),
+                    TableView.row("卖出", d -> TextUtil.price(d.getPriceSell()), C, E, Hold::getPriceSell))
             ),
-            ExcelView.row("份额", d -> TextUtil.text(d.getShareBuy()), C, E, CommonUtil.nullsLast(Hold::getShareBuy)),
-            ExcelView.row("金额", d -> TextUtil.amount(this.getAmount(d)), C, E, CommonUtil.nullsLast(this::getAmount)),
-            ExcelView.row("盈利", d -> TextUtil.amount(d.getProfit()), C, E, CommonUtil.nullsLast(Hold::getProfit))
+            TableView.row("份额", d -> TextUtil.text(d.getShareBuy()), C, E, Hold::getShareBuy),
+            TableView.row("金额", d -> TextUtil.amount(this.getAmount(d)), C, E, this::getAmount),
+            TableView.row("盈利", d -> TextUtil.amount(d.getProfit()), C, E, Hold::getProfit)
     );
 
     @Override
-    protected List<ExcelView.D<Hold>> define() {
+    protected List<TableView.D<Hold>> define() {
         return ds;
     }
 
