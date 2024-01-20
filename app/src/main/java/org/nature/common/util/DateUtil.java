@@ -10,10 +10,10 @@ import java.util.Date;
 public class DateUtil {
 
     public static Date parseDate(String date) {
-        return parseDate(date, Const.FORMAT_DATE);
+        return parse(date, Const.FORMAT_DATE);
     }
 
-    public static Date parseDate(String date, String format) {
+    public static Date parse(String date, String format) {
         try {
             return DateUtils.parseDate(date, format);
         } catch (ParseException e) {
@@ -30,38 +30,28 @@ public class DateUtil {
     }
 
     public static String addDays(String date, int days) {
-        Date parseDate = parseDate(date, Const.FORMAT_DAY);
+        Date parseDate = parse(date, Const.FORMAT_DAY);
         Date resultDate = DateUtils.addDays(parseDate, days);
         return DateFormatUtils.format(resultDate, Const.FORMAT_DAY);
     }
 
     public static String addWeeks(String date, int weeks) {
-        Date parseDate = parseDate(date, Const.FORMAT_DATE);
+        Date parseDate = parse(date, Const.FORMAT_DATE);
         Date resultDate = DateUtils.addWeeks(parseDate, weeks);
         return DateFormatUtils.format(resultDate, Const.FORMAT_DATE);
     }
 
     public static String addMonths(String date, int months) {
-        Date parseDate = parseDate(date, Const.FORMAT_DATE);
+        Date parseDate = parse(date, Const.FORMAT_DATE);
         Date resultDate = DateUtils.addMonths(parseDate, months);
         return DateFormatUtils.format(resultDate, Const.FORMAT_DATE);
 
     }
 
     public static String addYears(String date, int years) {
-        Date parseDate = parseDate(date, Const.FORMAT_DATE);
+        Date parseDate = parse(date, Const.FORMAT_DATE);
         Date resultDate = DateUtils.addYears(parseDate, years);
         return DateFormatUtils.format(resultDate, Const.FORMAT_DATE);
-    }
-
-    public static int monthBefore(String date) {
-        Date from = parseDate(date, Const.FORMAT_DATE);
-        long diff = System.currentTimeMillis() - from.getTime();
-        return (int) (diff / 30 / 24 / 60 / 60 / 1000);
-    }
-
-    public static String formatDate(String date) {
-        return String.format("%s-%s-%s", date.substring(0, 4), date.substring(4, 6), date.substring(6, 8));
     }
 
     public static String formatDay(Date date) {
