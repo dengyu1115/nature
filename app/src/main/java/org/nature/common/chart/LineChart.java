@@ -1,4 +1,4 @@
-package org.nature.common.view;
+package org.nature.common.chart;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -7,25 +7,71 @@ import android.view.MotionEvent;
 import android.view.View;
 import org.nature.common.exception.Warn;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * 折线图
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/22
+ */
 public class LineChart<T> extends View {
 
+    /**
+     * 坐标：整图、图形框
+     */
     private final XY all, rect;
+    /**
+     * 画笔
+     */
     private final Paint paint;
+    /**
+     * 数据量：默认、最小、最大
+     */
     private int sizeDefault = 90, sizeMin = 30, sizeMax = 1800;
-    private int[] colors;
+    /**
+     * 指标数据集合
+     */
     private List<List<Q<T>>> qs;
-    private List<C<T>> rs;
+    /**
+     * 内容数据集合
+     */
+    private List<org.nature.common.chart.R<T>> rs;
+    /**
+     * X轴文案获取函数
+     */
     private Function<T, String> xText;
+    /**
+     * 空数据
+     */
     private T empty;
+    /**
+     * 数据：全部、展示
+     */
     private List<T> data, list;
+    /**
+     * 当前数据
+     */
     private T curr;
-    private List<String> dateTexts;
-    private int intervalDate, index, listSize = sizeDefault, listStart, listEnd;
-    private float unitDate, dx, lx, ly;
+    /**
+     * X轴文案集合
+     */
+    private List<String> xTexts;
+    /**
+     * X单位长度、下标、集合大小、展示开始下标、展示结束下标
+     */
+    private int intervalX, index, listSize = sizeDefault, listStart, listEnd;
+    /**
+     * X单位长度
+     */
+    private float unitX, dx, lx, ly;
+    /**
+     * 状态：长按、移动
+     */
     private boolean longPressed, moving;
 
     public LineChart(Context context) {
@@ -41,8 +87,7 @@ public class LineChart<T> extends View {
         this.sizeMax = sizeMax;
     }
 
-    public void init(int[] colors, List<List<Q<T>>> qs, List<C<T>> rs, Function<T, String> xText, T empty) {
-        this.colors = colors;
+    public void init(List<List<Q<T>>> qs, List<org.nature.common.chart.R<T>> rs, Function<T, String> xText, T empty) {
         this.qs = qs;
         this.rs = rs;
         this.xText = xText;
@@ -136,7 +181,7 @@ public class LineChart<T> extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        this.calculateParams(list);
+        this.calcParams(list);
         this.drawBase(canvas);
     }
 
@@ -204,10 +249,10 @@ public class LineChart<T> extends View {
 
     private void doMoveIndex(MotionEvent event) {
         float x = event.getX(), y = event.getY();
-        if (x < rect.sx - unitDate / 2f || x > rect.ex + unitDate / 2f || y < rect.sy || y > rect.ey) {
+        if (x < rect.sx - unitX / 2f || x > rect.ex + unitX / 2f || y < rect.sy || y > rect.ey) {
             return;
         }
-        int index = Math.round((x - rect.sx) / unitDate);
+        int index = Math.round((x - rect.sx) / unitX);
         if (this.index == index) {
             return;
         }
@@ -218,7 +263,7 @@ public class LineChart<T> extends View {
 
     private void doMoveList(MotionEvent event) {
         float x = event.getX(), y = event.getY();
-        if (x < rect.sx - unitDate / 2f || x > rect.ex + unitDate / 2f || y < rect.sy || y > rect.ey) {
+        if (x < rect.sx - unitX / 2f || x > rect.ex + unitX / 2f || y < rect.sy || y > rect.ey) {
             return;
         }
         float diff = x - this.lx;
@@ -266,23 +311,23 @@ public class LineChart<T> extends View {
         return (int) (this.listSize / (float) (this.rect.ex - this.rect.sx) * diff + 0.5f);
     }
 
-    private void calculateParams(List<T> data) {
-        this.calculateDateParams(data);
-        for (C<T> r : rs) {
+    private void calcParams(List<T> data) {
+        this.calcXParams(data);
+        for (org.nature.common.chart.R<T> r : rs) {
             r.calculate(data);
         }
     }
 
 
-    private void calculateDateParams(List<T> data) {
+    private void calcXParams(List<T> data) {
         List<String> dates = data.stream().map(this.xText).collect(Collectors.toList());
-        this.dateTexts = new ArrayList<>();
+        this.xTexts = new ArrayList<>();
         int size = dates.size();
         int middle = size % 2 == 0 ? size / 2 : size / 2 + 1;
         if (middle > size - 1) middle = size - 1;
-        this.dateTexts.addAll(Arrays.asList(dates.get(0), dates.get(middle), dates.get(size - 1)));
-        this.intervalDate = (int) ((rect.ex - rect.sx) / (double) (dateTexts.size() - 1) + 0.5d);
-        this.unitDate = (float) (rect.ex - rect.sx) / (data.size() - 1);
+        this.xTexts.addAll(Arrays.asList(dates.get(0), dates.get(middle), dates.get(size - 1)));
+        this.intervalX = (int) ((rect.ex - rect.sx) / (double) (xTexts.size() - 1) + 0.5d);
+        this.unitX = (float) (rect.ex - rect.sx) / (data.size() - 1);
     }
 
     private void fixAll() {
@@ -308,7 +353,7 @@ public class LineChart<T> extends View {
         rect.ey = (int) (all.sy / 20f + all.ey / 20f * 19f + 0.5f);
         double total = rs.stream().mapToDouble(d -> d.weight).sum();
         int unit = (int) ((rect.ey - rect.sy) / total + 0.5d);
-        C<T> r = rs.get(0);
+        org.nature.common.chart.R<T> r = rs.get(0);
         int sy = rect.sy, ey = sy;
         r.fix(sy, ey);
         for (int i = 0; i < rs.size() - 1; i++) {
@@ -355,7 +400,7 @@ public class LineChart<T> extends View {
         // x轴线
         canvas.drawLine(rect.sx, rect.ey, rect.ex, rect.ey, paint);
         for (int i = 1; i < rs.size(); i++) {
-            C<T> r = rs.get(i);
+            org.nature.common.chart.R<T> r = rs.get(i);
             canvas.drawLine(rect.sx, r.sy, rect.ex, r.sy, paint);
         }
         // y轴线
@@ -364,7 +409,7 @@ public class LineChart<T> extends View {
         canvas.drawLine(rect.ex, rect.sy, rect.ex, rect.ey, paint);
         // x轴刻度
         this.drawXIndex(canvas);
-        for (C<T> r : rs) {
+        for (org.nature.common.chart.R<T> r : rs) {
             // y轴刻度平线
             this.drawYIndexLine(canvas, r);
             this.drawYIndex(canvas, r);
@@ -379,7 +424,7 @@ public class LineChart<T> extends View {
         }
         paint.setColor(Color.DKGRAY);
         paint.setStyle(Paint.Style.STROKE);
-        for (C<T> r : rs) {
+        for (org.nature.common.chart.R<T> r : rs) {
             this.doDrawLine(canvas, r);
         }
     }
@@ -387,12 +432,12 @@ public class LineChart<T> extends View {
     private void drawXIndexLine(Canvas canvas) {
         paint.setColor(Color.DKGRAY);
         paint.setPathEffect(new DashPathEffect(new float[]{8, 10, 8, 10}, 0));
-        float x = rect.sx + index * unitDate;
+        float x = rect.sx + index * unitX;
         canvas.drawLine(x, rect.sy, x, rect.ey, paint);
         paint.setPathEffect(null);
     }
 
-    private void drawYIndex(Canvas canvas, C<T> r) {
+    private void drawYIndex(Canvas canvas, org.nature.common.chart.R<T> r) {
         paint.setColor(Color.BLACK);
         paint.setTextSize(20f);
         List<String> texts = r.texts;
@@ -415,19 +460,19 @@ public class LineChart<T> extends View {
         paint.setColor(Color.BLACK);
         paint.setTextSize(20f);
         // x轴刻度
-        for (int i = 0; i < dateTexts.size(); i++) {
+        for (int i = 0; i < xTexts.size(); i++) {
             // x轴上的文字
-            String text = dateTexts.get(i);
+            String text = xTexts.get(i);
             if (text == null) {
                 continue;
             }
-            float x = rect.sx + i * intervalDate - this.getTextWidth(paint, text) / 2f;
+            float x = rect.sx + i * intervalX - this.getTextWidth(paint, text) / 2f;
             float y = rect.ey + this.getTextHeight(paint, text) / 2f * 3f + 15;
             canvas.drawText(text, x, y, paint);
         }
     }
 
-    private void drawYIndexLine(Canvas canvas, C<T> r) {
+    private void drawYIndexLine(Canvas canvas, org.nature.common.chart.R<T> r) {
         paint.setColor(Color.LTGRAY);
         paint.setPathEffect(new DashPathEffect(new float[]{8, 10, 8, 10}, 0));
         for (int i = 1; i < r.texts.size() - 1; i++) {
@@ -437,13 +482,12 @@ public class LineChart<T> extends View {
         paint.setPathEffect(null);
     }
 
-    private void doDrawLine(Canvas canvas, C<T> r) {
+    private void doDrawLine(Canvas canvas, org.nature.common.chart.R<T> r) {
         Double min = r.min;
         float unit = r.unit;
         int ey = r.ey;
-        int color = 0;
-        for (Function<T, Double> f : r.fs) {
-            this.doDrawLine(canvas, min, unit, ey, colors[color++], f);
+        for (C<T> c : r.cs) {
+            this.doDrawLine(canvas, min, unit, ey, c.color, c.func);
         }
     }
 
@@ -453,7 +497,7 @@ public class LineChart<T> extends View {
         boolean moved = false;
         for (int i = 0; i < list.size(); i++) {
             T k = list.get(i);
-            float x = i * unitDate + rect.sx;
+            float x = i * unitX + rect.sx;
             Double d = func.apply(k);
             if (d == null) {
                 continue;
@@ -488,103 +532,6 @@ public class LineChart<T> extends View {
         Rect rect = new Rect();
         paint.getTextBounds(text, 0, text.length(), rect);
         return rect.height();
-    }
-
-    private static class XY {
-        private int sx;
-        private int sy;
-        private int ex;
-        private int ey;
-    }
-
-    public static class C<T> {
-
-        private final int scale;
-        private final int weight;
-        private final List<Function<T, Double>> fs;
-        private final Function<Double, String> formatter;
-
-        private int sy;
-        private int ey;
-        private int interval;
-        private float unit;
-        private Double min;
-        private List<String> texts;
-
-        public C(int scale, int weight, List<Function<T, Double>> fs, Function<Double, String> formatter) {
-            this.scale = scale;
-            this.weight = weight;
-            this.fs = fs;
-            this.formatter = formatter;
-        }
-
-        public void fix(int sy, int ey) {
-            this.sy = sy;
-            this.ey = ey;
-        }
-
-        @SuppressLint("DefaultLocale")
-        public void calculate(List<T> data) {
-            SortedSet<Double> amounts = new TreeSet<>();
-            for (T d : data) {
-                for (Function<T, Double> f : fs) {
-                    this.addDoubles(amounts, f.apply(d));
-                }
-            }
-            double min = amounts.first() * scale, max = amounts.last() * scale, count = 2d;
-            if (max == min) { // 最大值与最小值相等，特殊处理
-                max = max * 2;
-                min = 0;
-            }
-            double v = Math.ceil((max - min) / count), first = Math.floor(min), last = first + v * (count - 1);
-            if (last < max) {
-                count = 3d;
-            }
-            this.texts = new ArrayList<>();
-            for (int i = 0; i < count; i++) {
-                this.texts.add(formatter.apply((first + v * i) / scale));
-            }
-            this.min = first / scale;
-            max = (first + (count - 1) * v) / scale;
-            this.interval = (int) ((this.ey - this.sy) / (double) (this.texts.size() - 1) + 0.5d);
-            this.unit = (float) ((this.ey - this.sy) / (max - this.min));
-        }
-
-        private void addDoubles(SortedSet<Double> doubles, Double d) {
-            if (d != null) {
-                doubles.add(d);
-            }
-        }
-
-    }
-
-    public static class Q<T> {
-        private final String title;
-        private final Function<T, String> text;
-        private final int color;
-        private int sx;
-        private int ex;
-        private int y;
-
-        public Q(String title, Function<T, String> text, int color) {
-            this.title = title;
-            this.text = text;
-            this.color = color;
-        }
-
-        private String content(T d) {
-            if (d == null) {
-                return "";
-            }
-            return text.apply(d);
-        }
-
-        private void fix(int sx, int ex, int y) {
-            this.sx = sx;
-            this.ex = ex;
-            this.y = y;
-        }
-
     }
 
 }

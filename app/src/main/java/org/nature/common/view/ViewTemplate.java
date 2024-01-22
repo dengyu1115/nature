@@ -6,7 +6,6 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.text.InputType;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.*;
@@ -17,11 +16,25 @@ import org.nature.common.util.DateUtil;
 
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Map;
 
+import static android.text.InputType.*;
+
+/**
+ * view模板
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/21
+ */
+@SuppressLint({"UseCompatLoadingForDrawables", "ResourceType", "DefaultLocale"})
 public class ViewTemplate {
 
-    public static final int PAD = 10;
+    /**
+     * 默认内边距
+     */
+    private static final int PAD = 10;
+    /**
+     * context
+     */
     private final Context context;
 
     private ViewTemplate(Context context) {
@@ -32,6 +45,12 @@ public class ViewTemplate {
         return new ViewTemplate(context);
     }
 
+    /**
+     * 按钮
+     * @param w 宽
+     * @param h 高
+     * @return Button
+     */
     public Button button(int w, int h) {
         Button button = new Button(context);
         float density = context.getResources().getDisplayMetrics().density;
@@ -41,18 +60,31 @@ public class ViewTemplate {
         button.setLayoutParams(params);
         button.setGravity(Gravity.CENTER);
         button.setPadding(PAD, PAD, PAD, PAD);
-        @SuppressLint("UseCompatLoadingForDrawables")
         Drawable drawable = context.getDrawable(R.drawable.common_background);
         button.setBackground(drawable);
         return button;
     }
 
+    /**
+     * 按钮
+     * @param name 名称
+     * @param w    宽
+     * @param h    高
+     * @return Button
+     */
     public Button button(String name, int w, int h) {
         Button button = this.button(w, h);
         button.setText(name);
         return button;
     }
 
+    /**
+     * 文本框
+     * @param name 名称
+     * @param w    宽
+     * @param h    高
+     * @return TextView
+     */
     public TextView textView(String name, int w, int h) {
         TextView text = new TextView(context);
         text.setText(name);
@@ -66,13 +98,24 @@ public class ViewTemplate {
         return text;
     }
 
+    /**
+     * 数字框
+     * @param w 宽
+     * @param h 高
+     * @return EditText
+     */
     public EditText numeric(int w, int h) {
         EditText editText = this.editText(w, h);
-        editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL
-                | InputType.TYPE_NUMBER_FLAG_SIGNED);
+        editText.setInputType(TYPE_CLASS_NUMBER | TYPE_NUMBER_FLAG_DECIMAL | TYPE_NUMBER_FLAG_SIGNED);
         return editText;
     }
 
+    /**
+     * 编辑框
+     * @param w 宽
+     * @param h 高
+     * @return EditText
+     */
     public EditText editText(int w, int h) {
         EditText editText = new EditText(context);
         float density = context.getResources().getDisplayMetrics().density;
@@ -83,12 +126,17 @@ public class ViewTemplate {
         editText.setLayoutParams(params);
         editText.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
         editText.setPadding(PAD, PAD, PAD, PAD);
-        @SuppressLint("UseCompatLoadingForDrawables")
         Drawable drawable = context.getDrawable(R.drawable.common_background);
         editText.setBackground(drawable);
         return editText;
     }
 
+    /**
+     * 文本域
+     * @param w 宽
+     * @param h 高
+     * @return EditText
+     */
     public EditText areaText(int w, int h) {
         EditText text = new EditText(context);
         float density = context.getResources().getDisplayMetrics().density;
@@ -98,16 +146,27 @@ public class ViewTemplate {
         text.setPadding(PAD, PAD, PAD, PAD);
         text.setLayoutParams(param);
         text.setGravity(Gravity.TOP | Gravity.START);
-        @SuppressLint("UseCompatLoadingForDrawables")
         Drawable drawable = context.getDrawable(R.drawable.common_background);
         text.setBackground(drawable);
         return text;
     }
 
+    /**
+     * 选择器
+     * @param w 宽
+     * @param h 高
+     * @return Selector
+     */
     public <T> Selector<T> selector(int w, int h) {
         return new Selector<>(context, w, h);
     }
 
+    /**
+     * 行
+     * @param w 宽
+     * @param h 高
+     * @return LinearLayout
+     */
     public LinearLayout line(int w, int h) {
         LinearLayout line = new LinearLayout(context);
         line.setGravity(Gravity.CENTER);
@@ -119,6 +178,12 @@ public class ViewTemplate {
         return line;
     }
 
+    /**
+     * 块
+     * @param w 宽
+     * @param h 高
+     * @return LinearLayout
+     */
     public LinearLayout block(int w, int h) {
         LinearLayout line = new LinearLayout(context);
         line.setGravity(Gravity.CENTER);
@@ -131,24 +196,23 @@ public class ViewTemplate {
         return line;
     }
 
+    /**
+     * 页面
+     * @return LinearLayout
+     */
     public LinearLayout linearPage() {
         LinearLayout page = new LinearLayout(context);
         page.setOrientation(LinearLayout.VERTICAL);
         return page;
     }
 
-    public LinearLayout checkbox(Map<String, String> map) {
-        LinearLayout page = new LinearLayout(context);
-        page.setOrientation(LinearLayout.VERTICAL);
-        map.forEach((k, v) -> {
-            CheckBox checkBox = new CheckBox(context);
-            checkBox.setHint(k);
-            checkBox.setText(v);
-            page.addView(checkBox);
-        });
-        return page;
-    }
-
+    /**
+     * 单选按钮
+     * @param name 名称
+     * @param w    宽
+     * @param h    高
+     * @return Button
+     */
     public Button radio(String name, int w, int h) {
         Button button = this.button(name, w, h);
         button.setTextColor(Color.DKGRAY);
@@ -161,6 +225,12 @@ public class ViewTemplate {
         return button;
     }
 
+    /**
+     * 日期选择器
+     * @param w 宽
+     * @param h 高
+     * @return Button
+     */
     public Button datePiker(int w, int h) {
         Button button = this.button(w, h);
         button.setOnClickListener(l -> {
@@ -168,7 +238,6 @@ public class ViewTemplate {
             Date date = s.isEmpty() ? new Date() : DateUtil.parse(s, Const.FORMAT_DAY);
             Calendar c = Calendar.getInstance();
             c.setTime(date);
-            @SuppressLint("ResourceType")
             DatePickerDialog picker = new DatePickerDialog(context, 3,
                     (view, year, month, dayOfMonth) -> button.setText(this.getDate(view)),
                     c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
@@ -181,6 +250,12 @@ public class ViewTemplate {
         return button;
     }
 
+    /**
+     * 时间选择器
+     * @param w 宽
+     * @param h 高
+     * @return Button
+     */
     public Button timePiker(int w, int h) {
         Button button = this.button(w, h);
         button.setOnClickListener(l -> {
@@ -188,7 +263,6 @@ public class ViewTemplate {
             Date date = s.isEmpty() ? new Date() : DateUtil.parse(s, Const.FORMAT_TIME);
             Calendar c = Calendar.getInstance();
             c.setTime(date);
-            @SuppressLint("ResourceType")
             TimePickerDialog picker = new TimePickerDialog(context, 3,
                     (view, hour, min) -> button.setText(this.getTime(view)),
                     c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true);
@@ -201,13 +275,22 @@ public class ViewTemplate {
         return button;
     }
 
-    @SuppressLint("DefaultLocale")
+    /**
+     * 获取日期
+     * @param view view
+     * @return String
+     */
     private String getDate(DatePicker view) {
         return String.format("%04d%02d%02d", view.getYear(), view.getMonth() + 1, view.getDayOfMonth());
     }
 
-    @SuppressLint("DefaultLocale")
+    /**
+     * 获取时间
+     * @param view view
+     * @return String
+     */
     private String getTime(TimePicker view) {
         return String.format("%02d:%02d:00", view.getHour(), view.getMinute());
     }
+
 }

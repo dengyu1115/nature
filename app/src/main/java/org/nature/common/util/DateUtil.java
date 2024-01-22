@@ -7,6 +7,12 @@ import org.nature.common.constant.Const;
 import java.text.ParseException;
 import java.util.Date;
 
+/**
+ * 日期工具类
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/1/20
+ */
 public class DateUtil {
 
     public static Date parseDate(String date) {
