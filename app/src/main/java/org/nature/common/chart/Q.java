@@ -16,7 +16,7 @@ public class Q<T> {
     /**
      * 文案获取函数
      */
-    public final Function<T, String> text;
+    public final Function<T, String> func;
     /**
      * 颜色
      */
@@ -34,9 +34,9 @@ public class Q<T> {
      */
     public int y;
 
-    public Q(String title, Function<T, String> text, int color) {
+    public Q(String title, Function<T, String> func, int color) {
         this.title = title;
-        this.text = text;
+        this.func = func;
         this.color = color;
     }
 
@@ -49,7 +49,7 @@ public class Q<T> {
         if (d == null) {
             return "";
         }
-        String s = text.apply(d);
+        String s = func.apply(d);
         if (s == null) {
             return "";
         }

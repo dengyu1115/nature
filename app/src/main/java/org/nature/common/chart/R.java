@@ -68,8 +68,11 @@ public class R<T> {
         this.ey = ey;
     }
 
-    @SuppressLint("DefaultLocale")
-    public void calculate(List<T> data) {
+    /**
+     * 计算参数
+     * @param data 数据
+     */
+    public void calcParams(List<T> data) {
         SortedSet<Double> amounts = new TreeSet<>();
         for (T d : data) {
             for (C<T> c : cs) {
@@ -96,6 +99,11 @@ public class R<T> {
         this.unit = (float) ((this.ey - this.sy) / (max - this.min));
     }
 
+    /**
+     * 添加数值
+     * @param doubles 集合
+     * @param d       数值
+     */
     private void addDoubles(SortedSet<Double> doubles, Double d) {
         if (d != null) {
             doubles.add(d);
