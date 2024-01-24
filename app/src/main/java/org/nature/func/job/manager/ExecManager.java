@@ -31,19 +31,18 @@ public class ExecManager {
     /**
      * 执行
      */
-    public void exec() {
+    public void exec(Date date) {
         // 开启异步线程
         RemoteExeUtil.submit(() -> {
             try {
-                this.doExec();
+                this.doExec(date);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         });
     }
 
-    private void doExec() {
-        Date date = new Date();
+    private void doExec(Date date) {
         String year = DateFormatUtils.format(date, "yyyy");
         String month = DateFormatUtils.format(date, "MM");
         String day = DateFormatUtils.format(date, "dd");

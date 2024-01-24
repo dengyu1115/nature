@@ -120,12 +120,13 @@ public class JobService extends Service {
      */
     private void task() {
         try {
-            String date = DateFormatUtils.format(new Date(), Const.FORMAT_DATETIME);
+            Date now = new Date();
+            String date = DateFormatUtils.format(now, Const.FORMAT_DATETIME);
             String s = String.format("%s:%s", date, counter.incrementAndGet());
             NotifyUtil.notify("NATURE正在运行", s);
             ExecManager execManager = InstanceHolder.get(ExecManager.class);
             if (execManager != null) {
-                execManager.exec();
+                execManager.exec(now);
             }
         } catch (Exception e) {
             e.printStackTrace();
