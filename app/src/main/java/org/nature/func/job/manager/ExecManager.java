@@ -61,7 +61,7 @@ public class ExecManager {
                 // 执行任务
                 Job job = JobHolder.get(i.getCode());
                 if (job != null) {
-                    job.exec(null);
+                    job.exec();
                 }
             } catch (Exception e) {
                 // 执行异常，发送通知

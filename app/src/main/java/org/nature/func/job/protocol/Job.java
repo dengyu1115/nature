@@ -10,8 +10,7 @@ public interface Job {
 
     /**
      * 执行
-     * @param param 参数
      */
-    void exec(String param);
+    void exec();
 
 }

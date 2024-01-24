@@ -42,7 +42,7 @@ public class HandleNoticeJob implements Job {
     private static final Map<String, Set<String>> MAP = new HashMap<>();
 
     @Override
-    public void exec(String param) {
+    public void exec() {
         // 非工作日不处理
         if (!workdayManager.isWorkday()) {
             return;

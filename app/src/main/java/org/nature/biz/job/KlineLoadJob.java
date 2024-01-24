@@ -19,7 +19,7 @@ public class KlineLoadJob implements Job {
     private KlineManager klineManager;
 
     @Override
-    public void exec(String param) {
+    public void exec() {
         int load = klineManager.load();
         NotifyUtil.notifyOne("K线加载", "K线加载完成，共加载" + load + "条数据");
     }
