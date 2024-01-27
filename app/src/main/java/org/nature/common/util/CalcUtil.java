@@ -9,7 +9,7 @@ import java.util.function.Function;
  * @version 1.0.0
  * @since 2019/11/6 23:14
  */
-public class CalUtil {
+public class CalcUtil {
 
     /**
      * 极大值

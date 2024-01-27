@@ -22,7 +22,7 @@ public class P<T> {
     /**
      * 内容数据集合
      */
-    public List<R<T>> rs;
+    public List<BR<T>> rs;
     /**
      * X轴文案获取函数
      */

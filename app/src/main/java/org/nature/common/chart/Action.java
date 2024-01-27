@@ -97,38 +97,38 @@ public class Action<T> {
             if (p.listSize <= p.sizeMin) {
                 return;
             }
-            int unit = this.moveUnit(-diff);
-            if (unit == 0) {
+            int moveSize = this.moveSize(-diff);
+            if (moveSize == 0) {
                 return;
             }
-            p.listSize -= unit;
+            p.listSize -= moveSize;
             if (p.listSize < p.sizeMin) {
-                unit -= p.sizeMin - p.listSize;
+                moveSize -= p.sizeMin - p.listSize;
                 p.listSize = p.sizeMin;
             }
-            p.listStart += unit / 2;
-            p.listEnd -= unit - unit / 2;
+            p.listStart += moveSize / 2;
+            p.listEnd -= moveSize - moveSize / 2;
         } else {
             int size = p.data.size();
             int sizeMax = Math.min(p.sizeMax, size);
             if (p.listSize >= sizeMax) {
                 return;
             }
-            int unit = this.moveUnit(diff);
-            if (unit == 0) {
+            int moveSize = this.moveSize(diff);
+            if (moveSize == 0) {
                 return;
             }
-            p.listSize += unit;
+            p.listSize += moveSize;
             if (p.listSize > sizeMax) {
-                unit -= p.listSize - sizeMax;
+                moveSize -= p.listSize - sizeMax;
                 p.listSize = sizeMax;
             }
-            p.listStart -= unit / 2;
+            p.listStart -= moveSize / 2;
             if (p.listStart < 0) {
-                p.listEnd += unit - unit / 2 - p.listStart;
+                p.listEnd += moveSize - moveSize / 2 - p.listStart;
                 p.listStart = 0;
             } else {
-                p.listEnd += unit - unit / 2;
+                p.listEnd += moveSize - moveSize / 2;
                 if (p.listEnd > size) {
                     p.listStart -= p.listEnd - size;
                     p.listEnd = size;
@@ -165,10 +165,12 @@ public class Action<T> {
      */
     private void doMoveList(MotionEvent event) {
         float x = event.getX(), y = event.getY();
+        // 超出边框
         if (x < rect.sx - p.unitX / 2f || x > rect.ex + p.unitX / 2f || y < rect.sy || y > rect.ey) {
             return;
         }
         float diff = x - p.lx;
+        // 没有移动
         if (diff == 0) {
             return;
         }
@@ -178,30 +180,30 @@ public class Action<T> {
             if (p.listEnd == size) {
                 return;
             }
-            int unit = this.moveUnit(-diff);
-            if (unit == 0) {
+            int moveSize = this.moveSize(-diff);
+            if (moveSize == 0) {
                 return;
             }
-            p.listEnd += unit;
+            p.listEnd += moveSize;
             if (p.listEnd > size) {
-                unit -= (p.listEnd - size);
+                moveSize -= (p.listEnd - size);
                 p.listEnd = size;
             }
-            p.listStart += unit;
+            p.listStart += moveSize;
         } else {
             if (p.listStart == 0) {
                 return;
             }
-            int unit = this.moveUnit(diff);
-            if (unit == 0) {
+            int moveSize = this.moveSize(diff);
+            if (moveSize == 0) {
                 return;
             }
-            p.listStart -= unit;
+            p.listStart -= moveSize;
             if (p.listStart < 0) {
-                unit += p.listStart;
+                moveSize += p.listStart;
                 p.listStart = 0;
             }
-            p.listEnd -= unit;
+            p.listEnd -= moveSize;
         }
         p.list = p.data.subList(p.listStart, p.listEnd);
         p.index = p.list.size() - 1;
@@ -210,12 +212,16 @@ public class Action<T> {
     }
 
     /**
-     * 移动单位大小计算
+     * 移动大小计算
      * @param diff 差值
      * @return int
      */
-    private int moveUnit(float diff) {
-        return (int) (p.listSize / (float) (this.rect.ex - this.rect.sx) * diff + 0.5f);
+    private int moveSize(float diff) {
+        int moveSize = (int) ((float) p.listSize / (float) (this.rect.ex - this.rect.sx) * diff + 0.5f);
+        if (moveSize == 0 && diff > 20) {
+            return 1;
+        }
+        return moveSize;
     }
 
 }

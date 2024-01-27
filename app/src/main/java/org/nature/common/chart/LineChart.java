@@ -48,6 +48,7 @@ public class LineChart<T> extends View {
      */
     public void sizeDefault(int sizeDefault, int sizeMin, int sizeMax) {
         p.sizeDefault = sizeDefault;
+        p.listSize = sizeDefault;
         p.sizeMin = sizeMin;
         p.sizeMax = sizeMax;
     }
@@ -59,7 +60,7 @@ public class LineChart<T> extends View {
      * @param xText X轴文案获取函数
      * @param empty 空对象
      */
-    public void init(List<List<Q<T>>> qs, List<org.nature.common.chart.R<T>> rs, Function<T, String> xText, T empty) {
+    public void init(List<List<Q<T>>> qs, List<BR<T>> rs, Function<T, String> xText, T empty) {
         p.qs = qs;
         p.rs = rs;
         p.xText = xText;

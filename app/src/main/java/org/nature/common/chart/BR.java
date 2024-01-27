@@ -1,7 +1,5 @@
 package org.nature.common.chart;
 
-import android.annotation.SuppressLint;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedSet;
@@ -14,7 +12,7 @@ import java.util.function.Function;
  * @version 1.0.0
  * @since 2024/1/22
  */
-public class R<T> {
+public abstract class BR<T> {
     /**
      * 小数位数
      */
@@ -23,10 +21,6 @@ public class R<T> {
      * 字体
      */
     public final int weight;
-    /**
-     * 字段取值函数
-     */
-    public final List<C<T>> cs;
     /**
      * 字段文案格式化函数
      */
@@ -56,10 +50,9 @@ public class R<T> {
      */
     public List<String> texts;
 
-    public R(int scale, int weight, List<C<T>> cs, Function<Double, String> formatter) {
+    public BR(int scale, int weight, Function<Double, String> formatter) {
         this.scale = scale;
         this.weight = weight;
-        this.cs = cs;
         this.formatter = formatter;
     }
 
@@ -74,9 +67,10 @@ public class R<T> {
      */
     public void calcParams(List<T> data) {
         SortedSet<Double> amounts = new TreeSet<>();
+        List<Function<T, Double>> fs = this.fs();
         for (T d : data) {
-            for (C<T> c : cs) {
-                this.addDoubles(amounts, c.func.apply(d));
+            for (Function<T, Double> f : fs) {
+                this.addDoubles(amounts, f.apply(d));
             }
         }
         double min = amounts.first() * scale, max = amounts.last() * scale, count = 2d;
@@ -98,6 +92,8 @@ public class R<T> {
         this.interval = (int) ((this.ey - this.sy) / (double) (this.texts.size() - 1) + 0.5d);
         this.unit = (float) ((this.ey - this.sy) / (max - this.min));
     }
+
+    protected abstract List<Function<T, Double>> fs();
 
     /**
      * 添加数值

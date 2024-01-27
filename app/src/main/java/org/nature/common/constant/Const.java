@@ -55,5 +55,9 @@ public interface Const {
      * 格式化：时分秒
      */
     String FORMAT_TIME = "HH:mm:ss";
+    /**
+     * 间隔
+     */
+    int PAD = 15;
 
 }

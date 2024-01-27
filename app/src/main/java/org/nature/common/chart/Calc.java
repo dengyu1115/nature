@@ -39,24 +39,9 @@ public class Calc<T> {
      */
     public void params(List<T> data) {
         this.xParams(data);
-        for (R<T> r : p.rs) {
+        for (BR<T> r : p.rs) {
             r.calcParams(data);
         }
-    }
-
-    /**
-     * 计算X轴参数
-     * @param data 数据集合
-     */
-    private void xParams(List<T> data) {
-        List<String> dates = data.stream().map(p.xText).collect(Collectors.toList());
-        p.xTexts = new ArrayList<>();
-        int size = dates.size();
-        int middle = size % 2 == 0 ? size / 2 : size / 2 + 1;
-        if (middle > size - 1) middle = size - 1;
-        p.xTexts.addAll(Arrays.asList(dates.get(0), dates.get(middle), dates.get(size - 1)));
-        p.intervalX = (int) ((rect.ex - rect.sx) / (double) (p.xTexts.size() - 1) + 0.5d);
-        p.unitX = (float) (rect.ex - rect.sx) / (data.size() - 1);
     }
 
     /**
@@ -89,7 +74,7 @@ public class Calc<T> {
         rect.ey = (int) (all.sy / 20f + all.ey / 20f * 19f + 0.5f);
         double total = p.rs.stream().mapToDouble(d -> d.weight).sum();
         int unit = (int) ((rect.ey - rect.sy) / total + 0.5d);
-        org.nature.common.chart.R<T> r = p.rs.get(0);
+        BR<T> r = p.rs.get(0);
         int sy = rect.sy, ey = sy;
         r.fix(sy, ey);
         for (int i = 0; i < p.rs.size() - 1; i++) {
@@ -128,6 +113,21 @@ public class Calc<T> {
                 q.get(j).fix(sxs[j], exs[j], ys[i]);
             }
         }
+    }
+
+    /**
+     * 计算X轴参数
+     * @param data 数据集合
+     */
+    private void xParams(List<T> data) {
+        List<String> dates = data.stream().map(p.xText).collect(Collectors.toList());
+        p.xTexts = new ArrayList<>();
+        int size = dates.size();
+        int middle = size % 2 == 0 ? size / 2 : size / 2 + 1;
+        if (middle > size - 1) middle = size - 1;
+        p.xTexts.addAll(Arrays.asList(dates.get(0), dates.get(middle), dates.get(size - 1)));
+        p.intervalX = (int) ((rect.ex - rect.sx) / (double) (p.xTexts.size() - 1) + 0.5d);
+        p.unitX = (float) (rect.ex - rect.sx) / (data.size() - 1);
     }
 
 }
