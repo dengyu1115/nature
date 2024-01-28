@@ -46,6 +46,18 @@ public class KlineView extends BaseModel {
      */
     private Double amount;
     /**
+     * 涨幅
+     */
+    private Double ratioInc;
+    /**
+     * 涨幅-累计
+     */
+    private Double ratioTotal;
+    /**
+     * 振幅
+     */
+    private Double ratioDiff;
+    /**
      * 5日均线
      */
     private Double ma5;

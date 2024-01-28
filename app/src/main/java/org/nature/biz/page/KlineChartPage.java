@@ -60,19 +60,22 @@ public class KlineChartPage extends Page {
                     new Q<>("项目:", d -> TextUtil.text(d.getName()), Color.BLACK),
                     new Q<>("日期:", d -> TextUtil.text(d.getDate()), Color.BLACK),
                     new Q<>("交易量:", d -> TextUtil.amount(d.getShare()), Color.BLUE),
-                    new Q<>("交易额:", d -> TextUtil.amount(d.getAmount()), Color.BLUE)
+                    new Q<>("交易额:", d -> TextUtil.amount(d.getAmount()), Color.BLUE),
+                    new Q<>("涨幅:", d -> TextUtil.hundred(d.getRatioInc()), Color.BLUE)
             ),
             List.of(
                     new Q<>("开盘:", d -> TextUtil.price(d.getOpen()), Color.GREEN),
                     new Q<>("收盘:", d -> TextUtil.price(d.getLatest()), Color.GREEN),
                     new Q<>("最高:", d -> TextUtil.price(d.getHigh()), Color.GREEN),
-                    new Q<>("最低:", d -> TextUtil.price(d.getLow()), Color.GREEN)
+                    new Q<>("最低:", d -> TextUtil.price(d.getLow()), Color.GREEN),
+                    new Q<>("累计涨幅:", d -> TextUtil.hundred(d.getRatioTotal()), Color.GREEN)
             ),
             List.of(
                     new Q<>("MA5:", d -> TextUtil.price(d.getMa5()), 0xFFB22222),
                     new Q<>("MA10:", d -> TextUtil.price(d.getMa10()), 0xFFA020F0),
                     new Q<>("MA20:", d -> TextUtil.price(d.getMa20()), 0xFF2E8B57),
-                    new Q<>("MA60:", d -> TextUtil.price(d.getMa60()), 0xFF0000CD)
+                    new Q<>("MA60:", d -> TextUtil.price(d.getMa60()), 0xFF0000CD),
+                    new Q<>("振幅:", d -> TextUtil.hundred(d.getRatioDiff()), Color.BLUE)
             )
     );
     /**
@@ -260,15 +263,27 @@ public class KlineChartPage extends Page {
         List<Double> l10 = new LinkedList<>();
         List<Double> l20 = new LinkedList<>();
         List<Double> l60 = new LinkedList<>();
+        Double last = null, first = null;
         for (Kline k : list) {
             KlineView view = new KlineView();
-            view.setDate(k.getDate());
-            view.setOpen(k.getOpen().doubleValue());
-            double latest = k.getLatest().doubleValue();
             view.setName(this.name);
+            view.setDate(k.getDate());
+            double open = k.getOpen().doubleValue();
+            double latest = k.getLatest().doubleValue();
+            double high = k.getHigh().doubleValue();
+            double low = k.getLow().doubleValue();
+            if (last == null) {
+                last = open;
+                first = open;
+            }
+            view.setOpen(open);
             view.setLatest(latest);
-            view.setHigh(k.getHigh().doubleValue());
-            view.setLow(k.getLow().doubleValue());
+            view.setHigh(high);
+            view.setLow(low);
+            view.setRatioDiff((high - low) / low);
+            view.setRatioInc((latest - last) / last);
+            view.setRatioTotal((latest - first) / first);
+            last = latest;
             view.setAmount(k.getAmount().doubleValue());
             view.setShare(k.getShare().doubleValue());
             view.setMa5(this.addValue(l5, 5, latest));
