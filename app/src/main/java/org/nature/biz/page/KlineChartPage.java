@@ -3,6 +3,7 @@ package org.nature.biz.page;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -10,8 +11,8 @@ import org.nature.biz.manager.KlineManager;
 import org.nature.biz.model.Item;
 import org.nature.biz.model.Kline;
 import org.nature.biz.model.KlineView;
+import org.nature.biz.util.KlineUtil;
 import org.nature.common.chart.*;
-import org.nature.common.constant.Const;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.Page;
@@ -19,14 +20,12 @@ import org.nature.common.util.ClickUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.ViewTemplate;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.Month;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.WeekFields;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * K线图
@@ -38,13 +37,13 @@ import java.util.stream.Collectors;
 public class KlineChartPage extends Page {
 
     /**
-     * 第三个框中的线条配置
+     * 交易额折线配置
      */
     public static final List<C<KlineView>> FUNC_AMOUNT = List.of(
             new C<>(0xFFFF0000, KlineView::getAmount)
     );
     /**
-     * 均线集合
+     * 均线集合配置
      */
     public static final List<C<KlineView>> MA_LIST = List.of(
             new C<>(0xFFB22222, KlineView::getMa5),
@@ -92,8 +91,17 @@ public class KlineChartPage extends Page {
             new LR<>(1000, 1, FUNC_AMOUNT, TextUtil::amount)
     );
 
+    /**
+     * 项目名称
+     */
     private String name;
+    /**
+     * K线数据原集合
+     */
     private List<Kline> list;
+    /**
+     * view模板
+     */
     private ViewTemplate template;
 
     @Injection
@@ -108,21 +116,25 @@ public class KlineChartPage extends Page {
     protected void makeStructure(LinearLayout page, Context context) {
         template = ViewTemplate.build(context);
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        page.setOrientation(LinearLayout.VERTICAL);
-        int height = metrics.heightPixels;
+        int width = metrics.widthPixels;
         float density = metrics.density;
-        LinearLayout header = new LinearLayout(context);
-        header.setLayoutParams(new LayoutParams(MATCH_PARENT, (int) (30 * density)));
-        LinearLayout body = new LinearLayout(context);
-        body.setLayoutParams(new LayoutParams(MATCH_PARENT, height - (int) (30 * density)));
-        page.addView(header);
-        page.addView(body);
-        body.addView(chart = new LineChart<>(context));
-        header.addView(this.klineView("日", i -> i));
-        header.addView(this.klineView("周", this::convertWeek));
-        header.addView(this.klineView("月", this::convertMonth));
-        header.addView(this.klineView("季", this::convertSeason));
-        header.addView(this.klineView("年", this::convertYear));
+        // 创建两个容器左右布局，左边放图，右边放K线切换按钮
+        LinearLayout left = new LinearLayout(context);
+        LinearLayout right = new LinearLayout(context);
+        left.setLayoutParams(new LayoutParams(width - (int) (100 * density), MATCH_PARENT));
+        left.setOrientation(LinearLayout.VERTICAL);
+        right.setOrientation(LinearLayout.VERTICAL);
+        right.setLayoutParams(new LayoutParams((int) (100 * density), MATCH_PARENT));
+        right.setGravity(Gravity.CENTER_VERTICAL);
+        page.addView(left);
+        page.addView(right);
+        left.addView(chart = new LineChart<>(context));
+        WeekFields wf = WeekFields.of(Locale.getDefault());
+        right.addView(this.klineView("日", i -> i));
+        right.addView(this.klineView("周", i -> KlineUtil.convert(i, d -> d.get(wf.weekOfWeekBasedYear()))));
+        right.addView(this.klineView("月", i -> KlineUtil.convert(i, LocalDate::getMonthValue)));
+        right.addView(this.klineView("季", i -> KlineUtil.convert(i, d -> (d.getMonthValue() - 1) / 3)));
+        right.addView(this.klineView("年", i -> KlineUtil.convert(i, LocalDate::getYear)));
         chart.sizeDefault(30, 15, 1800);
         chart.init(QS, RS, KlineView::getDate);
     }
@@ -135,180 +147,21 @@ public class KlineChartPage extends Page {
         list = klineManager.listByItem(item);
         // 按时间正序排序
         list.sort(Comparator.comparing(Kline::getDate));
-        List<KlineView> viewList = this.convert(list);
+        List<KlineView> viewList = KlineUtil.convert(list, name);
         // 设置K线图加载数据
         chart.data(viewList);
     }
 
-
+    /**
+     * 查看K线按钮
+     * @param title 标题
+     * @param func  K线数据转换函数
+     * @return Button
+     */
     private Button klineView(String title, Function<List<Kline>, List<Kline>> func) {
         Button button = template.button(title, 60, 30);
-        ClickUtil.onClick(button, () -> chart.data(this.convert(func.apply(list))));
+        ClickUtil.onClick(button, () -> chart.data(KlineUtil.convert(func.apply(list), name)));
         return button;
     }
 
-    private List<Kline> convertWeek(List<Kline> list) {
-        List<List<Kline>> ll = new ArrayList<>();
-        List<Kline> l = null;
-        Integer week = null;
-        for (Kline i : list) {
-            String date = i.getDate();
-            LocalDate d = LocalDate.parse(date, DateTimeFormatter.ofPattern(Const.FORMAT_DAY));
-            WeekFields wf = WeekFields.of(Locale.getDefault());
-            int w = d.get(wf.weekOfWeekBasedYear());
-            if (week == null || !week.equals(w)) {
-                l = new ArrayList<>();
-                ll.add(l);
-                week = w;
-            }
-            l.add(i);
-        }
-        return ll.stream().map(this::toKline).collect(Collectors.toList());
-    }
-
-    private List<Kline> convertMonth(List<Kline> list) {
-        List<List<Kline>> ll = new ArrayList<>();
-        List<Kline> l = null;
-        Month month = null;
-        for (Kline i : list) {
-            String date = i.getDate();
-            LocalDate d = LocalDate.parse(date, DateTimeFormatter.ofPattern(Const.FORMAT_DAY));
-            Month m = d.getMonth();
-            if (month == null || !month.equals(m)) {
-                l = new ArrayList<>();
-                ll.add(l);
-                month = m;
-            }
-            l.add(i);
-        }
-        return ll.stream().map(this::toKline).collect(Collectors.toList());
-    }
-
-    private List<Kline> convertSeason(List<Kline> list) {
-        List<List<Kline>> ll = new ArrayList<>();
-        List<Kline> l = null;
-        Integer season = null;
-        for (Kline i : list) {
-            String date = i.getDate();
-            LocalDate d = LocalDate.parse(date, DateTimeFormatter.ofPattern(Const.FORMAT_DAY));
-            int m = d.getMonthValue();
-            if (season == null || !season.equals((m - 1) / 3)) {
-                l = new ArrayList<>();
-                ll.add(l);
-                season = (m - 1) / 3;
-            }
-            l.add(i);
-        }
-        return ll.stream().map(this::toKline).collect(Collectors.toList());
-    }
-
-    private List<Kline> convertYear(List<Kline> list) {
-        List<List<Kline>> ll = new ArrayList<>();
-        List<Kline> l = null;
-        Integer year = null;
-        for (Kline i : list) {
-            String date = i.getDate();
-            LocalDate d = LocalDate.parse(date, DateTimeFormatter.ofPattern(Const.FORMAT_DAY));
-            int y = d.getYear();
-            if (year == null || !year.equals(y)) {
-                l = new ArrayList<>();
-                ll.add(l);
-                year = y;
-            }
-            l.add(i);
-        }
-        return ll.stream().map(this::toKline).collect(Collectors.toList());
-    }
-
-    private Kline toKline(List<Kline> list) {
-        Kline kline = new Kline();
-        for (Kline i : list) {
-            kline.setCode(i.getCode());
-            kline.setType(i.getType());
-            kline.setDate(i.getDate());
-            kline.setLatest(i.getLatest());
-            if (kline.getOpen() == null) {
-                kline.setOpen(i.getOpen());
-            }
-            if (kline.getHigh() == null || kline.getHigh().compareTo(i.getHigh()) < 0) {
-                kline.setHigh(i.getHigh());
-            }
-            if (kline.getLow() == null || kline.getLow().compareTo(i.getLow()) > 0) {
-                kline.setLow(i.getLow());
-            }
-            BigDecimal share = kline.getShare();
-            if (share == null) {
-                kline.setShare(i.getShare());
-            } else {
-                kline.setShare(share.add(i.getShare()));
-            }
-            BigDecimal amount = kline.getAmount();
-            if (amount == null) {
-                kline.setAmount(i.getAmount());
-            } else {
-                kline.setAmount(amount.add(i.getAmount()));
-            }
-        }
-        return kline;
-    }
-
-    /**
-     * 转换K线数据
-     * @param list 数据集
-     * @return list
-     */
-    private List<KlineView> convert(List<Kline> list) {
-        List<KlineView> viewList = new ArrayList<>();
-        List<Double> l5 = new LinkedList<>();
-        List<Double> l10 = new LinkedList<>();
-        List<Double> l20 = new LinkedList<>();
-        List<Double> l60 = new LinkedList<>();
-        Double last = null, first = null;
-        for (Kline k : list) {
-            KlineView view = new KlineView();
-            view.setName(this.name);
-            view.setDate(k.getDate());
-            double open = k.getOpen().doubleValue();
-            double latest = k.getLatest().doubleValue();
-            double high = k.getHigh().doubleValue();
-            double low = k.getLow().doubleValue();
-            if (last == null) {
-                last = open;
-                first = open;
-            }
-            view.setOpen(open);
-            view.setLatest(latest);
-            view.setHigh(high);
-            view.setLow(low);
-            view.setRatioDiff((high - low) / low);
-            view.setRatioInc((latest - last) / last);
-            view.setRatioTotal((latest - first) / first);
-            last = latest;
-            view.setAmount(k.getAmount().doubleValue());
-            view.setShare(k.getShare().doubleValue());
-            view.setMa5(this.addValue(l5, 5, latest));
-            view.setMa10(this.addValue(l10, 10, latest));
-            view.setMa20(this.addValue(l20, 20, latest));
-            view.setMa60(this.addValue(l60, 60, latest));
-            viewList.add(view);
-        }
-        return viewList;
-    }
-
-    /**
-     * 添加数值
-     * @param list  集合
-     * @param size  控制大小
-     * @param value 数值
-     */
-    private Double addValue(List<Double> list, int size, double value) {
-        if (list.size() == size) {
-            list.remove(0);
-        }
-        list.add(value);
-        if (list.size() == size) {
-            return list.stream().mapToDouble(a -> a).average().orElse(0.0);
-        }
-        return null;
-    }
 }
