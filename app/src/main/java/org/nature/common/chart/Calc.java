@@ -5,6 +5,7 @@ import android.view.View;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -120,7 +121,7 @@ public class Calc<T> {
      * @param data 数据集合
      */
     private void xParams(List<T> data) {
-        List<String> dates = data.stream().map(p.xText).collect(Collectors.toList());
+        List<String> dates = data.stream().filter(Objects::nonNull).map(p.xText).collect(Collectors.toList());
         p.xTexts = new ArrayList<>();
         int size = dates.size();
         int middle = size % 2 == 0 ? size / 2 : size / 2 + 1;

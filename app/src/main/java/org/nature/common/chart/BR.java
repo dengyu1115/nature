@@ -69,6 +69,9 @@ public abstract class BR<T> {
         SortedSet<Double> amounts = new TreeSet<>();
         List<Function<T, Double>> fs = this.fs();
         for (T d : data) {
+            if (d == null) {
+                continue;
+            }
             for (Function<T, Double> f : fs) {
                 this.addDoubles(amounts, f.apply(d));
             }

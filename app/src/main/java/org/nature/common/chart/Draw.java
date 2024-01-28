@@ -177,9 +177,12 @@ public class Draw<T> {
         Path path = new Path();
         boolean moved = false;
         for (int i = 0; i < p.list.size(); i++) {
-            T k = p.list.get(i);
+            T t = p.list.get(i);
+            if (t == null) {
+                continue;
+            }
             float x = i * p.unitX + rect.sx;
-            Double d = func.apply(k);
+            Double d = func.apply(t);
             if (d == null) {
                 continue;
             }
@@ -217,6 +220,9 @@ public class Draw<T> {
         }
         for (int i = 0; i < p.list.size(); i++) {
             T t = p.list.get(i);
+            if (t == null) {
+                continue;
+            }
             float x = i * unitX + rect.sx;
             Double latest = r.latest.apply(t);
             Double open = r.open.apply(t);

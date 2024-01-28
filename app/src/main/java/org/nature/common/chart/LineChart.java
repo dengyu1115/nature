@@ -58,13 +58,11 @@ public class LineChart<T> extends View {
      * @param qs    指标集合
      * @param rs    图形集合
      * @param xText X轴文案获取函数
-     * @param empty 空对象
      */
-    public void init(List<List<Q<T>>> qs, List<BR<T>> rs, Function<T, String> xText, T empty) {
+    public void init(List<List<Q<T>>> qs, List<BR<T>> rs, Function<T, String> xText) {
         p.qs = qs;
         p.rs = rs;
         p.xText = xText;
-        p.empty = empty;
     }
 
     /**
@@ -72,10 +70,10 @@ public class LineChart<T> extends View {
      * @param data 数据集合
      */
     public void data(List<T> data) {
-        p.data = data;
         if (data == null) {
             throw new Warn("data is null");
         }
+        p.data = new ArrayList<>(data);
         int size = data.size();
         if (p.listSize < size) {
             // 数量超出的截取尾部展示
@@ -89,7 +87,7 @@ public class LineChart<T> extends View {
             // 数据量不足，补全后展示
             p.list = new ArrayList<>();
             for (int i = 0; i < p.sizeMin - size; i++) {
-                p.list.add(p.empty);
+                p.list.add(null);
             }
             p.list.addAll(data);
             p.data = p.list;
@@ -99,6 +97,7 @@ public class LineChart<T> extends View {
         p.listSize = p.list.size();
         p.index = p.list.size() - 1;
         p.curr = p.list.get(p.index);
+        this.invalidate();
     }
 
     @Override

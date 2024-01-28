@@ -15,9 +15,13 @@ public class Action<T> {
      * 参数
      */
     private final P<T> p;
-
+    /**
+     * view
+     */
     private final View view;
-
+    /**
+     * 矩形框
+     */
     private final XY rect;
 
     public Action(P<T> p, View view, XY rect) {
@@ -147,15 +151,20 @@ public class Action<T> {
      */
     private void doMoveIndex(MotionEvent event) {
         float x = event.getX(), y = event.getY();
+        //  判断是否在有效区域内
         if (x < rect.sx - p.unitX / 2f || x > rect.ex + p.unitX / 2f || y < rect.sy || y > rect.ey) {
             return;
         }
+        //  计算下标
         int index = Math.round((x - rect.sx) / p.unitX);
+        // 判断位置是否发生变化
         if (p.index == index) {
             return;
         }
+        // 当前下标位置设置
         p.index = index;
         p.curr = p.list.get(p.index);
+        // 操作绘制view
         view.invalidate();
     }
 
@@ -165,7 +174,7 @@ public class Action<T> {
      */
     private void doMoveList(MotionEvent event) {
         float x = event.getX(), y = event.getY();
-        // 超出边框
+        // 判断是否在有效区域内
         if (x < rect.sx - p.unitX / 2f || x > rect.ex + p.unitX / 2f || y < rect.sy || y > rect.ey) {
             return;
         }
@@ -174,40 +183,51 @@ public class Action<T> {
         if (diff == 0) {
             return;
         }
-        p.lx = x;
         int size = p.data.size();
         if (diff < 0) {
+            // 已经移动至末端
             if (p.listEnd == size) {
                 return;
             }
+            // 计算移动量
             int moveSize = this.moveSize(-diff);
+            // 没有移动
             if (moveSize == 0) {
                 return;
             }
             p.listEnd += moveSize;
+            // 移动后超出范围处理
             if (p.listEnd > size) {
                 moveSize -= (p.listEnd - size);
                 p.listEnd = size;
             }
             p.listStart += moveSize;
         } else {
+            // 已经移动至头部
             if (p.listStart == 0) {
                 return;
             }
+            // 计算移动量
             int moveSize = this.moveSize(diff);
+            // 没有移动
             if (moveSize == 0) {
                 return;
             }
             p.listStart -= moveSize;
+            // 移动量超出部分重置为有效区域
             if (p.listStart < 0) {
                 moveSize += p.listStart;
                 p.listStart = 0;
             }
             p.listEnd -= moveSize;
         }
+        // 上一个位置设置
+        p.lx = x;
+        // 展示数据设置
         p.list = p.data.subList(p.listStart, p.listEnd);
         p.index = p.list.size() - 1;
         p.curr = p.list.get(p.index);
+        // 操作绘制view
         view.invalidate();
     }
 

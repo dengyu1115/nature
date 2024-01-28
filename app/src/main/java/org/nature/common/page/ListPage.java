@@ -8,6 +8,7 @@ import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import org.apache.commons.lang3.StringUtils;
 import org.nature.common.util.PopUtil;
@@ -80,7 +81,7 @@ public abstract class ListPage<T> extends Page {
     private void header() {
         LinearLayout header = new LinearLayout(context);
         page.addView(header);
-        header.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, (int) (40 * density)));
+        header.setLayoutParams(new LayoutParams(MATCH_PARENT, (int) (40 * density)));
         SearchBar searchBar = new SearchBar(context);
         header.addView(searchBar);
         button = template.button("查询", 50, 30);
@@ -94,7 +95,7 @@ public abstract class ListPage<T> extends Page {
     private void body() {
         LinearLayout body = new LinearLayout(context);
         page.addView(body);
-        body.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, height - (int) (60 * density)));
+        body.setLayoutParams(new LayoutParams(MATCH_PARENT, height - (int) (60 * density)));
         this.excel = new TableView<>(context, this.getExcelColumns());
         body.addView(this.excel);
     }
@@ -105,7 +106,7 @@ public abstract class ListPage<T> extends Page {
     private void footer() {
         LinearLayout footer = new LinearLayout(context);
         page.addView(footer);
-        footer.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, (int) (20 * density)));
+        footer.setLayoutParams(new LayoutParams(MATCH_PARENT, (int) (20 * density)));
         footer.setGravity(Gravity.CENTER);
         total = new TextView(context);
         footer.addView(total);

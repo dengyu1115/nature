@@ -28,10 +28,6 @@ public class P<T> {
      */
     public Function<T, String> xText;
     /**
-     * 空数据
-     */
-    public T empty;
-    /**
      * 数据：全部、展示
      */
     public List<T> data, list;
