@@ -6,15 +6,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.nature.common.constant.Const;
-import org.nature.common.enums.DateType;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.ClickUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.TableView;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
+import org.nature.common.view.TableView;
 import org.nature.func.workday.manager.WorkdayManager;
 import org.nature.func.workday.model.Month;
 
@@ -49,7 +48,7 @@ public class WorkdayPage extends ListPage<Month> {
         ds.add(TableView.row("月份", i -> TextUtil.text(i.getMonth()), C, C, Month::getMonth));
         for (int i = 1; i < 32; i++) {
             String day = String.format("%02d", i);
-            ds.add(TableView.row(day, d -> TextUtil.text(this.getDateType(d, day)), C, C));
+            ds.add(TableView.row(day, d -> TextUtil.text(d.getDateType(d.getMonth() + day)), C, C));
         }
         return ds;
     }
@@ -57,7 +56,9 @@ public class WorkdayPage extends ListPage<Month> {
     @Override
     protected List<Month> listData() {
         String date = this.year.getValue();
-        if (StringUtils.isBlank(date)) return new ArrayList<>();
+        if (StringUtils.isBlank(date)) {
+            return new ArrayList<>();
+        }
         return workDayManager.listYearMonths(date.substring(0, 4));
     }
 
@@ -92,18 +93,6 @@ public class WorkdayPage extends ListPage<Month> {
     @Override
     protected int getExcelColumns() {
         return 14;
-    }
-
-    /**
-     * 获取日期类型
-     * @param m   月份
-     * @param day 日期
-     * @return String
-     */
-    private String getDateType(Month m, String day) {
-        String date = String.format("%s%s", m.getMonth(), day);
-        String type = m.getDateType(date);
-        return DateType.codeToName(type);
     }
 
     /**
