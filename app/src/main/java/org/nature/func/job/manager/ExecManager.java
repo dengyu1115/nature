@@ -42,7 +42,12 @@ public class ExecManager {
         });
     }
 
+    /**
+     * 执行
+     * @param date 时间
+     */
     private void doExec(Date date) {
+        long l1 = System.currentTimeMillis();
         String year = DateFormatUtils.format(date, "yyyy");
         String month = DateFormatUtils.format(date, "MM");
         String day = DateFormatUtils.format(date, "dd");
@@ -61,13 +66,14 @@ public class ExecManager {
                 // 执行任务
                 Job job = JobHolder.get(i.getCode());
                 if (job != null) {
-                    job.exec();
+                    job.exec(date);
                 }
             } catch (Exception e) {
                 // 执行异常，发送通知
                 NotifyUtil.notifyOne("定时任务执行异常", e.getMessage());
             }
         }
+        System.out.println("耗时：" + (System.currentTimeMillis() - l1));
     }
 
     /**

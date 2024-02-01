@@ -24,7 +24,7 @@ public class WorkdayLoadJob implements Job {
     private WorkdayManager workdayManager;
 
     @Override
-    public void exec() {
+    public void exec(Date date) {
         String year = DateFormatUtils.format(DateUtils.addYears(new Date(), 1), Const.FORMAT_YEAR);
         int load = workdayManager.load(year);
         NotifyUtil.notifyOne("工作日数据加载", "加载完成，共加载" + load + "条数据");

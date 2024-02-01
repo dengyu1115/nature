@@ -1,5 +1,7 @@
 package org.nature.func.job.protocol;
 
+import java.util.Date;
+
 /**
  * 任务
  * @author Nature
@@ -10,7 +12,8 @@ public interface Job {
 
     /**
      * 执行
+     * @param date 日期
      */
-    void exec();
+    void exec(Date date);
 
 }

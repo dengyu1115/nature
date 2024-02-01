@@ -6,6 +6,8 @@ import org.nature.common.ioc.annotation.JobExec;
 import org.nature.common.util.NotifyUtil;
 import org.nature.func.job.protocol.Job;
 
+import java.util.Date;
+
 /**
  * K线数据加载
  * @author Nature
@@ -19,7 +21,7 @@ public class KlineLoadJob implements Job {
     private KlineManager klineManager;
 
     @Override
-    public void exec() {
+    public void exec(Date date) {
         int load = klineManager.load();
         NotifyUtil.notifyOne("K线加载", "K线加载完成，共加载" + load + "条数据");
     }

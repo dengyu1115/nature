@@ -6,6 +6,8 @@ import org.nature.common.ioc.annotation.JobExec;
 import org.nature.common.util.NotifyUtil;
 import org.nature.func.job.protocol.Job;
 
+import java.util.Date;
+
 /**
  * 持仓计算
  * @author Nature
@@ -19,7 +21,7 @@ public class HoldCalcJob implements Job {
     private HoldManager holdManager;
 
     @Override
-    public void exec() {
+    public void exec(Date date) {
         int calc = holdManager.calc();
         NotifyUtil.notifyOne("持仓计算", "计算完成，共计算" + calc + "条持仓数据");
     }

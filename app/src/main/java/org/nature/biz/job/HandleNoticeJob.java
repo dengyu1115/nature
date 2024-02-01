@@ -42,7 +42,11 @@ public class HandleNoticeJob implements Job {
     private static final Map<String, Set<String>> MAP = new HashMap<>();
 
     @Override
-    public void exec() {
+    public void exec(Date date) {
+        // 执行延时1秒以上废弃任务
+        if (System.currentTimeMillis() - date.getTime() > 1000) {
+            return;
+        }
         // 非工作日不处理
         if (!workdayManager.isWorkday()) {
             return;
