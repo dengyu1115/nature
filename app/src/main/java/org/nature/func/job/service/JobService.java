@@ -1,6 +1,7 @@
 package org.nature.func.job.service;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -52,7 +53,8 @@ public class JobService extends Service {
         super.onCreate();
         NotifyUtil.notify("NATURE正在运行", "服务初始化...");
         // 设置为前台进程，降低oom_adj，提高进程优先级，提高存活机率
-        this.startForeground(NotifyUtil.NOTIFICATION_ID, NotifyUtil.notification("NATURE正在运行", "服务前台启动..."));
+        Notification notification = NotifyUtil.notification("NATURE正在运行", "服务前台启动...");
+        this.startForeground(NotifyUtil.NOTIFICATION_ID, notification);
         this.acquireWakeLock();
         synchronized (JobService.class) {  // 保证逻辑只启动一次
             if (service != null) {
