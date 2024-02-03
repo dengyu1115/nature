@@ -324,10 +324,11 @@ public class TableView<T> extends BasicView {
     }
 
     private HorizontalScrollView horizontalScrollView() {
-        HorizontalScrollView horizontalScrollView = new HorizontalScrollView(context);
-        horizontalScrollView.setLayoutParams(param);
-        horizontalScrollView.setScrollBarSize(0);
-        return horizontalScrollView;
+        HorizontalScrollView hsv = new HorizontalScrollView(context);
+        hsv.setLayoutParams(param);
+        hsv.setScrollBarSize(0);
+        hsv.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        return hsv;
     }
 
     private ListView listView() {
@@ -337,6 +338,7 @@ public class TableView<T> extends BasicView {
         listView.setAdapter(adapter);
         listView.setDivider(new GradientDrawable(RIGHT_LEFT, new int[]{BG_COLOR, BG_COLOR, BG_COLOR}));
         listView.setDividerHeight(1);
+        listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         listView.setOnScrollChangeListener((v, x, y, ox, oy) -> {
             int count = listView.getChildCount();
             if (childCount < count) {
@@ -569,15 +571,16 @@ public class TableView<T> extends BasicView {
             TextView textView = textViews.get(num);
             textView.setText(d.content.apply(item));
             textView.setGravity(textAlign(d.contentAlign));
-            if (d.click != null) {
-                textView.setOnClickListener(v -> {
-                    try {
-                        d.click.accept(item);
-                    } catch (Throwable t) {
-                        PopUtil.alert(context, t.getMessage());
-                    }
-                });
+            if (d.click == null) {
+                return;
             }
+            textView.setOnClickListener(v -> {
+                try {
+                    d.click.accept(item);
+                } catch (Throwable t) {
+                    PopUtil.alert(context, t.getMessage());
+                }
+            });
         }
     }
 

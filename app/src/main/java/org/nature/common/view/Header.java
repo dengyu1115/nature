@@ -5,6 +5,12 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 
+/**
+ * 页面头部模块
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/2/3
+ */
 public class Header extends BasicView {
 
     private final LayoutParams params;

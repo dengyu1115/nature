@@ -8,6 +8,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * 状态枚举
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/2/3
+ */
 @AllArgsConstructor
 @Getter
 public enum Status {

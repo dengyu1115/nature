@@ -35,6 +35,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
 
     @Injection
     private ConfigInfoManager configInfoManager;
+
     private Button start, stop, add;
     private LinearLayout editPop;
     private Selector<String> jobSel, statusSel;

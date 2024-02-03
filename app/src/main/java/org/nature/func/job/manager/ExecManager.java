@@ -1,9 +1,9 @@
 package org.nature.func.job.manager;
 
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.holder.JobHolder;
+import org.nature.common.util.DateUtil;
 import org.nature.common.util.NotifyUtil;
 import org.nature.common.util.RemoteExeUtil;
 import org.nature.func.job.enums.Status;
@@ -47,12 +47,12 @@ public class ExecManager {
      * @param date 时间
      */
     private void doExec(Date date) {
-        String year = DateFormatUtils.format(date, "yyyy");
-        String month = DateFormatUtils.format(date, "MM");
-        String day = DateFormatUtils.format(date, "dd");
-        String hour = DateFormatUtils.format(date, "HH");
-        String minute = DateFormatUtils.format(date, "mm");
-        String second = DateFormatUtils.format(date, "ss");
+        String year = DateUtil.format(date, "yyyy");
+        String month = DateUtil.format(date, "MM");
+        String day = DateUtil.format(date, "dd");
+        String hour = DateUtil.format(date, "HH");
+        String minute = DateUtil.format(date, "mm");
+        String second = DateUtil.format(date, "ss");
         // 查询所有任务配置数据
         List<ConfigInfo> list = configInfoMapper.listAll().stream()
                 .filter(i -> Status.RUNNING.getCode().equals(i.getStatus())).collect(Collectors.toList());
@@ -85,23 +85,14 @@ public class ExecManager {
      * @param second 秒
      * @return boolean
      */
-    private boolean meet(ConfigInfo info, String year, String month, String day, String hour, String minute, String second) {
-        if (!this.meet(info.getYear(), year)) {
-            return false;
-        }
-        if (!this.meet(info.getMonth(), month)) {
-            return false;
-        }
-        if (!this.meet(info.getDay(), day)) {
-            return false;
-        }
-        if (!this.meet(info.getHour(), hour)) {
-            return false;
-        }
-        if (!this.meet(info.getMinute(), minute)) {
-            return false;
-        }
-        return this.meet(info.getSecond(), second);
+    private boolean meet(ConfigInfo info, String year, String month, String day,
+                         String hour, String minute, String second) {
+        return this.meet(info.getYear(), year)
+                && this.meet(info.getMonth(), month)
+                && this.meet(info.getDay(), day)
+                && this.meet(info.getHour(), hour)
+                && this.meet(info.getMinute(), minute)
+                && this.meet(info.getSecond(), second);
     }
 
     /**

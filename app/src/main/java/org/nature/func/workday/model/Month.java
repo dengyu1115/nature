@@ -13,7 +13,13 @@ import java.util.Map;
  */
 public class Month extends BaseModel {
 
+    /**
+     * 日期数据
+     */
     private final Map<String, String> dateTypeMap = new HashMap<>();
+    /**
+     * 月份
+     */
     private String month;
 
     public String getMonth() {
