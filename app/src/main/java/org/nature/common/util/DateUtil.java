@@ -122,9 +122,9 @@ public class DateUtil {
      * @return String
      */
     private static String addDate(String date, int num, BiFunction<Date, Integer, Date> func) {
-        Date parseDate = parse(date, Const.FORMAT_DATE);
+        Date parseDate = parse(date, Const.FORMAT_DAY);
         Date resultDate = func.apply(parseDate, num);
-        return DateFormatUtils.format(resultDate, Const.FORMAT_DATE);
+        return DateFormatUtils.format(resultDate, Const.FORMAT_DAY);
     }
 
 }
