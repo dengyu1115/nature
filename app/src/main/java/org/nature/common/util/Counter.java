@@ -23,11 +23,15 @@ public class Counter {
     public void count(int inc) {
         long id = Thread.currentThread().getId();
         Integer count = map.get(id);
-        if (count == null) synchronized (map) {
-            if ((count = map.get(id)) == null) map.put(id, inc);
-            else map.put(id, count + inc);
-        }
-        else map.put(id, count + inc);
+        if (count == null) {
+            synchronized (map) {
+                if ((count = map.get(id)) == null) {
+                    map.put(id, inc);
+                } else {
+                    map.put(id, count + inc);
+                }
+            }
+        } else map.put(id, count + inc);
     }
 
     /**
@@ -36,7 +40,9 @@ public class Counter {
      */
     public int get() {
         int total = 0;
-        for (Integer i : map.values()) total += i;
+        for (Integer i : map.values()) {
+            total += i;
+        }
         return total;
     }
 }

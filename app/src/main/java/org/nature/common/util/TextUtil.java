@@ -3,72 +3,101 @@ package org.nature.common.util;
 import android.annotation.SuppressLint;
 
 import java.math.BigDecimal;
+import java.util.function.Function;
 
+/**
+ * 文本工具类
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/2/3
+ */
 @SuppressLint("DefaultLocale")
 public class TextUtil {
 
     public static String text(Object o) {
-        if (o == null) return "";
-        return o.toString();
+        return TextUtil.text(o, Object::toString);
     }
 
     public static String amount(Double o) {
-        if (o == null) return "";
-        else if (Math.abs(o) < 10000) return String.format("%.2f", o);
-        else if (Math.abs(o) < 100000000) return String.format("%.2f万", o / 10000d);
-        else if (Math.abs(o) < 1000000000000d) return String.format("%.4f亿", o / 10000d / 10000d);
-        else return String.format("%.4f万亿", o / 10000d / 10000d / 10000d);
+        return TextUtil.text(o, i -> {
+            if (Math.abs(i) < 10000) {
+                return String.format("%.2f", i);
+            }
+            if (Math.abs(i) < 100000000) {
+                return String.format("%.2f万", i / 10000d);
+            }
+            if (Math.abs(i) < 1000000000000d) {
+                return String.format("%.4f亿", i / 10000d / 10000d);
+            }
+            return String.format("%.4f万亿", i / 10000d / 10000d / 10000d);
+        });
     }
 
     public static String amount(BigDecimal o) {
-        if (o == null) return "";
-        return amount(o.doubleValue());
+        return TextUtil.text(o, i -> TextUtil.amount(i.doubleValue()));
     }
 
     public static String hundred(Double o) {
-        if (o == null) return "";
-        return String.format("%.2f%%", o * 100d);
+        if (o == null) {
+            return "";
+        }
+        return TextUtil.text(o, i -> String.format("%.2f%%", i * 100d));
     }
 
     public static String hundred(BigDecimal o) {
-        if (o == null) return "";
-        return hundred(o.doubleValue());
+        return TextUtil.text(o, i -> TextUtil.hundred(i.doubleValue()));
     }
 
     public static String percent(Double o) {
-        if (o == null) return "";
-        return String.format("%.2f%%", o);
+        return TextUtil.text(o, i -> String.format("%.2f%%", i));
     }
 
     public static String percent(BigDecimal o) {
-        if (o == null) return "";
-        return percent(o);
+        return TextUtil.text(o, i -> TextUtil.percent(i.doubleValue()));
     }
 
     public static String price(Double o) {
-        if (o == null) return "";
-        return String.format("%.3f", o);
+        return TextUtil.text(o, i -> String.format("%.3f", i));
     }
 
     public static String price(BigDecimal o) {
-        if (o == null) return "";
-        return price(o.doubleValue());
+        return TextUtil.text(o, i -> TextUtil.price(i.doubleValue()));
     }
 
     public static String net(Double o) {
-        if (o == null) return "";
-        return String.format("%.4f", o);
+        return TextUtil.text(o, i -> String.format("%.4f", i));
     }
 
     public static Double getDouble(String s) {
-        if (s == null || s.isEmpty() || s.equals("-") || s.equals("---")) return null;
-        if (s.endsWith("%")) s = s.replace("%", "");
+        if (s == null || s.isEmpty() || s.equals("-") || s.equals("---")) {
+            return null;
+        }
+        if (s.endsWith("%")) {
+            s = s.replace("%", "");
+        }
         return Double.valueOf(s);
     }
 
     public static BigDecimal getDecimal(String s) {
-        if (s == null || s.isEmpty() || s.equals("-") || s.equals("---")) return null;
-        if (s.endsWith("%")) s = s.replace("%", "");
+        if (s == null || s.isEmpty() || s.equals("-") || s.equals("---")) {
+            return null;
+        }
+        if (s.endsWith("%")) {
+            s = s.replace("%", "");
+        }
         return new BigDecimal(s);
+    }
+
+    /**
+     * 转化为文本
+     * @param t    对象
+     * @param func 函数
+     * @return String
+     */
+    private static <T> String text(T t, Function<T, String> func) {
+        if (t == null) {
+            return "";
+        }
+        return func.apply(t);
     }
 }

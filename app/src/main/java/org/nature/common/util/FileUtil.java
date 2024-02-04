@@ -21,7 +21,9 @@ public class FileUtil {
             try {
                 File parent = file.getParentFile();
                 assert parent != null;
-                if (!parent.exists()) parent.mkdirs();
+                if (!parent.exists()) {
+                    parent.mkdirs();
+                }
                 file.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException(e);
