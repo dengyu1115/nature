@@ -12,7 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.nature.common.constant.Const.*;
+import static org.nature.common.constant.Const.EMPTY;
+import static org.nature.common.constant.Const.HYPHEN;
 
 /**
  * K线获取
@@ -42,7 +43,7 @@ public class KlineHttp {
         // 填充参数生成完整URL
         String uri = String.format(URL_KLINE, type, code, start, end);
         // 发起请求调用得到返回
-        String response = HttpUtil.doGet(uri, UTF_8, lines -> lines.collect(Collectors.toList()).get(0));
+        String response = HttpUtil.doGet(uri, lines -> lines.collect(Collectors.toList()).get(0));
         // 解析返回数据，转换为json对象
         JSONObject jo = JSON.parseObject(response);
         // 获取所需字段

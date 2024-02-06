@@ -10,7 +10,7 @@ import org.nature.biz.model.Kline;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.util.DateUtil;
-import org.nature.common.util.RemoteExeUtil;
+import org.nature.common.util.ExecUtil;
 
 import java.util.Date;
 import java.util.List;
@@ -36,7 +36,7 @@ public class KlineManager {
      * @return int
      */
     public int load() {
-        return RemoteExeUtil.exec(itemMapper::listAll, this::loadByItem).stream().mapToInt(i -> i).sum();
+        return ExecUtil.batch(itemMapper::listAll, this::loadByItem).stream().mapToInt(i -> i).sum();
     }
 
     /**
@@ -44,7 +44,7 @@ public class KlineManager {
      * @return int
      */
     public int reload() {
-        return RemoteExeUtil.exec(itemMapper::listAll, this::reloadByItem).stream().mapToInt(i -> i).sum();
+        return ExecUtil.batch(itemMapper::listAll, this::reloadByItem).stream().mapToInt(i -> i).sum();
     }
 
     /**

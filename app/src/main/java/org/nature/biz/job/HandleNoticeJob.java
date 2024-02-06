@@ -29,6 +29,8 @@ public class HandleNoticeJob implements Job {
 
     public static final BigDecimal HUNDRED = new BigDecimal("100");
 
+    private static boolean running;
+
     @Injection
     private RuleManager ruleManager;
     @Injection
@@ -43,57 +45,65 @@ public class HandleNoticeJob implements Job {
 
     @Override
     public void exec(Date date) {
-        // 执行延时1秒以上废弃任务
-        if (System.currentTimeMillis() - date.getTime() > 1000) {
+        if (running) {
             return;
         }
-        // 非工作日不处理
-        if (!workdayManager.isWorkday()) {
-            return;
-        }
-        // 查询最新操作数据
-        List<Hold> holds = ruleManager.latestHandle();
-        // 转换买入、卖出数据
-        String today = DateUtil.today();
-        String keyBuy = today + ":buy";
-        String keySell = today + ":sell";
-        Set<String> buyExists = MAP.computeIfAbsent(keyBuy, k -> new HashSet<>());
-        Set<String> sellExists = MAP.computeIfAbsent(keySell, k -> new HashSet<>());
-        // 项目-操作-价格-数量
-        Map<String, Map<String, Map<BigDecimal, BigDecimal>>> map = new HashMap<>();
-        // 遍历数据，解析需要新执行的各个项目的买入、卖出-价格-份额数据
-        for (Hold i : holds) {
-            String key = this.key(i);
-            BigDecimal priceSell = i.getPriceSell();
-            if (priceSell == null) {
-                if (buyExists.contains(key)) {
-                    continue;
-                }
-                // 买入操作数据添加
-                this.fillHandleData(map, i, keyBuy, i.getPriceBuy(), i.getShareBuy());
-                buyExists.add(key);
-            } else {
-                if (sellExists.contains(key)) {
-                    continue;
-                }
-                // 卖出操作数据添加
-                this.fillHandleData(map, i, keySell, i.getPriceSell(), i.getShareSell());
-                sellExists.add(key);
+        try {
+            running = true;
+            // 执行延时1秒以上废弃任务
+            if (System.currentTimeMillis() - date.getTime() > 1000) {
+                return;
             }
-        }
-        // 构建文本
-        String text = this.buildText(map, keyBuy, keySell);
-        // 转换语音进行提示
-        if (text != null) {
-            NotifyUtil.notifyOne("交易提醒", text);
-            NotifyUtil.speak(text);
-        }
-        // 删除过期数据
-        Set<String> set = new HashSet<>(MAP.keySet());
-        for (String s : set) {
-            if (!keyBuy.equals(s) && !keySell.equals(s)) {
-                MAP.remove(s);
+            // 非工作日不处理
+            if (!workdayManager.isWorkday()) {
+                return;
             }
+            // 查询最新操作数据
+            List<Hold> holds = ruleManager.latestHandle();
+            // 转换买入、卖出数据
+            String today = DateUtil.today();
+            String keyBuy = today + ":buy";
+            String keySell = today + ":sell";
+            Set<String> buyExists = MAP.computeIfAbsent(keyBuy, k -> new HashSet<>());
+            Set<String> sellExists = MAP.computeIfAbsent(keySell, k -> new HashSet<>());
+            // 项目-操作-价格-数量
+            Map<String, Map<String, Map<BigDecimal, BigDecimal>>> map = new HashMap<>();
+            // 遍历数据，解析需要新执行的各个项目的买入、卖出-价格-份额数据
+            for (Hold i : holds) {
+                String key = this.key(i);
+                BigDecimal priceSell = i.getPriceSell();
+                if (priceSell == null) {
+                    if (buyExists.contains(key)) {
+                        continue;
+                    }
+                    // 买入操作数据添加
+                    this.fillHandleData(map, i, keyBuy, i.getPriceBuy(), i.getShareBuy());
+                    buyExists.add(key);
+                } else {
+                    if (sellExists.contains(key)) {
+                        continue;
+                    }
+                    // 卖出操作数据添加
+                    this.fillHandleData(map, i, keySell, i.getPriceSell(), i.getShareSell());
+                    sellExists.add(key);
+                }
+            }
+            // 构建文本
+            String text = this.buildText(map, keyBuy, keySell);
+            // 转换语音进行提示
+            if (text != null) {
+                NotifyUtil.notifyOne("交易提醒", text);
+                NotifyUtil.speak(text);
+            }
+            // 删除过期数据
+            Set<String> set = new HashSet<>(MAP.keySet());
+            for (String s : set) {
+                if (!keyBuy.equals(s) && !keySell.equals(s)) {
+                    MAP.remove(s);
+                }
+            }
+        } finally {
+            running = false;
         }
     }
 

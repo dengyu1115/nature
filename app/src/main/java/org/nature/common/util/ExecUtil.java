@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * @version 1.0.0
  * @since 2024/1/7
  */
-public class RemoteExeUtil {
+public class ExecUtil {
 
     private static final int SIZE_CORE = 32, SIZE_MAX = 64, ALIVE_TIME = 1;
 
@@ -23,11 +23,46 @@ public class RemoteExeUtil {
 
     /**
      * 执行
+     * @param item 数据获取逻辑
+     * @param run  执行逻辑
+     * @return 执行后结果集
+     */
+    public static <I, O> O single(Supplier<I> item, Function<I, O> run) {
+        // 获取数据集合
+        I i = item.get();
+        // 任务结果获取集合
+        Future<O> future = EXECUTOR.submit(() -> doExec(run, i, 0));
+        // 结果获取，执行无结果返回null
+        try {
+            return future.get();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 执行
+     * @param call 执行逻辑
+     * @return 执行后结果集
+     */
+    public static <O> O single(Callable<O> call) {
+        // 任务结果获取集合
+        Future<O> future = EXECUTOR.submit(call);
+        // 结果获取，执行无结果返回null
+        try {
+            return future.get();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 执行
      * @param list 数据集合获取逻辑
      * @param run  执行逻辑
      * @return 执行后结果集
      */
-    public static <I, O> List<O> exec(Supplier<List<I>> list, Function<I, O> run) {
+    public static <I, O> List<O> batch(Supplier<List<I>> list, Function<I, O> run) {
         // 获取数据集合
         List<I> items = list.get();
         // 任务结果获取集合

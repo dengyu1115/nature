@@ -35,7 +35,9 @@ public class JobService extends Service {
     /**
      * 计数器
      */
-    private static final AtomicInteger counter = new AtomicInteger();
+    private final AtomicInteger counter = new AtomicInteger();
+
+    private final long startTime = System.currentTimeMillis();
     /**
      * 定时器
      */
@@ -124,7 +126,9 @@ public class JobService extends Service {
         try {
             Date now = new Date();
             String date = DateFormatUtils.format(now, Const.FORMAT_DATETIME);
-            String s = String.format("%s:%s", date, counter.incrementAndGet());
+            long times = (System.currentTimeMillis() - startTime) / 1000;
+            int count = counter.getAndIncrement();
+            String s = String.format("时间:%s 次数:%s 漏执行:%s", date, count, times - count);
             NotifyUtil.notify("NATURE正在运行", s);
             ExecManager execManager = InstanceHolder.get(ExecManager.class);
             if (execManager != null) {

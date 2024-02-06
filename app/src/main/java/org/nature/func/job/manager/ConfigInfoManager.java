@@ -56,4 +56,5 @@ public class ConfigInfoManager {
     public List<ConfigInfo> listAll() {
         return configInfoMapper.listAll();
     }
+
 }

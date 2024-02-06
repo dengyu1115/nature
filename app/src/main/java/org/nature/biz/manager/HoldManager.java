@@ -11,7 +11,7 @@ import org.nature.biz.simulator.SimulatorBuilder;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.util.DateUtil;
-import org.nature.common.util.RemoteExeUtil;
+import org.nature.common.util.ExecUtil;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -38,7 +38,7 @@ public class HoldManager {
      * @return int
      */
     public int calc() {
-        return RemoteExeUtil.exec(ruleMapper::listAll, this::calc).stream().mapToInt(i -> i).sum();
+        return ExecUtil.batch(ruleMapper::listAll, this::calc).stream().mapToInt(i -> i).sum();
     }
 
     /**

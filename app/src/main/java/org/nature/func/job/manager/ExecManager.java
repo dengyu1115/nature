@@ -4,8 +4,8 @@ import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.holder.JobHolder;
 import org.nature.common.util.DateUtil;
+import org.nature.common.util.ExecUtil;
 import org.nature.common.util.NotifyUtil;
-import org.nature.common.util.RemoteExeUtil;
 import org.nature.func.job.enums.Status;
 import org.nature.func.job.mapper.ConfigInfoMapper;
 import org.nature.func.job.model.ConfigInfo;
@@ -32,21 +32,6 @@ public class ExecManager {
      * 执行
      */
     public void exec(Date date) {
-        // 开启异步线程
-        RemoteExeUtil.submit(() -> {
-            try {
-                this.doExec(date);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
-
-    /**
-     * 执行
-     * @param date 时间
-     */
-    private void doExec(Date date) {
         String year = DateUtil.format(date, "yyyy");
         String month = DateUtil.format(date, "MM");
         String day = DateUtil.format(date, "dd");
@@ -54,23 +39,35 @@ public class ExecManager {
         String minute = DateUtil.format(date, "mm");
         String second = DateUtil.format(date, "ss");
         // 查询所有任务配置数据
-        List<ConfigInfo> list = configInfoMapper.listAll().stream()
-                .filter(i -> Status.RUNNING.getCode().equals(i.getStatus())).collect(Collectors.toList());
+        List<ConfigInfo> list = configInfoMapper.listAll().stream().filter(i -> Status.isRunning(i.getStatus()))
+                .collect(Collectors.toList());
         for (ConfigInfo i : list) {
             // 判断是否满足执行条件
             if (!this.meet(i, year, month, day, hour, minute, second)) {
                 continue;
             }
-            try {
-                // 执行任务
-                Job job = JobHolder.get(i.getCode());
-                if (job != null) {
+            this.doExec(date, i.getCode());
+        }
+    }
+
+    /**
+     * 执行
+     * @param date 时间
+     * @param code
+     */
+    private void doExec(Date date, String code) {
+        // 执行任务
+        Job job = JobHolder.get(code);
+        if (job != null) {
+            // 开启异步线程
+            ExecUtil.submit(() -> {
+                try {
                     job.exec(date);
+                } catch (Exception e) {
+                    // 执行异常，发送通知
+                    NotifyUtil.notifyOne("定时任务执行异常", e.getMessage());
                 }
-            } catch (Exception e) {
-                // 执行异常，发送通知
-                NotifyUtil.notifyOne("定时任务执行异常", e.getMessage());
-            }
+            });
         }
     }
 

@@ -38,4 +38,8 @@ public enum Status {
         return CODES;
     }
 
+    public static boolean isRunning(String code) {
+        return RUNNING.getCode().equals(code);
+    }
+
 }
