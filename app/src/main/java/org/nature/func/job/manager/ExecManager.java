@@ -39,7 +39,8 @@ public class ExecManager {
         String minute = DateUtil.format(date, "mm");
         String second = DateUtil.format(date, "ss");
         // 查询所有任务配置数据
-        List<ConfigInfo> list = configInfoMapper.listAll().stream().filter(i -> Status.isRunning(i.getStatus()))
+        List<ConfigInfo> list = configInfoMapper.listAll().stream()
+                .filter(i -> Status.isRunning(i.getStatus()))
                 .collect(Collectors.toList());
         for (ConfigInfo i : list) {
             // 判断是否满足执行条件
@@ -53,22 +54,23 @@ public class ExecManager {
     /**
      * 执行
      * @param date 时间
-     * @param code
+     * @param code 任务编号
      */
     private void doExec(Date date, String code) {
         // 执行任务
         Job job = JobHolder.get(code);
-        if (job != null) {
-            // 开启异步线程
-            ExecUtil.submit(() -> {
-                try {
-                    job.exec(date);
-                } catch (Exception e) {
-                    // 执行异常，发送通知
-                    NotifyUtil.notifyOne("定时任务执行异常", e.getMessage());
-                }
-            });
+        if (job == null) {
+            return;
         }
+        // 开启异步线程
+        ExecUtil.submit(() -> {
+            try {
+                job.exec(date);
+            } catch (Exception e) {
+                // 执行异常，发送通知
+                NotifyUtil.notifyOne("定时任务执行异常", e.getMessage());
+            }
+        });
     }
 
     /**
@@ -101,13 +103,16 @@ public class ExecManager {
     private boolean meet(String condition, String time) {
         String[] split = condition.split(":");
         String type = split[0];
+        // 全部时间通用
         if ("0".equals(type)) {
             return true;
         }
+        // 按时间范围
         if ("1".equals(type)) {
             String[] ss = split[1].split("-");
             return time.compareTo(ss[0]) >= 0 && time.compareTo(ss[1]) <= 0;
         }
+        // 按时间点
         if ("2".equals(type)) {
             List<String> list = Arrays.asList(split[1].split(","));
             return list.contains(time);

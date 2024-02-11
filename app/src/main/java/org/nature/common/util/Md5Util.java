@@ -11,6 +11,11 @@ import java.security.NoSuchAlgorithmException;
  */
 public class Md5Util {
 
+    /**
+     * 生成MD5字符串
+     * @param input 输入
+     * @return String
+     */
     public static String md5(String... input) {
         return md5(String.join(":", input));
     }
