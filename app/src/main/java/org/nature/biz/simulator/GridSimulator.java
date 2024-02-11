@@ -12,6 +12,12 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 网格交易模拟器
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/2/11
+ */
 public class GridSimulator implements Simulator {
 
     public static final int SCALE = 3;

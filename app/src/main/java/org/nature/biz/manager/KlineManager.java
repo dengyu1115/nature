@@ -102,7 +102,7 @@ public class KlineManager {
      * @return String
      */
     private String getLastDate(Kline kline) {
-        return kline == null ? "" : DateUtil.addDays(kline.getDate(), 1).replace("-", "");
+        return kline == null ? "" : DateUtil.addDays(kline.getDate(), 1);
     }
 
 }

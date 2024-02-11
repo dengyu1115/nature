@@ -7,6 +7,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import android.widget.LinearLayout.LayoutParams;
@@ -163,11 +164,12 @@ public class ViewTemplate {
 
     /**
      * 行
-     * @param w 宽
-     * @param h 高
+     * @param w     宽
+     * @param h     高
+     * @param views 下级view集合
      * @return LinearLayout
      */
-    public LinearLayout line(int w, int h) {
+    public LinearLayout line(int w, int h, View... views) {
         LinearLayout line = new LinearLayout(context);
         line.setGravity(Gravity.CENTER);
         float density = context.getResources().getDisplayMetrics().density;
@@ -175,6 +177,9 @@ public class ViewTemplate {
         int height = (int) (h * density + 0.5f);
         LayoutParams param = new LayoutParams(width, height);
         line.setLayoutParams(param);
+        for (View view : views) {
+            line.addView(view);
+        }
         return line;
     }
 
@@ -197,12 +202,18 @@ public class ViewTemplate {
     }
 
     /**
-     * 页面
+     * 线性布局
+     * @param gravity 排布方式
+     * @param views   子级view集合
      * @return LinearLayout
      */
-    public LinearLayout linearPage() {
+    public LinearLayout linearPage(int gravity, View... views) {
         LinearLayout page = new LinearLayout(context);
         page.setOrientation(LinearLayout.VERTICAL);
+        page.setGravity(gravity);
+        for (View view : views) {
+            page.addView(view);
+        }
         return page;
     }
 

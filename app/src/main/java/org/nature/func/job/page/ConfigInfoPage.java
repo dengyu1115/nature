@@ -14,6 +14,7 @@ import org.nature.common.util.*;
 import org.nature.common.view.TableView;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
+import org.nature.common.view.ViewTemplate;
 import org.nature.func.job.enums.Status;
 import org.nature.func.job.manager.ConfigInfoManager;
 import org.nature.func.job.model.ConfigInfo;
@@ -22,6 +23,8 @@ import org.nature.func.job.service.JobService;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static org.nature.common.constant.Const.*;
 
 /**
  * 任务配置
@@ -87,42 +90,19 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
      * 构建弹窗
      */
     private void makeWindowStructure() {
-        editPop = template.linearPage();
-        editPop.setGravity(Gravity.CENTER);
-        LinearLayout l1 = template.line(300, 30);
-        LinearLayout l2 = template.line(300, 30);
-        LinearLayout l3 = template.line(300, 30);
-        LinearLayout l4 = template.line(300, 30);
-        LinearLayout l5 = template.line(300, 30);
-        LinearLayout l6 = template.line(300, 30);
-        LinearLayout l7 = template.line(300, 30);
-        LinearLayout l8 = template.line(300, 30);
-        l1.addView(template.textView("任务：", 100, 30));
-        l1.addView(jobSel = template.selector(200, 30));
-        l2.addView(template.textView("年：", 100, 30));
-        l2.addView(year = template.editText(200, 30));
-        l3.addView(template.textView("月：", 100, 30));
-        l3.addView(month = template.editText(200, 30));
-        l4.addView(template.textView("日：", 100, 30));
-        l4.addView(day = template.editText(200, 30));
-        l5.addView(template.textView("时：", 100, 30));
-        l5.addView(hour = template.editText(200, 30));
-        l6.addView(template.textView("分：", 100, 30));
-        l6.addView(minute = template.editText(200, 30));
-        l7.addView(template.textView("秒：", 100, 30));
-        l7.addView(second = template.editText(200, 30));
-        l8.addView(template.textView("状态：", 100, 30));
-        l8.addView(statusSel = template.selector(200, 30));
+        ViewTemplate t = template;
+        editPop = t.linearPage(Gravity.CENTER,
+                t.line(L_W, L_H, t.textView("任务：", L_W_T, L_H), jobSel = t.selector(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("年：", L_W_T, L_H), year = t.editText(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("月：", L_W_T, L_H), month = t.editText(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("日：", L_W_T, L_H), day = t.editText(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("时：", L_W_T, L_H), hour = t.editText(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("分：", L_W_T, L_H), minute = t.editText(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("秒：", L_W_T, L_H), second = t.editText(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("状态：", L_W_T, L_H), statusSel = t.selector(L_W_C, L_H))
+        );
         jobSel.mapper(JobHolder::getName).init().refreshData(JobHolder.jobs());
         statusSel.mapper(Status::name).init().refreshData(Status.codes());
-        editPop.addView(l1);
-        editPop.addView(l2);
-        editPop.addView(l3);
-        editPop.addView(l4);
-        editPop.addView(l5);
-        editPop.addView(l6);
-        editPop.addView(l7);
-        editPop.addView(l8);
     }
 
     /**

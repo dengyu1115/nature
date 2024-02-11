@@ -56,8 +56,8 @@ public interface Const {
      */
     String FORMAT_TIME = "HH:mm:ss";
     /**
-     * 间隔
+     * 间隔、行宽、行宽-标题、行宽-内容、行高
      */
-    int PAD = 15;
+    int PAD = 15, L_W = 300, L_W_T = 100, L_W_C = 200, L_H = 30;
 
 }

@@ -14,11 +14,14 @@ import org.nature.common.util.PopUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.TableView;
+import org.nature.common.view.ViewTemplate;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static org.nature.common.constant.Const.*;
 
 /**
  * 项目分组
@@ -128,18 +131,12 @@ public class GroupListPage extends ListPage<Group> {
      * 创建弹窗
      */
     private void makeWindowStructure() {
-        page = template.linearPage();
-        page.setGravity(Gravity.CENTER);
-        LinearLayout cl = template.line(300, 30);
-        LinearLayout nl = template.line(300, 30);
-        LinearLayout el = template.line(300, 30);
-        cl.addView(template.textView("分组编号：", 100, 30));
-        cl.addView(code = template.editText(200, 30));
-        nl.addView(template.textView("分组名称：", 100, 30));
-        nl.addView(name = template.editText(200, 30));
-        page.addView(cl);
-        page.addView(nl);
-        page.addView(el);
+        ViewTemplate t = template;
+        page = t.linearPage(Gravity.CENTER,
+                t.line(L_W, L_H, t.textView("分组编号：", L_W_T, L_H), code = t.editText(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("分组名称：", L_W_T, L_H), name = t.editText(L_W_C, L_H)),
+                t.line(L_W, L_H)
+        );
     }
 
 }

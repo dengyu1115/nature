@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static org.nature.common.constant.Const.*;
+
 /**
  * 规则页面
  * @author Nature
@@ -200,39 +202,18 @@ public class RuleListPage extends ListPage<Rule> {
      * 构建弹窗
      */
     private void makeWindowStructure() {
-        ViewTemplate template = ViewTemplate.build(context);
-        page = template.linearPage();
-        page.setGravity(Gravity.CENTER);
-        LinearLayout l1 = template.line(300, 30);
-        LinearLayout l2 = template.line(300, 30);
-        LinearLayout l3 = template.line(300, 30);
-        LinearLayout l4 = template.line(300, 30);
-        LinearLayout l5 = template.line(300, 30);
-        LinearLayout l6 = template.line(300, 30);
-        LinearLayout l7 = template.line(300, 30);
-        l1.addView(template.textView("名称：", 100, 30));
-        l1.addView(name = template.editText(200, 30));
-        l2.addView(template.textView("开始日期：", 100, 30));
-        l2.addView(date = template.editText(200, 30));
-        l3.addView(template.textView("金额基数：", 100, 30));
-        l3.addView(base = template.numeric(200, 30));
-        l4.addView(template.textView("波动比率：", 100, 30));
-        l4.addView(ratio = template.numeric(200, 30));
-        l5.addView(template.textView("扩大幅度：", 100, 30));
-        l5.addView(expansion = template.numeric(200, 30));
-        l6.addView(template.textView("状态：", 100, 30));
-        l6.addView(statusSel = template.selector(200, 30));
-        l7.addView(template.textView("规则类型：", 100, 30));
-        l7.addView(typeSel = template.selector(200, 30));
+        ViewTemplate t = template;
+        page = t.linearPage(Gravity.CENTER,
+                t.line(L_W, L_H, t.textView("名称：", L_W_T, L_H), name = t.editText(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("开始日期：", L_W_T, L_H), date = t.editText(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("金额基数：", L_W_T, L_H), base = t.numeric(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("波动比率：", L_W_T, L_H), ratio = t.numeric(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("扩大幅度：", L_W_T, L_H), expansion = t.numeric(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("状态：", L_W_T, L_H), statusSel = t.selector(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("规则类型：", L_W_T, L_H), typeSel = t.selector(L_W_C, L_H))
+        );
         statusSel.init().mapper(this::statusName).refreshData(Arrays.asList("1", "0"));
         typeSel.init().mapper(this::typeName).refreshData(Arrays.asList("0", "1", "2"));
-        page.addView(l1);
-        page.addView(l2);
-        page.addView(l3);
-        page.addView(l4);
-        page.addView(l5);
-        page.addView(l6);
-        page.addView(l7);
     }
 
     /**

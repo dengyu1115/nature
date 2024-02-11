@@ -14,10 +14,14 @@ import org.nature.biz.model.Item;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.*;
-import org.nature.common.view.TableView;
+import org.nature.common.util.ClickUtil;
+import org.nature.common.util.PopUtil;
+import org.nature.common.util.Sorter;
+import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
+import org.nature.common.view.TableView;
+import org.nature.common.view.ViewTemplate;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -25,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import static org.nature.common.constant.Const.*;
 
 /**
  * 项目维护
@@ -266,28 +272,16 @@ public class ItemListPage extends ListPage<Item> {
      * 构建弹窗结构
      */
     private void makeWindowStructure() {
-        editPop = template.linearPage();
-        editPop.setGravity(Gravity.CENTER);
-        LinearLayout cl = template.line(300, 30);
-        LinearLayout nl = template.line(300, 30);
-        LinearLayout tl = template.line(300, 30);
-        LinearLayout gl = template.line(300, 30);
-        LinearLayout el = template.line(300, 30);
-        cl.addView(template.textView("编号：", 100, 30));
-        cl.addView(code = template.editText(200, 30));
-        nl.addView(template.textView("名称：", 100, 30));
-        nl.addView(name = template.editText(200, 30));
-        tl.addView(template.textView("类型：", 100, 30));
-        tl.addView(type = template.selector(200, 30));
-        gl.addView(template.textView("分组：", 100, 30));
-        gl.addView(group = template.selector(200, 30));
+        ViewTemplate t = template;
+        editPop = t.linearPage(Gravity.CENTER,
+                t.line(L_W, L_H, t.textView("编号：", L_W_T, L_H), code = t.editText(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("名称：", L_W_T, L_H), name = t.editText(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("类型：", L_W_T, L_H), type = t.selector(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("分组：", L_W_T, L_H), group = t.selector(L_W_C, L_H)),
+                t.line(L_W, L_H)
+        );
         type.mapper(i -> i).init().refreshData(Arrays.asList("0", "1"));
         group.mapper(Group::getName).init().refreshData(groupManager.listAll());
-        editPop.addView(cl);
-        editPop.addView(nl);
-        editPop.addView(tl);
-        editPop.addView(gl);
-        editPop.addView(el);
     }
 
 }
