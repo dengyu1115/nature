@@ -114,7 +114,9 @@ public class Selector<T> extends BasicView {
             valueView.setTag(tag);
             if (!Objects.equals(value, tag)) {
                 value = (T) tag;
-                if (changeRun != null) changeRun.run();
+                if (changeRun != null) {
+                    changeRun.run();
+                }
             }
         });
     }
@@ -131,7 +133,9 @@ public class Selector<T> extends BasicView {
         if (!items.isEmpty() && (valueView.getText() == null || valueView.getText().length() == 0)) {
             this.doSelect(0, valueView);
             value = (T) valueView.getTag();
-            if (changeRun != null) changeRun.run();
+            if (changeRun != null) {
+                changeRun.run();
+            }
         }
     }
 
@@ -170,8 +174,10 @@ public class Selector<T> extends BasicView {
 
         @Override
         public View getView(int pos, View convertView, ViewGroup viewGroup) {
-            if (convertView == null) convertView = textView();
-            doSelect(pos, (TextView) convertView);
+            if (convertView == null) {
+                convertView = textView();
+            }
+            Selector.this.doSelect(pos, (TextView) convertView);
             return convertView;
         }
     }

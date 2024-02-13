@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.*;
 import org.apache.commons.lang3.StringUtils;
 import org.nature.common.util.ClickUtil;
-import org.nature.common.util.PopUtil;
 import org.nature.common.util.Sorter;
 
 import java.util.*;
@@ -29,7 +28,7 @@ import static android.graphics.drawable.GradientDrawable.Orientation.RIGHT_LEFT;
  * @version 1.0.0
  * @since 2024/1/5
  */
-@SuppressLint("DefaultLocale")
+@SuppressLint({"DefaultLocale", "ClickableViewAccessibility"})
 public class TableView<T> extends BasicView {
 
     public static final int HEIGHT = 33;
@@ -49,10 +48,8 @@ public class TableView<T> extends BasicView {
     private List<T> tempList;
     private float colWidth;
     private HorizontalScrollView touchView;
-    private int scrollX;
+    private int scrollX, oldScrollX;
     private final OnScrollChangeListener scrollChangeListener = (v, x, y, ox, oy) -> this.scrollAll(this.scrollX = x);
-    private int oldScrollX;
-    private int childCount;
     private Comparator<T> comparator;
     private int sortCol;
     private boolean sortClicked;
@@ -74,41 +71,67 @@ public class TableView<T> extends BasicView {
         this.columns = columns;
     }
 
+    /**
+     * 定义
+     * @param ds 列定义集合
+     */
     public void define(List<D<T>> ds) {
         this.ds = ds;
         this.init();
     }
 
+    /**
+     * 设置数据
+     * @param list 数据
+     */
     public void data(List<T> list) {
         this.tempList = list;
         handler.sendMessage(new Message());
     }
 
+    /**
+     * 初始化
+     */
     private void init() {
+        // 计算列宽
         this.calculateColumnWidth();
+        // 设置行间线
         this.setBaselineAligned(true);
+        // 设置布局参数
         this.setLayoutParams(param);
+        // 设置布局方向
         this.setOrientation(VERTICAL);
-        this.addView(this.titleView());
+        // 设置表头
+        this.addView(this.headerView());
+        // 设置分割线
         this.addView(this.hDivider());
-        this.addView(this.listView());
+        // 设置数据行
+        this.addView(this.dataView());
     }
 
+    /**
+     * 计算列宽度
+     */
     private void calculateColumnWidth() {
-//        context.getResources().getDisplayMetrics().widthPixels;
+        // context.getResources().getDisplayMetrics().widthPixels;
         this.colWidth = (2228 - columns) * widthRate / DENSITY / columns + 0.5f; //  - 2
     }
 
-    private LinearLayout titleView() {
-        LinearLayout line = this.line();
+    /**
+     * 表头view部分
+     * @return LinearLayout
+     */
+    private LinearLayout headerView() {
+        LinearLayout line = this.lineView();
         HorizontalScrollView scrollView = this.horizontalScrollView();
         scrollView.setOnScrollChangeListener(scrollChangeListener);
-        LinearLayout innerLine = this.line();
+        LinearLayout innerLine = this.lineView();
         scrollView.addView(innerLine);
         horizontalScrollViews.add(scrollView);
         this.scrollFix(scrollView);
         for (D<T> d : ds) {
             List<D<T>> ds = d.ds;
+            // 单层表头处理
             if (ds == null || ds.isEmpty()) {
                 TextView content = this.titleView(d);
                 if (titleGroup == 0) {
@@ -122,8 +145,9 @@ public class TableView<T> extends BasicView {
                     innerLine.addView(vDivider());
                 }
             } else {
+                // 多级表头处理
                 if (StringUtils.isNotBlank(d.title)) {
-                    LinearLayout rect = this.rect(d.title, d.titleAlign, d.ds);
+                    LinearLayout rect = this.rectView(d.title, d.titleAlign, d.ds);
                     if (titleGroup == 0) {
                         line.addView(rect);
                         line.addView(vDivider());
@@ -174,6 +198,11 @@ public class TableView<T> extends BasicView {
         return line;
     }
 
+    /**
+     * 标题view
+     * @param td 定义信息
+     * @return TextView
+     */
     private TextView titleView(D<T> td) {
         TextView textView = textView();
         textView.setText(td.title);
@@ -182,20 +211,25 @@ public class TableView<T> extends BasicView {
         return textView;
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    private void addSortClickEvent(TextView textView, Comparator<T> comparator) {
+
+    /**
+     * 添加点击排序事件
+     * @param view       view
+     * @param comparator 排序逻辑
+     */
+    private void addSortClickEvent(TextView view, Comparator<T> comparator) {
         if (comparator == null) {
             return;
         }
         int col = titleCol++;
         if (this.titleGroup == 0) {
-            textView.setOnClickListener((v) -> {
+            view.setOnClickListener(v -> {
                 this.comparator = comparator;
                 this.sortCol = col;
                 this.sortClick(v);
             });
         } else {
-            textView.setOnTouchListener((v, event) -> {
+            view.setOnTouchListener((v, event) -> {
                 int action = event.getAction();
                 if (action == MotionEvent.ACTION_DOWN) {
                     this.comparator = comparator;
@@ -207,8 +241,12 @@ public class TableView<T> extends BasicView {
         }
     }
 
-    private void sortClick(View v) {
-        ClickUtil.click(v, () -> {
+    /**
+     * 排序点击
+     * @param view view
+     */
+    private void sortClick(View view) {
+        ClickUtil.click(view, () -> {
             if (sc.get() == this.sortCol) {
                 sc.set(-1);
                 this.list.sort(this.comparator.reversed());
@@ -220,11 +258,15 @@ public class TableView<T> extends BasicView {
         });
     }
 
-    @SuppressLint("ClickableViewAccessibility")
+    /**
+     * 滚动到固定位置
+     * @param scrollView 水平滚动view
+     */
     private void scrollFix(HorizontalScrollView scrollView) {
-        OnTouchListener listener = (v, event) -> {
+        scrollView.setOnTouchListener((view, event) -> {
             int action = event.getAction();
-            if (action == MotionEvent.ACTION_DOWN) { // 手指点下时候事件处理
+            if (action == MotionEvent.ACTION_DOWN) {
+                // 手指点下时候事件处理
                 clickX = event.getX();
                 clickY = event.getY();
                 synchronized (TableView.this) {
@@ -237,10 +279,12 @@ public class TableView<T> extends BasicView {
                     (touchView = scrollView).setOnScrollChangeListener(scrollChangeListener);
                 }
             } else if (action == MotionEvent.ACTION_UP && sortClicked
-                    && event.getX() == clickX && event.getY() == clickY) { // 手指放开事件处理
-                this.sortClick(v);
+                    && event.getX() == clickX && event.getY() == clickY) {
+                // 手指放开事件处理
+                this.sortClick(view);
                 this.sortClicked = false;
-            } else if (action != MotionEvent.ACTION_MOVE) { // 其他非移动情况处理
+            } else if (action != MotionEvent.ACTION_MOVE) {
+                // 其他非移动情况处理
                 synchronized (TableView.this) {
                     canceled.set(false);
                     if (running.get()) return false;
@@ -253,10 +297,15 @@ public class TableView<T> extends BasicView {
                 (touchView = scrollView).setOnScrollChangeListener(scrollChangeListener);
             }
             return false;
-        };
-        scrollView.setOnTouchListener(listener);
+        });
     }
 
+    /**
+     * 移动至指定位置任务
+     * @param scrollView 滚动view
+     * @param timer      定时器
+     * @return TimerTask
+     */
     private TimerTask moveFixTask(HorizontalScrollView scrollView, Timer timer) {
         return new TimerTask() {
             @Override
@@ -268,12 +317,12 @@ public class TableView<T> extends BasicView {
                         return;
                     }
                     int x = scrollView.getScrollX();
-                    int scrollX = calculateFixScroll(x);
+                    int scrollX = TableView.this.calculateFixScroll(x);
                     if (oldScrollX != x) {
                         oldScrollX = x;
                     } else {
                         scrollView.setOnScrollChangeListener(null);
-                        scrollAll(scrollX);
+                        TableView.this.scrollAll(scrollX);
                     }
                     if (scrollX == x) {
                         timer.cancel();
@@ -284,30 +333,45 @@ public class TableView<T> extends BasicView {
         };
     }
 
+    /**
+     * 计算滚动固定位置
+     * @param i 第几个
+     * @return int
+     */
     private int calculateFixScroll(int i) {
-        float dp = pxToDp(i);
+        float dp = this.pxToDp(i);
         int v = (int) (dp / colWidth);
-        return dpToPx(colWidth * (dp - colWidth * v < colWidth / 2 ? v : v + 1)) + v; //
+        return this.dpToPx(colWidth * (dp - colWidth * v < colWidth / 2 ? v : v + 1)) + v;
     }
 
-    private LinearLayout line() {
+    /**
+     * 行
+     * @return LinearLayout
+     */
+    private LinearLayout lineView() {
         LinearLayout line = new LinearLayout(context);
-        LayoutParams param = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
-        line.setLayoutParams(param);
+        line.setLayoutParams(new LayoutParams(MATCH_PARENT, WRAP_CONTENT));
         return line;
     }
 
-    private LinearLayout rect(String text, int align, List<D<T>> ds) {
+    /**
+     * 列
+     * @param text  文案
+     * @param align 对其方式
+     * @param ds    定义信息
+     * @return LinearLayout
+     */
+    private LinearLayout rectView(String text, int align, List<D<T>> ds) {
         LinearLayout line = new LinearLayout(context);
         line.setLayoutParams(new LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
         line.setOrientation(VERTICAL);
         TextView textView = this.textView();
-        textView.setWidth(ds.size() * dpToPx(colWidth));
-        textView.setHeight(dpToPx(HEIGHT / 2f) - 1);
+        textView.setWidth(ds.size() * this.dpToPx(colWidth));
+        textView.setHeight(this.dpToPx(HEIGHT / 2f) - 1);
         textView.setText(text);
-        textView.setGravity(textAlign(align));
+        textView.setGravity(this.textAlign(align));
         line.addView(textView);
-        line.addView(hDivider());
+        line.addView(this.hDivider());
         LinearLayout bottom = new LinearLayout(context);
         bottom.setLayoutParams(new LayoutParams(MATCH_PARENT, WRAP_CONTENT));
         line.addView(bottom);
@@ -315,7 +379,7 @@ public class TableView<T> extends BasicView {
         for (D<T> d : ds) {
             TextView content = this.titleView(d);
             if (i != 0) {
-                bottom.addView(vDivider());
+                bottom.addView(this.vDivider());
             }
             bottom.addView(content);
             i++;
@@ -323,6 +387,10 @@ public class TableView<T> extends BasicView {
         return line;
     }
 
+    /**
+     * 水平滚动view
+     * @return HorizontalScrollView
+     */
     private HorizontalScrollView horizontalScrollView() {
         HorizontalScrollView hsv = new HorizontalScrollView(context);
         hsv.setLayoutParams(param);
@@ -331,7 +399,11 @@ public class TableView<T> extends BasicView {
         return hsv;
     }
 
-    private ListView listView() {
+    /**
+     * 数据view
+     * @return ListView
+     */
+    private ListView dataView() {
         ListView listView = new ListView(context);
         listView.setLayoutParams(param);
         listView.setScrollBarSize(SCROLL_BAR_SIZE);
@@ -339,61 +411,86 @@ public class TableView<T> extends BasicView {
         listView.setDivider(new GradientDrawable(RIGHT_LEFT, new int[]{BG_COLOR, BG_COLOR, BG_COLOR}));
         listView.setDividerHeight(1);
         listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        listView.setOnScrollChangeListener((v, x, y, ox, oy) -> {
-            int count = listView.getChildCount();
-            if (childCount < count) {
-                childCount = count;
-                this.scrollAll(this.scrollX);
-            }
-        });
+        // 数据刷新完成滚动所有view到同一位置
+        listView.getViewTreeObserver().addOnGlobalLayoutListener(() -> this.scrollAll(this.scrollX));
         return listView;
     }
 
+    /**
+     * 获取数据size
+     * @return int
+     */
     public int getListSize() {
         return list.size();
     }
 
+    /**
+     * 文本排布
+     * @param textAlign 排布方式
+     * @return int
+     */
     private int textAlign(int textAlign) {
         if (textAlign == 1) {
             return Gravity.START | Gravity.CENTER;
-        } else if (textAlign == 2) {
-            return Gravity.END | Gravity.CENTER;
-        } else {
-            return Gravity.CENTER;
         }
+        if (textAlign == 2) {
+            return Gravity.END | Gravity.CENTER;
+        }
+        return Gravity.CENTER;
     }
 
+    /**
+     * 文本view
+     * @return TextView
+     */
     private TextView textView() {
         TextView view = new TextView(context);
-        view.setWidth(dpToPx(colWidth));
-        view.setHeight(dpToPx(HEIGHT));
-        view.setPadding(dpToPx(PADDING), 0, dpToPx(PADDING), 0);
+        view.setWidth(this.dpToPx(colWidth));
+        view.setHeight(this.dpToPx(HEIGHT));
+        view.setPadding(this.dpToPx(PADDING), 0, this.dpToPx(PADDING), 0);
         return view;
     }
 
+    /**
+     * 水平分隔线
+     * @return View
+     */
     private View hDivider() {
-        return divider(MATCH_PARENT, 1);
+        return this.divider(MATCH_PARENT, 1);
     }
 
+    /**
+     * 纵向分隔线
+     * @return View
+     */
     private View vDivider() {
-        return divider(1, MATCH_PARENT);
+        return this.divider(1, MATCH_PARENT);
     }
 
+    /**
+     * 分隔线
+     * @param w 宽
+     * @param h 高
+     * @return View
+     */
     private View divider(int w, int h) {
         View view = new View(context);
-        LayoutParams param = new LayoutParams(w, h);
-        view.setLayoutParams(param);
+        view.setLayoutParams(new LayoutParams(w, h));
         view.setBackgroundColor(BG_COLOR);
         return view;
     }
 
+    /**
+     * 内容view
+     * @return LinearLayout
+     */
     private LinearLayout contentView() {
         List<View> textViews = new ArrayList<>();
-        LinearLayout line = this.line();
+        LinearLayout line = this.lineView();
         line.setTag(textViews);
         HorizontalScrollView scrollView = this.horizontalScrollView();
         scrollView.setOnScrollChangeListener(scrollChangeListener);
-        LinearLayout innerLine = this.line();
+        LinearLayout innerLine = this.lineView();
         scrollView.addView(innerLine);
         horizontalScrollViews.add(scrollView);
         this.scrollFix(scrollView);
@@ -402,49 +499,51 @@ public class TableView<T> extends BasicView {
             D<T> d = ds.get(i);
             List<D<T>> ds = d.ds;
             if (ds == null || ds.isEmpty()) {
-                TextView content = textView();
+                // 单层表头的处理
+                TextView content = this.textView();
                 textViews.add(content);
                 if (i == 0) {
                     line.addView(content);
-                    line.addView(vDivider());
+                    line.addView(this.vDivider());
                     line.addView(scrollView);
                 } else if (i == size - 1) {
                     innerLine.addView(content);
                 } else {
                     innerLine.addView(content);
-                    innerLine.addView(vDivider());
+                    innerLine.addView(this.vDivider());
                 }
             } else {
+                // 多层表头的处理
                 if (i == 0) {
                     for (int j = 0; j < ds.size(); j++) {
-                        TextView content = textView();
+                        TextView content = this.textView();
                         textViews.add(content);
                         if (j == ds.size() - 1) {
                             line.addView(content);
-                            line.addView(vDivider());
+                            line.addView(this.vDivider());
                             line.addView(scrollView);
                         } else {
                             line.addView(content);
-                            line.addView(vDivider());
+                            line.addView(this.vDivider());
                         }
                     }
                 } else if (i == size - 1) {
                     for (int j = 0; j < ds.size(); j++) {
-                        TextView content = textView();
+                        TextView content = this.textView();
                         textViews.add(content);
                         if (j == ds.size() - 1) {
                             innerLine.addView(content);
                         } else {
                             innerLine.addView(content);
-                            innerLine.addView(vDivider());
+                            innerLine.addView(this.vDivider());
                         }
                     }
                 } else {
                     for (int j = 0; j < ds.size(); j++) {
-                        TextView content = textView();
+                        TextView content = this.textView();
                         textViews.add(content);
                         innerLine.addView(content);
-                        innerLine.addView(vDivider());
+                        innerLine.addView(this.vDivider());
                     }
                 }
             }
@@ -452,15 +551,22 @@ public class TableView<T> extends BasicView {
         return line;
     }
 
+    /**
+     * 控制全部滚动至同一位置
+     * @param x 位置坐标
+     */
     private void scrollAll(int x) {
-        for (HorizontalScrollView v : horizontalScrollViews) {
-            v.scrollTo(x, 0);
-        }
+        horizontalScrollViews.forEach(i -> i.scrollTo(x, 0));
     }
 
+    /**
+     * 处理数据更新
+     * @param msg 消息
+     * @return boolean
+     */
     private boolean handleMessage(Message msg) {
-        list = tempList;
-        adapter.notifyDataSetChanged();
+        this.list = this.tempList;
+        this.adapter.notifyDataSetChanged();
         return false;
     }
 
@@ -545,9 +651,10 @@ public class TableView<T> extends BasicView {
         }
 
         @SuppressWarnings("unchecked")
+        @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = contentView();
+                convertView = TableView.this.contentView();
             }
             List<TextView> textViews = (List<TextView>) convertView.getTag();
             T item = this.getItem(position);
@@ -567,20 +674,22 @@ public class TableView<T> extends BasicView {
             return convertView;
         }
 
-        private void addAction(List<TextView> textViews, T item, int num, D<T> d) {
-            TextView textView = textViews.get(num);
+        /**
+         * 添加点击处理事件
+         * @param views view集合
+         * @param item  数据
+         * @param num   第几个
+         * @param d     定义信息
+         */
+        private void addAction(List<TextView> views, T item, int num, D<T> d) {
+            TextView textView = views.get(num);
             textView.setText(d.content.apply(item));
             textView.setGravity(textAlign(d.contentAlign));
             if (d.click == null) {
                 return;
             }
-            textView.setOnClickListener(v -> {
-                try {
-                    d.click.accept(item);
-                } catch (Throwable t) {
-                    PopUtil.alert(context, t.getMessage());
-                }
-            });
+            // 设置点击事件
+            ClickUtil.onClick(textView, () -> d.click.accept(item));
         }
     }
 

@@ -5,6 +5,12 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 
+/**
+ * 搜索条
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/2/13
+ */
 public class SearchBar extends BasicView {
 
     private final LayoutParams params;
