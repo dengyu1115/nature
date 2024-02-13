@@ -114,7 +114,7 @@ public class TableView<T> extends BasicView {
      */
     private void calculateColumnWidth() {
         // context.getResources().getDisplayMetrics().widthPixels;
-        this.colWidth = (2228 - columns) * widthRate / DENSITY / columns + 0.5f; //  - 2
+        this.colWidth = (2228 - columns + 1) * widthRate / DENSITY / columns + 0.4f; //  - 2
     }
 
     /**
@@ -335,13 +335,15 @@ public class TableView<T> extends BasicView {
 
     /**
      * 计算滚动固定位置
-     * @param i 第几个
+     * @param x 位置
      * @return int
      */
-    private int calculateFixScroll(int i) {
-        float dp = this.pxToDp(i);
-        int v = (int) (dp / colWidth);
-        return this.dpToPx(colWidth * (dp - colWidth * v < colWidth / 2 ? v : v + 1)) + v;
+    private int calculateFixScroll(int x) {
+        float dp = this.pxToDp(x);
+        // 计算滚动至第几个
+        int num = (int) (dp / (colWidth + 1));
+        // 计算位置：
+        return this.dpToPx((colWidth + 1) * (dp - colWidth * num < colWidth / 2 ? num : num + 1));
     }
 
     /**
