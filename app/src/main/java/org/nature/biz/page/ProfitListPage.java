@@ -200,7 +200,7 @@ public class ProfitListPage extends ListPage<Profit> {
                 date = DateUtils.addWeeks(date, -1);
                 calendar.setTime(date);
                 calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
-                dates.add(0, DateUtil.formatDay(calendar.getTime()));
+                dates.add(0, DateUtil.format(calendar.getTime(), Const.FORMAT_DAY));
             }
             return dates;
         }
@@ -210,7 +210,7 @@ public class ProfitListPage extends ListPage<Profit> {
                 date = DateUtils.addMonths(date, -1);
                 calendar.setTime(date);
                 calendar.set(Calendar.DAY_OF_MONTH, 0);
-                dates.add(0, DateUtil.formatDay(calendar.getTime()));
+                dates.add(0, DateUtil.format(calendar.getTime(), Const.FORMAT_DAY));
             }
             return dates;
         }
@@ -220,7 +220,7 @@ public class ProfitListPage extends ListPage<Profit> {
                 date = DateUtils.addYears(date, -1);
                 calendar.setTime(date);
                 calendar.set(Calendar.DAY_OF_YEAR, 0);
-                dates.add(0, DateUtil.formatDay(calendar.getTime()));
+                dates.add(0, DateUtil.format(calendar.getTime(), Const.FORMAT_DAY));
             }
             return dates;
         }

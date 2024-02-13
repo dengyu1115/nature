@@ -18,15 +18,6 @@ public class DateUtil {
 
     /**
      * 转化日期
-     * @param date 日期字符串
-     * @return Date
-     */
-    public static Date parseDate(String date) {
-        return parse(date, Const.FORMAT_DATE);
-    }
-
-    /**
-     * 转化日期
      * @param date   日期字符串
      * @param format 日期格式
      * @return Date

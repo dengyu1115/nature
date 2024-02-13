@@ -17,7 +17,7 @@ public class Md5Util {
      * @return String
      */
     public static String md5(String... input) {
-        return md5(String.join(":", input));
+        return Md5Util.md5(String.join(":", input));
     }
 
     /**

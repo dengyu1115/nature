@@ -103,16 +103,19 @@ public class WorkdayManager {
      * @return list
      */
     private List<Workday> getYearWorkDays(String year) {
-        Set<String> holidays = new TreeSet<>(this.getHolidaysByHttp(year));      // 获取全年节假日
+        // 获取全年节假日
+        Set<String> holidays = new TreeSet<>(this.getHolidaysByHttp(year));
         List<Workday> list = new ArrayList<>();
-        String day = DateUtil.formatDay(DateUtil.parse(year, "yyyy"));  // 年初第一天
+        // 年初第一天
+        String day = DateUtil.format(DateUtil.parse(year, "yyyy"), Const.FORMAT_DAY);
         while (true) {
             Workday workDay = new Workday();
             workDay.setDate(day);
             workDay.setType((holidays.contains(day) || this.isWeekend(day)) ? TYPE_HOLIDAY : TYPE_WORKDAY);
             list.add(workDay);
             if (day.endsWith("1231")) {
-                break;   // 生成至年底截止
+                // 生成至年底截止
+                break;
             }
             day = DateUtil.addDays(day, 1);
         }

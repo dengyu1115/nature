@@ -19,10 +19,16 @@ public class Sorter {
         return (Comparator<T> & Serializable)
                 (c1, c2) -> {
                     U u1 = keyExtractor.apply(c1), u2 = keyExtractor.apply(c2);
-                    if (u1 != null && u2 != null) return u1.compareTo(u2);
-                    else if (u1 == null && u2 != null) return -1;
-                    else if (u1 != null) return 1;
-                    else return 0;
+                    if (u1 != null && u2 != null) {
+                        return u1.compareTo(u2);
+                    }
+                    if (u1 == null && u2 != null) {
+                        return -1;
+                    }
+                    if (u1 != null) {
+                        return 1;
+                    }
+                    return 0;
                 };
     }
 }

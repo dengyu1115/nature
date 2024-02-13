@@ -33,7 +33,7 @@ public class PopUtil {
      * @param runnable 执行逻辑
      */
     public static void confirm(Context context, String title, String message, Runnable runnable) {
-        buildAlertDialog(context, title, builder -> builder.setMessage(message), runnable);
+        PopUtil.buildAlertDialog(context, title, builder -> builder.setMessage(message), runnable);
     }
 
     /**
@@ -44,7 +44,7 @@ public class PopUtil {
      * @param supplier 执行逻辑
      */
     public static void confirmAsync(Context context, String title, String message, Supplier<String> supplier) {
-        buildAsyncDialog(context, title, builder -> builder.setMessage(message), supplier);
+        PopUtil.buildAsyncDialog(context, title, builder -> builder.setMessage(message), supplier);
     }
 
     /**
@@ -55,7 +55,7 @@ public class PopUtil {
      * @param runnable 执行逻辑
      */
     public static void confirm(Context context, String title, View view, Runnable runnable) {
-        buildAlertDialog(context, title, builder -> builder.setView(view), runnable);
+        PopUtil.buildAlertDialog(context, title, builder -> builder.setView(view), runnable);
     }
 
     /**
@@ -66,7 +66,7 @@ public class PopUtil {
      * @param supplier 执行逻辑
      */
     public static void confirmAsync(Context context, String title, View view, Supplier<String> supplier) {
-        buildAsyncDialog(context, title, builder -> builder.setView(view), supplier);
+        PopUtil.buildAsyncDialog(context, title, builder -> builder.setView(view), supplier);
     }
 
     /**

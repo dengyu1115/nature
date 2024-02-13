@@ -33,7 +33,7 @@ public class ClickUtil {
      * @param runnable 执行逻辑
      */
     public static void onClick(View view, Runnable runnable) {
-        view.setOnClickListener(v -> click(v, runnable));
+        view.setOnClickListener(v -> ClickUtil.click(v, runnable));
     }
 
     /**
@@ -43,7 +43,7 @@ public class ClickUtil {
      * @param handled  执行完毕后下一步执行
      */
     public static void onClick(View view, Runnable runnable, Runnable handled) {
-        view.setOnClickListener(v -> click(v, runnable, handled));
+        view.setOnClickListener(v -> ClickUtil.click(v, runnable, handled));
     }
 
     /**
@@ -53,7 +53,7 @@ public class ClickUtil {
      * @param handled  执行完毕后下一步执行
      */
     public static void onAsyncClick(View view, Supplier<String> supplier, Runnable handled) {
-        view.setOnClickListener(v -> asyncClick(v, supplier, handled));
+        view.setOnClickListener(v -> ClickUtil.asyncClick(v, supplier, handled));
     }
 
     /**
@@ -62,7 +62,7 @@ public class ClickUtil {
      * @param supplier 执行逻辑
      */
     public static void onAsyncClick(View view, Supplier<String> supplier) {
-        view.setOnClickListener(v -> asyncClick(v, supplier));
+        view.setOnClickListener(v -> ClickUtil.asyncClick(v, supplier));
     }
 
     /**
@@ -73,7 +73,7 @@ public class ClickUtil {
      * @param supplier 处理逻辑
      */
     public static void onPopConfirm(View view, String title, String content, Supplier<String> supplier) {
-        onClick(view, () -> PopUtil.confirmAsync(view.getContext(), title, content, supplier));
+        ClickUtil.onClick(view, () -> PopUtil.confirmAsync(view.getContext(), title, content, supplier));
     }
 
     /**
@@ -84,7 +84,7 @@ public class ClickUtil {
      * @param supplier 处理逻辑
      */
     public static void onPopConfirm(View view, String title, View inner, Supplier<String> supplier) {
-        onClick(view, () -> PopUtil.confirmAsync(view.getContext(), title, inner, supplier));
+        ClickUtil.onClick(view, () -> PopUtil.confirmAsync(view.getContext(), title, inner, supplier));
     }
 
     /**
@@ -93,7 +93,7 @@ public class ClickUtil {
      * @param runnable 执行逻辑
      */
     public static void click(View view, Runnable runnable) {
-        click(view, runnable, () -> {
+        ClickUtil.click(view, runnable, () -> {
         });
     }
 
@@ -134,7 +134,7 @@ public class ClickUtil {
      * @param supplier 执行逻辑
      */
     public static void asyncClick(View view, Supplier<String> supplier) {
-        asyncClick(view, supplier, () -> {
+        ClickUtil.asyncClick(view, supplier, () -> {
         });
     }
 
@@ -145,7 +145,7 @@ public class ClickUtil {
      * @param handled  执行完毕后下一步执行
      */
     public static void asyncClick(View view, Runnable runnable, Runnable handled) {
-        asyncClick(view, () -> {
+        ClickUtil.asyncClick(view, () -> {
             runnable.run();
             return null;
         }, handled);

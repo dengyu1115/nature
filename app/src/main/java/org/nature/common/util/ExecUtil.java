@@ -114,7 +114,7 @@ public class ExecUtil {
             return run.apply(i);
         } catch (Exception e) {    // ignore
             e.printStackTrace();
-            return doExec(run, i, counted);
+            return ExecUtil.doExec(run, i, counted);
         }
     }
 }
