@@ -693,6 +693,7 @@ public class TableView<T> extends BasicView {
             // 设置点击事件
             ClickUtil.onClick(textView, () -> d.click.accept(item));
         }
+
     }
 
 }

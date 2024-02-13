@@ -22,6 +22,7 @@ public class BatchSaveSource implements FunctionalSource {
             return 0;
         }
         DB db = DB.create(ModelUtil.db(cls));
+        // 批量保存
         return db.batchExec(list, this.getBatch(cls), l -> db.executeUpdate(SqlAppender.batchSaveBuilder(cls, l)));
     }
 

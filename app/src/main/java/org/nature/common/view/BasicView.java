@@ -49,7 +49,7 @@ public class BasicView extends LinearLayout {
      * @param dp dp
      * @return px
      */
-    int dpToPx(float dp) {
+    protected int dpToPx(float dp) {
         return (int) (dp * DENSITY + 0.5f);
     }
 
@@ -58,7 +58,7 @@ public class BasicView extends LinearLayout {
      * @param px px
      * @return px
      */
-    float pxToDp(float px) {
+    protected float pxToDp(float px) {
         return px / DENSITY;
     }
 
