@@ -45,11 +45,7 @@ public class HandleNoticeJob implements Job {
 
     @Override
     public void exec(Date date) {
-        if (running) {
-            return;
-        }
-        try {
-            running = true;
+        this.doExec(() -> {
             // 执行延时1秒以上废弃任务
             if (System.currentTimeMillis() - date.getTime() > 1000) {
                 return;
@@ -102,7 +98,27 @@ public class HandleNoticeJob implements Job {
                     MAP.remove(s);
                 }
             }
+        });
+    }
+
+    /**
+     * 串行执行
+     * @param runnable 执行逻辑
+     */
+    private void doExec(Runnable runnable) {
+        synchronized (this) {
+            // 已经有执行中任务，不再执行
+            if (running) {
+                return;
+            }
+            // 标记正在执行
+            running = true;
+        }
+        // 执行任务
+        try {
+            runnable.run();
         } finally {
+            // 执行完毕，标记为未执行
             running = false;
         }
     }

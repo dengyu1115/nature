@@ -8,7 +8,6 @@ import org.nature.common.ioc.annotation.Component;
 import org.nature.common.util.HttpUtil;
 import org.nature.common.util.TextUtil;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,12 +54,8 @@ public class KlineHttp {
         if (ks == null) {
             throw new RuntimeException("历史K线数据缺失：" + code + ":" + type);
         }
-        List<Kline> list = new ArrayList<>();
-        // 遍历json数组，生成Kline对象
-        for (Object datum : ks) {
-            list.add(this.genKline(code, type, (String) datum));
-        }
-        return list;
+        // 转换为Kline对象
+        return ks.stream().map(i -> this.genKline(code, type, (String) i)).collect(Collectors.toList());
     }
 
     /**
