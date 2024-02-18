@@ -115,6 +115,7 @@ public class SqlAppender {
             for (int i = 0; i < ids.size(); i++) {
                 Object id = ids.get(i);
                 builder.appendArg(id);
+                builder.append("?");
                 if (i < ids.size() - 1) {
                     builder.append(",");
                 }
