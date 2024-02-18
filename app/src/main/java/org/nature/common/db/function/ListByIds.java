@@ -16,5 +16,5 @@ public interface ListByIds<T, I> {
      * @param ids ID集合
      * @return list
      */
-    List<T> findByIds(List<I> ids);
+    List<T> listByIds(List<I> ids);
 }
