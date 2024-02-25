@@ -43,8 +43,8 @@ public class GroupListPage extends ListPage<Group> {
     private final List<TableView.D<Group>> ds = Arrays.asList(
             TableView.row("名称", d -> TextUtil.text(d.getName()), C, S, Group::getName),
             TableView.row("code", d -> TextUtil.text(d.getCode()), C, C, Group::getCode),
-            TableView.row("编辑", d -> "+", C, C, this.edit()),
-            TableView.row("删除", d -> "-", C, C, this.delete())
+            TableView.row("编辑", d -> "+", C, C, this::edit),
+            TableView.row("删除", d -> "-", C, C, this::delete)
     );
 
     @Override
@@ -83,15 +83,13 @@ public class GroupListPage extends ListPage<Group> {
 
     /**
      * 编辑操作
-     * @return 编辑操作
+     * @param d 数据
      */
-    private Consumer<Group> edit() {
-        return d -> {
-            this.makeWindowStructure();
-            this.code.setText(d.getCode());
-            this.name.setText(d.getName());
-            PopUtil.confirm(context, "编辑项目-" + d.getName(), page, () -> this.doEdit(groupManager::edit));
-        };
+    private void edit(Group d) {
+        this.makeWindowStructure();
+        this.code.setText(d.getCode());
+        this.name.setText(d.getName());
+        PopUtil.confirm(context, "编辑项目-" + d.getName(), page, () -> this.doEdit(groupManager::edit));
     }
 
     /**
@@ -117,10 +115,10 @@ public class GroupListPage extends ListPage<Group> {
 
     /**
      * 删除操作
-     * @return 删除逻辑
+     * @param d 删除对象
      */
-    private Consumer<Group> delete() {
-        return d -> PopUtil.confirm(context, "删除项目-" + d.getName(), "确认删除吗？", () -> {
+    private void delete(Group d) {
+        PopUtil.confirm(context, "删除项目-" + d.getName(), "确认删除吗？", () -> {
             groupManager.delete(d.getCode());
             this.refreshData();
             PopUtil.alert(context, "删除成功！");

@@ -81,7 +81,7 @@ public class RuleListPage extends ListPage<Rule> {
     }
 
     @Override
-    protected int getExcelColumns() {
+    protected int getTotalColumns() {
         return 11;
     }
 

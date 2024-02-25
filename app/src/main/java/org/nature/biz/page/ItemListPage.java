@@ -143,7 +143,7 @@ public class ItemListPage extends ListPage<Item> {
     }
 
     @Override
-    protected int getExcelColumns() {
+    protected int getTotalColumns() {
         return 10;
     }
 

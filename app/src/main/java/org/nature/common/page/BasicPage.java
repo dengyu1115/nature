@@ -11,6 +11,9 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.function.Consumer;
 
+import static org.nature.common.constant.Const.PAGE_HEIGHT;
+import static org.nature.common.constant.Const.PAGE_WIDTH;
+
 /**
  * 基础页面
  * @author Nature
@@ -28,7 +31,7 @@ public class BasicPage extends LinearLayout {
         this.pages = new Stack<>();
         this.map = new HashMap<>();
         // 页面宽高设置
-        ViewGroup.LayoutParams params = new LayoutParams(2228, 1080);
+        ViewGroup.LayoutParams params = new LayoutParams(PAGE_WIDTH, PAGE_HEIGHT);
         this.setLayoutParams(params);
     }
 
@@ -73,7 +76,12 @@ public class BasicPage extends LinearLayout {
      */
     public void show(Page page) {
         this.viewHandle(v -> v.setVisibility(GONE));
-        this.addView(page.get());
+        View view = page.get();
+        if (pages.contains(page)) {
+            view.setVisibility(VISIBLE);
+        } else {
+            this.addView(view);
+        }
         pages.push(page);
         page.onShow();
     }
@@ -91,7 +99,12 @@ public class BasicPage extends LinearLayout {
      */
     public void dispose() {
         Page page = pages.pop();
-        this.removeView(page.get());
+        View view = page.get();
+        if (pages.contains(page)) {
+            view.setVisibility(GONE);
+        } else {
+            this.removeView(view);
+        }
         this.viewHandle(v -> v.setVisibility(VISIBLE));
     }
 

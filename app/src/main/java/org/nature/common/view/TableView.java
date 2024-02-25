@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static android.graphics.drawable.GradientDrawable.Orientation.RIGHT_LEFT;
+import static org.nature.common.constant.Const.PAGE_WIDTH;
 
 /**
  * 表格
@@ -34,7 +35,7 @@ public class TableView<T> extends BasicView {
     public static final int HEIGHT = 33;
     public static final int PADDING = 8;
     public static final int SCROLL_BAR_SIZE = 3;
-    private final int columns;
+    private final int columns, fixed;
     private final float widthRate;
     private final LayoutParams param = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
     private final List<HorizontalScrollView> horizontalScrollViews = new ArrayList<>();
@@ -57,15 +58,16 @@ public class TableView<T> extends BasicView {
     private int titleGroup, titleCol;
 
     public TableView(Context context) {
-        this(context, 3);
+        this(context, 3, 1);
     }
 
-    public TableView(Context context, int columns) {
-        this(context, columns, 1);
+    public TableView(Context context, int columns, int fixed) {
+        this(context, columns, fixed, 1);
     }
 
-    public TableView(Context context, int columns, float widthRate) {
+    public TableView(Context context, int columns, int fixed, float widthRate) {
         super(context);
+        this.fixed = fixed;
         this.widthRate = widthRate;
         this.context = context;
         this.columns = columns;
@@ -114,7 +116,7 @@ public class TableView<T> extends BasicView {
      */
     private void calculateColumnWidth() {
         // context.getResources().getDisplayMetrics().widthPixels;
-        this.colWidth = (2228 - columns + 1) * widthRate / DENSITY / columns + 0.4f; //  - 2
+        this.colWidth = (PAGE_WIDTH - columns + 1) * widthRate / DENSITY / columns + 0.4f; //  - 2
     }
 
     /**
@@ -134,41 +136,53 @@ public class TableView<T> extends BasicView {
             // 单层表头处理
             if (ds == null || ds.isEmpty()) {
                 TextView content = this.titleView(d);
-                if (titleGroup == 0) {
+                if (titleGroup < fixed - 1) {
                     line.addView(content);
-                    line.addView(vDivider());
+                    line.addView(this.vDivider());
+                } else if (titleGroup == fixed - 1) {
+                    line.addView(content);
+                    line.addView(this.vDivider());
                     line.addView(scrollView);
                 } else if (titleGroup == this.ds.size() - 1) {
                     innerLine.addView(content);
                 } else {
                     innerLine.addView(content);
-                    innerLine.addView(vDivider());
+                    innerLine.addView(this.vDivider());
                 }
             } else {
                 // 多级表头处理
                 if (StringUtils.isNotBlank(d.title)) {
                     LinearLayout rect = this.rectView(d.title, d.titleAlign, d.ds);
-                    if (titleGroup == 0) {
+                    if (titleGroup < fixed - 1) {
                         line.addView(rect);
-                        line.addView(vDivider());
+                        line.addView(this.vDivider());
+                    } else if (titleGroup == fixed - 1) {
+                        line.addView(rect);
+                        line.addView(this.vDivider());
                         line.addView(scrollView);
                     } else if (titleGroup == this.ds.size() - 1) {
                         innerLine.addView(rect);
                     } else {
                         innerLine.addView(rect);
-                        innerLine.addView(vDivider());
+                        innerLine.addView(this.vDivider());
                     }
-                } else if (titleGroup == 0) {
+                } else if (titleGroup < fixed - 1) {
+                    for (D<T> td : ds) {
+                        TextView content = this.titleView(td);
+                        line.addView(content);
+                        line.addView(this.vDivider());
+                    }
+                } else if (titleGroup == fixed - 1) {
                     int j = 0;
                     for (D<T> td : ds) {
                         TextView content = this.titleView(td);
                         if (j == ds.size() - 1) {
                             line.addView(content);
-                            line.addView(vDivider());
+                            line.addView(this.vDivider());
                             line.addView(scrollView);
                         } else {
                             line.addView(content);
-                            line.addView(vDivider());
+                            line.addView(this.vDivider());
                         }
                         j++;
                     }
@@ -178,7 +192,7 @@ public class TableView<T> extends BasicView {
                         TextView content = this.titleView(td);
                         if (j == ds.size() - 1) {
                             innerLine.addView(content);
-                            innerLine.addView(vDivider());
+                            innerLine.addView(this.vDivider());
                         } else {
                             innerLine.addView(content);
                         }
@@ -188,7 +202,7 @@ public class TableView<T> extends BasicView {
                     for (D<T> td : ds) {
                         TextView content = this.titleView(td);
                         innerLine.addView(content);
-                        innerLine.addView(vDivider());
+                        innerLine.addView(this.vDivider());
                     }
                 }
 
@@ -204,7 +218,7 @@ public class TableView<T> extends BasicView {
      * @return TextView
      */
     private TextView titleView(D<T> td) {
-        TextView textView = textView();
+        TextView textView = this.textView();
         textView.setText(td.title);
         textView.setGravity(this.textAlign(td.titleAlign));
         this.addSortClickEvent(textView, td.sort);
@@ -222,7 +236,7 @@ public class TableView<T> extends BasicView {
             return;
         }
         int col = titleCol++;
-        if (this.titleGroup == 0) {
+        if (this.titleGroup < this.fixed) {
             view.setOnClickListener(v -> {
                 this.comparator = comparator;
                 this.sortCol = col;
@@ -375,7 +389,7 @@ public class TableView<T> extends BasicView {
         line.addView(textView);
         line.addView(this.hDivider());
         LinearLayout bottom = new LinearLayout(context);
-        bottom.setLayoutParams(new LayoutParams(MATCH_PARENT, WRAP_CONTENT));
+        bottom.setLayoutParams(new LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
         line.addView(bottom);
         int i = 0;
         for (D<T> d : ds) {
@@ -383,6 +397,7 @@ public class TableView<T> extends BasicView {
             if (i != 0) {
                 bottom.addView(this.vDivider());
             }
+            content.setHeight(this.dpToPx(HEIGHT / 2f) - 1);
             bottom.addView(content);
             i++;
         }
@@ -504,7 +519,10 @@ public class TableView<T> extends BasicView {
                 // 单层表头的处理
                 TextView content = this.textView();
                 textViews.add(content);
-                if (i == 0) {
+                if (i < this.fixed - 1) {
+                    line.addView(content);
+                    line.addView(this.vDivider());
+                } else if (i == this.fixed - 1) {
                     line.addView(content);
                     line.addView(this.vDivider());
                     line.addView(scrollView);
@@ -516,7 +534,14 @@ public class TableView<T> extends BasicView {
                 }
             } else {
                 // 多层表头的处理
-                if (i == 0) {
+                if (i < this.fixed - 1) {
+                    for (int j = 0; j < ds.size(); j++) {
+                        TextView content = this.textView();
+                        textViews.add(content);
+                        line.addView(content);
+                        line.addView(this.vDivider());
+                    }
+                } else if (i == this.fixed - 1) {
                     for (int j = 0; j < ds.size(); j++) {
                         TextView content = this.textView();
                         textViews.add(content);

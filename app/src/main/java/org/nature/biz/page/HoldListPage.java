@@ -134,7 +134,7 @@ public class HoldListPage extends ListPage<Hold> {
     }
 
     @Override
-    protected int getExcelColumns() {
+    protected int getTotalColumns() {
         return 11;
     }
 

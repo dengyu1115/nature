@@ -63,7 +63,7 @@ public class KlineListPage extends ListPage<Kline> {
     }
 
     @Override
-    protected int getExcelColumns() {
+    protected int getTotalColumns() {
         return 8;
     }
 

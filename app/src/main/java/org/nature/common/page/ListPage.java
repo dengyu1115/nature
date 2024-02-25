@@ -12,8 +12,8 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import org.apache.commons.lang3.StringUtils;
 import org.nature.common.util.PopUtil;
-import org.nature.common.view.TableView;
 import org.nature.common.view.SearchBar;
+import org.nature.common.view.TableView;
 import org.nature.common.view.ViewTemplate;
 
 import java.util.List;
@@ -96,7 +96,7 @@ public abstract class ListPage<T> extends Page {
         LinearLayout body = new LinearLayout(context);
         page.addView(body);
         body.setLayoutParams(new LayoutParams(MATCH_PARENT, height - (int) (60 * density)));
-        this.excel = new TableView<>(context, this.getExcelColumns());
+        this.excel = new TableView<>(context, this.getTotalColumns(), this.getFixedColumns());
         body.addView(this.excel);
     }
 
@@ -145,8 +145,16 @@ public abstract class ListPage<T> extends Page {
      * 表格列数
      * @return int
      */
-    protected int getExcelColumns() {
+    protected int getTotalColumns() {
         return 9;
+    }
+
+    /**
+     * 表格固定列数
+     * @return int
+     */
+    protected int getFixedColumns() {
+        return 1;
     }
 
     /**

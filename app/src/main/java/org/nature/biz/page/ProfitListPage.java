@@ -42,10 +42,8 @@ public class ProfitListPage extends ListPage<Profit> {
     private Selector<String> dateRule;
 
     private final List<TableView.D<Profit>> ds = Arrays.asList(
-            TableView.row("", C, Arrays.asList(
-                    TableView.row("项目", d -> TextUtil.text(d.getName()), C, S, Profit::getName),
-                    TableView.row("规则", d -> TextUtil.text(d.getRule()), C, S, Profit::getRule))
-            ),
+            TableView.row("项目", d -> TextUtil.text(d.getName()), C, S, Profit::getName),
+            TableView.row("规则", d -> TextUtil.text(d.getRule()), C, S, Profit::getRule),
             TableView.row("日期", C, Arrays.asList(
                     TableView.row("开始", d -> TextUtil.text(d.getDateStart()), C, C, Profit::getDateStart),
                     TableView.row("结束", d -> TextUtil.text(d.getDateEnd()), C, C, Profit::getDateEnd))
@@ -113,6 +111,11 @@ public class ProfitListPage extends ListPage<Profit> {
         this.toggleDateBtn();
         this.nameMap = itemMapper.listAll().stream()
                 .collect(Collectors.toMap(i -> String.join(Const.DELIMITER, i.getCode(), i.getType()), Item::getName));
+    }
+
+    @Override
+    protected int getFixedColumns() {
+        return 3;
     }
 
     /**

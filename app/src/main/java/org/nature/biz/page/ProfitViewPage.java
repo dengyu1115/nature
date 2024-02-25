@@ -68,7 +68,7 @@ public class ProfitViewPage extends ListPage<ProfitView> {
     }
 
     @Override
-    protected int getExcelColumns() {
+    protected int getTotalColumns() {
         return 7;
     }
 }

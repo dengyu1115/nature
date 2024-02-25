@@ -91,7 +91,7 @@ public class WorkdayPage extends ListPage<Month> {
     }
 
     @Override
-    protected int getExcelColumns() {
+    protected int getTotalColumns() {
         return 14;
     }
 
