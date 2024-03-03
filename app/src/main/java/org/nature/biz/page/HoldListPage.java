@@ -46,11 +46,9 @@ public class HoldListPage extends ListPage<Hold> {
     private final Map<String, String> itemNameMap = new HashMap<>();
 
     private final List<TableView.D<Hold>> ds = Arrays.asList(
-            TableView.row("", C, Arrays.asList(
-                    TableView.row("项目", d -> TextUtil.text(this.getItem(d)), C, S, this::getItem),
-                    TableView.row("规则", d -> TextUtil.text(d.getRule()), C, S, Hold::getRule),
-                    TableView.row("操作", d -> TextUtil.text(this.getHandle(d)), C, C, this::getHandle))
-            ),
+            TableView.row("项目", d -> TextUtil.text(this.getItem(d)), C, S, this::getItem),
+            TableView.row("规则", d -> TextUtil.text(d.getRule()), C, S, Hold::getRule),
+            TableView.row("操作", d -> TextUtil.text(this.getHandle(d)), C, C, this::getHandle),
             TableView.row("日期", C, Arrays.asList(
                     TableView.row("买入", d -> TextUtil.text(d.getDateBuy()), C, S, Hold::getDateBuy),
                     TableView.row("卖出", d -> TextUtil.text(d.getDateSell()), C, E, Hold::getDateSell))
@@ -136,6 +134,11 @@ public class HoldListPage extends ListPage<Hold> {
     @Override
     protected int getTotalColumns() {
         return 11;
+    }
+
+    @Override
+    protected int getFixedColumns() {
+        return 3;
     }
 
     /**

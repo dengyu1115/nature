@@ -47,12 +47,12 @@ public class RuleListPage extends ListPage<Rule> {
 
     private final List<TableView.D<Rule>> ds = Arrays.asList(
             TableView.row("名称", d -> TextUtil.text(d.getName()), C, S, Rule::getName),
+            TableView.row("规则类型", d -> TextUtil.text(this.typeName(d.getRuleType())), C, C, Rule::getRuleType),
+            TableView.row("状态", d -> TextUtil.text(this.statusName(d.getStatus())), C, C, Rule::getStatus),
             TableView.row("开始日期", d -> TextUtil.text(d.getDate()), C, C, Rule::getDate),
             TableView.row("金额基数", d -> TextUtil.text(d.getBase()), C, C, Rule::getBase),
             TableView.row("波动比率", d -> TextUtil.text(d.getRatio()), C, C, Rule::getRatio),
             TableView.row("扩大幅度", d -> TextUtil.text(d.getExpansion()), C, C, Rule::getExpansion),
-            TableView.row("状态", d -> TextUtil.text(this.statusName(d.getStatus())), C, C, Rule::getStatus),
-            TableView.row("规则类型", d -> TextUtil.text(this.typeName(d.getRuleType())), C, C, Rule::getRuleType),
             TableView.row("编辑", d -> "+", C, C, this.edit()),
             TableView.row("删除", d -> "-", C, C, this.delete()),
             TableView.row("持仓计算", d -> "计算", C, C, this.calcProfit()),

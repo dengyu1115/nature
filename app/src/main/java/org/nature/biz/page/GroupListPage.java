@@ -73,6 +73,11 @@ public class GroupListPage extends ListPage<Group> {
         add.setOnClickListener(v -> this.add());
     }
 
+    @Override
+    protected int getTotalColumns() {
+        return ds.size();
+    }
+
     /**
      * 添加操作
      */

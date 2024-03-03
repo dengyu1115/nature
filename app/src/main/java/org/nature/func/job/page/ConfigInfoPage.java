@@ -10,10 +10,13 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.ioc.holder.JobHolder;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.*;
-import org.nature.common.view.TableView;
+import org.nature.common.util.Md5Util;
+import org.nature.common.util.PopUtil;
+import org.nature.common.util.Sorter;
+import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
+import org.nature.common.view.TableView;
 import org.nature.common.view.ViewTemplate;
 import org.nature.func.job.enums.Status;
 import org.nature.func.job.manager.ConfigInfoManager;
@@ -44,25 +47,23 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
     private Selector<String> jobSel, statusSel;
     private EditText year, month, day, hour, minute, second;
 
-    private final List<TableView.D<ConfigInfo>> DS = Arrays.asList(
-            TableView.row("", C, Arrays.asList(
-                    TableView.row("名称", d -> JobHolder.getName(d.getCode()), C, S, Sorter.nullsLast(d -> JobHolder.getName(d.getCode()))),
-                    TableView.row("编号", d -> TextUtil.text(d.getCode()), C, C, ConfigInfo::getCode))
-            ),
+    private final List<TableView.D<ConfigInfo>> ds = Arrays.asList(
+            TableView.row("名称", d -> JobHolder.getName(d.getCode()), C, S, Sorter.nullsLast(d -> JobHolder.getName(d.getCode()))),
+            TableView.row("编号", d -> TextUtil.text(d.getCode()), C, S, ConfigInfo::getCode),
+            TableView.row("状态", d -> TextUtil.text(Status.name(d.getStatus())), C, C, ConfigInfo::getStatus),
+            TableView.row("编辑", d -> "+", C, C, this.edit()),
+            TableView.row("删除", d -> "-", C, C, this.delete()),
             TableView.row("年", d -> TextUtil.text(d.getYear()), C, C, ConfigInfo::getYear),
             TableView.row("月", d -> TextUtil.text(d.getMonth()), C, C, ConfigInfo::getMonth),
             TableView.row("日", d -> TextUtil.text(d.getDay()), C, C, ConfigInfo::getDay),
             TableView.row("时", d -> TextUtil.text(d.getHour()), C, C, ConfigInfo::getHour),
             TableView.row("分", d -> TextUtil.text(d.getMinute()), C, C, ConfigInfo::getMinute),
-            TableView.row("秒", d -> TextUtil.text(d.getSecond()), C, C, ConfigInfo::getSecond),
-            TableView.row("状态", d -> TextUtil.text(Status.name(d.getStatus())), C, C, ConfigInfo::getStatus),
-            TableView.row("编辑", d -> "+", C, C, this.edit()),
-            TableView.row("删除", d -> "-", C, C, this.delete())
+            TableView.row("秒", d -> TextUtil.text(d.getSecond()), C, C, ConfigInfo::getSecond)
     );
 
     @Override
     protected List<TableView.D<ConfigInfo>> define() {
-        return DS;
+        return ds;
     }
 
     @Override
@@ -84,6 +85,16 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         start.setOnClickListener(i -> context.startService(service));
         stop.setOnClickListener(i -> context.stopService(service));
         add.setOnClickListener(i -> this.add());
+    }
+
+    @Override
+    protected int getTotalColumns() {
+        return 7;
+    }
+
+    @Override
+    protected int getFixedColumns() {
+        return 3;
     }
 
     /**

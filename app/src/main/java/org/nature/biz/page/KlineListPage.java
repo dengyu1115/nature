@@ -64,7 +64,7 @@ public class KlineListPage extends ListPage<Kline> {
 
     @Override
     protected int getTotalColumns() {
-        return 8;
+        return ds.size();
     }
 
 }

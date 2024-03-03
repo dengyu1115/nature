@@ -211,6 +211,87 @@ public class TableView<T> extends BasicView {
         }
         return line;
     }
+    
+    /**
+     * 内容view
+     * @return LinearLayout
+     */
+    private LinearLayout contentView() {
+        List<View> textViews = new ArrayList<>();
+        LinearLayout line = this.lineView();
+        line.setTag(textViews);
+        HorizontalScrollView scrollView = this.horizontalScrollView();
+        scrollView.setOnScrollChangeListener(scrollChangeListener);
+        LinearLayout innerLine = this.lineView();
+        scrollView.addView(innerLine);
+        horizontalScrollViews.add(scrollView);
+        this.scrollFix(scrollView);
+        int size = ds.size();
+        for (int i = 0; i < size; i++) {
+            D<T> d = ds.get(i);
+            List<D<T>> ds = d.ds;
+            if (ds == null || ds.isEmpty()) {
+                // 单层表头的处理
+                TextView content = this.textView();
+                textViews.add(content);
+                if (i < this.fixed - 1) {
+                    line.addView(content);
+                    line.addView(this.vDivider());
+                } else if (i == this.fixed - 1) {
+                    line.addView(content);
+                    line.addView(this.vDivider());
+                    line.addView(scrollView);
+                } else if (i == size - 1) {
+                    innerLine.addView(content);
+                } else {
+                    innerLine.addView(content);
+                    innerLine.addView(this.vDivider());
+                }
+            } else {
+                // 多层表头的处理
+                if (i < this.fixed - 1) {
+                    for (int j = 0; j < ds.size(); j++) {
+                        TextView content = this.textView();
+                        textViews.add(content);
+                        line.addView(content);
+                        line.addView(this.vDivider());
+                    }
+                } else if (i == this.fixed - 1) {
+                    for (int j = 0; j < ds.size(); j++) {
+                        TextView content = this.textView();
+                        textViews.add(content);
+                        if (j == ds.size() - 1) {
+                            line.addView(content);
+                            line.addView(this.vDivider());
+                            line.addView(scrollView);
+                        } else {
+                            line.addView(content);
+                            line.addView(this.vDivider());
+                        }
+                    }
+                } else if (i == size - 1) {
+                    for (int j = 0; j < ds.size(); j++) {
+                        TextView content = this.textView();
+                        textViews.add(content);
+                        if (j == ds.size() - 1) {
+                            innerLine.addView(content);
+                        } else {
+                            innerLine.addView(content);
+                            innerLine.addView(this.vDivider());
+                        }
+                    }
+                } else {
+                    for (int j = 0; j < ds.size(); j++) {
+                        TextView content = this.textView();
+                        textViews.add(content);
+                        innerLine.addView(content);
+                        innerLine.addView(this.vDivider());
+                    }
+                }
+            }
+        }
+        return line;
+    }
 
     /**
      * 标题view
@@ -495,87 +576,6 @@ public class TableView<T> extends BasicView {
         view.setLayoutParams(new LayoutParams(w, h));
         view.setBackgroundColor(BG_COLOR);
         return view;
-    }
-
-    /**
-     * 内容view
-     * @return LinearLayout
-     */
-    private LinearLayout contentView() {
-        List<View> textViews = new ArrayList<>();
-        LinearLayout line = this.lineView();
-        line.setTag(textViews);
-        HorizontalScrollView scrollView = this.horizontalScrollView();
-        scrollView.setOnScrollChangeListener(scrollChangeListener);
-        LinearLayout innerLine = this.lineView();
-        scrollView.addView(innerLine);
-        horizontalScrollViews.add(scrollView);
-        this.scrollFix(scrollView);
-        int size = ds.size();
-        for (int i = 0; i < size; i++) {
-            D<T> d = ds.get(i);
-            List<D<T>> ds = d.ds;
-            if (ds == null || ds.isEmpty()) {
-                // 单层表头的处理
-                TextView content = this.textView();
-                textViews.add(content);
-                if (i < this.fixed - 1) {
-                    line.addView(content);
-                    line.addView(this.vDivider());
-                } else if (i == this.fixed - 1) {
-                    line.addView(content);
-                    line.addView(this.vDivider());
-                    line.addView(scrollView);
-                } else if (i == size - 1) {
-                    innerLine.addView(content);
-                } else {
-                    innerLine.addView(content);
-                    innerLine.addView(this.vDivider());
-                }
-            } else {
-                // 多层表头的处理
-                if (i < this.fixed - 1) {
-                    for (int j = 0; j < ds.size(); j++) {
-                        TextView content = this.textView();
-                        textViews.add(content);
-                        line.addView(content);
-                        line.addView(this.vDivider());
-                    }
-                } else if (i == this.fixed - 1) {
-                    for (int j = 0; j < ds.size(); j++) {
-                        TextView content = this.textView();
-                        textViews.add(content);
-                        if (j == ds.size() - 1) {
-                            line.addView(content);
-                            line.addView(this.vDivider());
-                            line.addView(scrollView);
-                        } else {
-                            line.addView(content);
-                            line.addView(this.vDivider());
-                        }
-                    }
-                } else if (i == size - 1) {
-                    for (int j = 0; j < ds.size(); j++) {
-                        TextView content = this.textView();
-                        textViews.add(content);
-                        if (j == ds.size() - 1) {
-                            innerLine.addView(content);
-                        } else {
-                            innerLine.addView(content);
-                            innerLine.addView(this.vDivider());
-                        }
-                    }
-                } else {
-                    for (int j = 0; j < ds.size(); j++) {
-                        TextView content = this.textView();
-                        textViews.add(content);
-                        innerLine.addView(content);
-                        innerLine.addView(this.vDivider());
-                    }
-                }
-            }
-        }
-        return line;
     }
 
     /**

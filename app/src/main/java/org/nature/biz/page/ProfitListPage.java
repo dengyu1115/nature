@@ -114,6 +114,11 @@ public class ProfitListPage extends ListPage<Profit> {
     }
 
     @Override
+    protected int getTotalColumns() {
+        return 10;
+    }
+
+    @Override
     protected int getFixedColumns() {
         return 3;
     }

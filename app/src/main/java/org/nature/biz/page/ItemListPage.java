@@ -86,10 +86,8 @@ public class ItemListPage extends ListPage<Item> {
      * 表头
      */
     private final List<TableView.D<Item>> ds = Arrays.asList(
-            TableView.row("", C, Arrays.asList(
-                    TableView.row("名称", d -> TextUtil.text(d.getName()), C, S, Item::getName),
-                    TableView.row("编号", d -> TextUtil.text(d.getCode()), C, C, Item::getCode))
-            ),
+            TableView.row("名称", d -> TextUtil.text(d.getName()), C, S, Item::getName),
+            TableView.row("编号", d -> TextUtil.text(d.getCode()), C, C, Item::getCode),
             TableView.row("类型", d -> TextUtil.text(d.getType()), C, C, Item::getType),
             TableView.row("分组", d -> TextUtil.text(groupMap.get(d.getGroup())), C, C, Sorter.nullsLast(d -> groupMap.get(d.getGroup()))),
             TableView.row("编辑", d -> "+", C, C, this.edit()),
@@ -145,6 +143,11 @@ public class ItemListPage extends ListPage<Item> {
     @Override
     protected int getTotalColumns() {
         return 10;
+    }
+
+    @Override
+    protected int getFixedColumns() {
+        return 3;
     }
 
     /**
