@@ -71,6 +71,19 @@ public class WorkdayManager {
     }
 
     /**
+     * 上一工作日
+     * @param date 日期
+     * @return String
+     */
+    public String lastWorkday(String date) {
+        Workday workday = workdayMapper.findLastWorkday(date);
+        if (workday == null) {
+            return null;
+        }
+        return workday.getDate();
+    }
+
+    /**
      * 按年查询月份数据
      * @param year 年
      * @return list

@@ -6,6 +6,7 @@ import android.view.Gravity;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.ioc.holder.JobHolder;
@@ -165,30 +166,23 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
      */
     private void doEdit(Consumer<ConfigInfo> consumer) {
         String code = this.jobSel.getValue();
-
         if (code == null) {
-            throw new RuntimeException("请选择任务");
+            throw new Warn("请选择任务");
         }
         String status = this.statusSel.getValue();
         if (status.isEmpty()) {
-            throw new RuntimeException("请选择状态");
+            throw new Warn("请选择状态");
         }
-        String year = this.year.getText().toString();
-        String month = this.month.getText().toString();
-        String day = this.day.getText().toString();
-        String hour = this.hour.getText().toString();
-        String minute = this.minute.getText().toString();
-        String second = this.second.getText().toString();
         ConfigInfo d = new ConfigInfo();
         d.setCode(code);
         d.setStatus(status);
-        d.setYear(year);
-        d.setMonth(month);
-        d.setDay(day);
-        d.setHour(hour);
-        d.setMinute(minute);
-        d.setSecond(second);
-        d.setSignature(Md5Util.md5(code, year, month, day, hour, minute, second));
+        d.setYear(this.year.getText().toString());
+        d.setMonth(this.month.getText().toString());
+        d.setDay(this.day.getText().toString());
+        d.setHour(this.hour.getText().toString());
+        d.setMinute(this.minute.getText().toString());
+        d.setSecond(this.second.getText().toString());
+        d.setSignature(Md5Util.md5(code, d.getYear(), d.getMonth(), d.getDay(), d.getHour(), d.getMinute(), d.getSecond()));
         consumer.accept(d);
         this.refreshData();
         PopUtil.alert(context, "编辑成功！");

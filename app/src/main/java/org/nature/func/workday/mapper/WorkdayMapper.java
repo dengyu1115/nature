@@ -1,10 +1,7 @@
 package org.nature.func.workday.mapper;
 
 
-import org.nature.common.db.annotation.Delete;
-import org.nature.common.db.annotation.Param;
-import org.nature.common.db.annotation.QueryList;
-import org.nature.common.db.annotation.TableModel;
+import org.nature.common.db.annotation.*;
 import org.nature.common.db.function.BatchSave;
 import org.nature.common.db.function.FindById;
 import org.nature.func.workday.model.Workday;
@@ -35,5 +32,13 @@ public interface WorkdayMapper extends BatchSave<Workday>, FindById<Workday, Str
      */
     @Delete(where = "date like #{year}||'%'")
     int deleteByYear(@Param("year") String year);
+
+    /**
+     * 查询最近一个工作日
+     * @param date 日期
+     * @return Workday
+     */
+    @QueryOne(where = "date < #{date} order by date desc limit 1")
+    Workday findLastWorkday(@Param("date") String date);
 
 }
