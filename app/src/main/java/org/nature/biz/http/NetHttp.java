@@ -38,11 +38,11 @@ public class NetHttp {
         // 获取所需字段
         JSONObject data = json.getJSONObject("Data");
         if (data == null) {
-            throw new RuntimeException("历史K线数据缺失：" + code);
+            throw new RuntimeException("历史净值数据缺失：" + code);
         }
         JSONArray list = data.getJSONArray("LSJZList");
         if (list == null || list.isEmpty()) {
-            throw new RuntimeException("历史K线数据缺失：" + code);
+            throw new RuntimeException("历史净值数据缺失：" + code);
         }
         // 解析响应，获取净值
         return list.getJSONObject(0).getBigDecimal("DWJZ");

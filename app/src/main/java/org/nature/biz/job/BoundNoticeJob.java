@@ -1,7 +1,7 @@
 package org.nature.biz.job;
 
 import org.nature.biz.http.KlineHttp;
-import org.nature.biz.http.NetHttp;
+import org.nature.biz.manager.BoundManager;
 import org.nature.biz.model.Kline;
 import org.nature.common.constant.Const;
 import org.nature.common.exception.Warn;
@@ -18,6 +18,9 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.nature.biz.memory.BoundMemory.LIST;
+import static org.nature.biz.memory.BoundMemory.NAME_MAP;
+
 /**
  * 债券差价提醒
  * @author Nature
@@ -27,22 +30,6 @@ import java.util.stream.Collectors;
 @JobExec(code = "bound_notice_job", name = "债券差价提醒")
 public class BoundNoticeJob implements Job {
 
-    /**
-     * code-名称map
-     */
-    public static final Map<String, String> NAME_MAP = Map.of(
-            "159649", "国开债ETF",
-            "159650", "国开ETF",
-            "159651", "国开债券ETF"
-    );
-    /**
-     * 品种集合
-     */
-    public static final List<String> LIST = NAME_MAP.keySet().stream().sorted().collect(Collectors.toList());
-    /**
-     * 最新净值记录map
-     */
-    private static final Map<String, Map<String, BigDecimal>> NET_MAP = new HashMap<>();
     /**
      * 最新操作数据map
      */
@@ -63,7 +50,7 @@ public class BoundNoticeJob implements Job {
     @Injection
     private WorkdayManager workdayManager;
     @Injection
-    private NetHttp netHttp;
+    private BoundManager boundManager;
     @Injection
     private KlineHttp klineHttp;
 
@@ -88,7 +75,7 @@ public class BoundNoticeJob implements Job {
      */
     private void boundHandle() {
         String today = DateUtil.today();
-        Map<String, BigDecimal> netMap = this.getNetMap(today);
+        Map<String, BigDecimal> netMap = boundManager.getNetMap(today);
         // 查询最新K线值，计算涨跌幅
         Map<String, BigDecimal> ratioMap = this.getRatioMap(today, netMap);
         // 已A3_2的排列计算价格差，满足价差的提醒
@@ -97,30 +84,6 @@ public class BoundNoticeJob implements Job {
         this.notice(today);
         // 删除过期数据
         this.deleteExpired(today);
-    }
-
-    /**
-     * 获取净值数据map
-     * @param date 日期
-     * @return map
-     */
-    private Map<String, BigDecimal> getNetMap(String date) {
-        // 取出当天数据
-        Map<String, BigDecimal> netMap = NET_MAP.get(date);
-        // 当天没数据则查询初始化
-        if (netMap == null) {
-            // 查询最新净值
-            String lastWorkday = workdayManager.lastWorkday(date);
-            netMap = LIST.parallelStream().collect(Collectors.toMap(i -> i, i -> {
-                BigDecimal value = netHttp.getNetValue(i, lastWorkday);
-                if (value == null) {
-                    throw new Warn("净值获取失败:" + i);
-                }
-                return value;
-            }));
-            NET_MAP.put(date, netMap);
-        }
-        return netMap;
     }
 
     /**
@@ -148,17 +111,25 @@ public class BoundNoticeJob implements Job {
         Map<String, BigDecimal> handleMap = HANDLE_MAP.computeIfAbsent(date, k -> new HashMap<>());
         // 排列组合数据计算差价是否满足通知条件
         LIST.forEach(m -> {
+            BigDecimal mv = ratioMap.get(m);
+            if (mv == null) {
+                return;
+            }
             List<String> list = new ArrayList<>(LIST);
             list.remove(m);
             list.forEach(n -> {
+                BigDecimal nv = ratioMap.get(n);
+                if (nv == null) {
+                    return;
+                }
                 String key = String.join(Const.DELIMITER, m, n);
                 BigDecimal v = handleMap.get(key);
                 if (v == null) {
                     v = DIFF;
                 }
-                BigDecimal ratio = ratioMap.get(m);
-                if (ratio != null && ratio.compareTo(v) >= 0) {
-                    handleMap.put(key, v);
+                BigDecimal diff = mv.subtract(nv).setScale(4, RoundingMode.HALF_UP);
+                if (diff.compareTo(v) >= 0) {
+                    handleMap.put(key, diff);
                 }
             });
         });
@@ -179,21 +150,20 @@ public class BoundNoticeJob implements Job {
         // 记录需要通知的文案集合
         List<String> list = new ArrayList<>();
         // 遍历操作数据，进行通知操作
-        Comparator<P> comparator = Comparator.comparing(i -> i.v);
-        Comparator<P> reversed = comparator.reversed();
-        handleMap.entrySet().stream().map(i -> {
+        Comparator<Map.Entry<String, BigDecimal>> comparator = Comparator.comparing(Map.Entry::getValue);
+        Comparator<Map.Entry<String, BigDecimal>> reversed = comparator.reversed();
+        handleMap.entrySet().stream().sorted(reversed).forEach(i -> {
             String[] keys = i.getKey().split(Const.DELIMITER);
             String m = keys[0];
             String n = keys[1];
-            return new P(m, n, i.getValue());
-        }).sorted(reversed).forEach(i -> {
-            String key = Md5Util.md5(i.m, i.n, i.v.toPlainString());
+            BigDecimal v = i.getValue();
+            String key = Md5Util.md5(m, n, v.toPlainString());
             // 如果已经通知过，则跳过
             if (set.contains(key)) {
                 return;
             }
             set.add(key);
-            list.add(NAME_MAP.get(i.m) + "和" + NAME_MAP.get(i.n) + "相差" + i.v.multiply(HUNDRED) + "%");
+            list.add(NAME_MAP.get(m) + "和" + NAME_MAP.get(n) + "相差" + v.multiply(HUNDRED) + "%");
         });
         if (list.isEmpty()) {
             return;
@@ -212,7 +182,7 @@ public class BoundNoticeJob implements Job {
      */
     private BigDecimal calcRatio(Map<String, BigDecimal> netMap, Kline i) {
         BigDecimal base = netMap.get(i.getCode());
-        return i.getLatest().subtract(base).divide(base, 4, RoundingMode.HALF_UP);
+        return i.getLatest().subtract(base).divide(base, 8, RoundingMode.HALF_UP);
     }
 
     /**
@@ -220,7 +190,7 @@ public class BoundNoticeJob implements Job {
      * @param date 日期
      */
     private void deleteExpired(String date) {
-        List<Map<String, ?>> list = List.of(NET_MAP, NOTICE_MAP, HANDLE_MAP);
+        List<Map<String, ?>> list = List.of(NOTICE_MAP, HANDLE_MAP);
         for (Map<String, ?> map : list) {
             Set<String> set = new HashSet<>(map.keySet());
             for (String s : set) {
@@ -250,18 +220,6 @@ public class BoundNoticeJob implements Job {
         } finally {
             // 执行完毕，标记为未执行
             running = false;
-        }
-    }
-
-    private static class P {
-        private final String m;
-        private final String n;
-        private final BigDecimal v;
-
-        public P(String m, String n, BigDecimal v) {
-            this.m = m;
-            this.n = n;
-            this.v = v;
         }
     }
 

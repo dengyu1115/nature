@@ -38,7 +38,7 @@ public interface WorkdayMapper extends BatchSave<Workday>, FindById<Workday, Str
      * @param date 日期
      * @return Workday
      */
-    @QueryOne(where = "date < #{date} order by date desc limit 1")
+    @QueryOne(where = "date < #{date} and type='W' order by date desc limit 1")
     Workday findLastWorkday(@Param("date") String date);
 
 }
