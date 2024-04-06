@@ -24,4 +24,8 @@ public class BoundMemory {
      */
     public static final List<String> LIST = NAME_MAP.keySet().stream().sorted().collect(Collectors.toList());
 
+    //511010 国债ETF，511020 活跃国债ETF
+
+
+
 }

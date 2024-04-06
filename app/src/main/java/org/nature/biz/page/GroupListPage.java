@@ -5,8 +5,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import org.apache.commons.lang3.StringUtils;
-import org.nature.biz.manager.GroupManager;
+import org.nature.biz.mapper.GroupMapper;
 import org.nature.biz.model.Group;
+import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
@@ -33,7 +34,7 @@ import static org.nature.common.constant.Const.*;
 public class GroupListPage extends ListPage<Group> {
 
     @Injection
-    private GroupManager groupManager;
+    private GroupMapper groupMapper;
 
     private EditText keyword;
     private LinearLayout page;
@@ -54,7 +55,7 @@ public class GroupListPage extends ListPage<Group> {
 
     @Override
     protected List<Group> listData() {
-        List<Group> list = groupManager.listAll();
+        List<Group> list = groupMapper.listAll();
         String keyword = this.keyword.getText().toString();
         if (StringUtils.isNotBlank(keyword)) {
             list = list.stream().filter(i -> i.getName().contains(keyword)).collect(Collectors.toList());
@@ -83,7 +84,7 @@ public class GroupListPage extends ListPage<Group> {
      */
     private void add() {
         this.makeWindowStructure();
-        PopUtil.confirm(context, "新增项目", page, () -> this.doEdit(groupManager::save));
+        PopUtil.confirm(context, "新增项目", page, () -> this.doEdit(this::save));
     }
 
     /**
@@ -94,7 +95,7 @@ public class GroupListPage extends ListPage<Group> {
         this.makeWindowStructure();
         this.code.setText(d.getCode());
         this.name.setText(d.getName());
-        PopUtil.confirm(context, "编辑项目-" + d.getName(), page, () -> this.doEdit(groupManager::edit));
+        PopUtil.confirm(context, "编辑项目-" + d.getName(), page, () -> this.doEdit(groupMapper::merge));
     }
 
     /**
@@ -124,7 +125,7 @@ public class GroupListPage extends ListPage<Group> {
      */
     private void delete(Group d) {
         PopUtil.confirm(context, "删除项目-" + d.getName(), "确认删除吗？", () -> {
-            groupManager.delete(d.getCode());
+            groupMapper.deleteById(d.getCode());
             this.refreshData();
             PopUtil.alert(context, "删除成功！");
         });
@@ -140,6 +141,20 @@ public class GroupListPage extends ListPage<Group> {
                 t.line(L_W, L_H, t.textView("分组名称：", L_W_T, L_H), name = t.editText(L_W_C, L_H)),
                 t.line(L_W, L_H)
         );
+    }
+
+    /**
+     * 保存
+     * @param group 分组
+     */
+    private void save(Group group) {
+        Group exists = groupMapper.findById(group.getCode());
+        // 分组已存在
+        if (exists != null) {
+            throw new Warn("datum exists");
+        }
+        // 保存
+        groupMapper.save(group);
     }
 
 }

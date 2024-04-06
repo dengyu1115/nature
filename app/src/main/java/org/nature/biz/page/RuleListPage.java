@@ -49,11 +49,11 @@ public class RuleListPage extends ListPage<Rule> {
             TableView.row("名称", d -> TextUtil.text(d.getName()), C, S, Rule::getName),
             TableView.row("规则类型", d -> TextUtil.text(this.typeName(d.getRuleType())), C, C, Rule::getRuleType),
             TableView.row("状态", d -> TextUtil.text(this.statusName(d.getStatus())), C, C, Rule::getStatus),
-            TableView.row("编辑", d -> "+", C, C, this.edit()),
-            TableView.row("删除", d -> "-", C, C, this.delete()),
-            TableView.row("持仓计算", d -> "计算", C, C, this.calcProfit()),
-            TableView.row("持仓查看", d -> "查看", C, C, this.showHold()),
-            TableView.row("收益查看", d -> "查看", C, C, this.showProfit()),
+            TableView.row("编辑", d -> "+", C, C, this::edit),
+            TableView.row("删除", d -> "-", C, C, this::delete),
+            TableView.row("持仓计算", d -> "计算", C, C, this::calcProfit),
+            TableView.row("持仓查看", d -> "查看", C, C, this::showHold),
+            TableView.row("收益查看", d -> "查看", C, C, this::showProfit),
             TableView.row("开始日期", d -> TextUtil.text(d.getDate()), C, C, Rule::getDate),
             TableView.row("金额基数", d -> TextUtil.text(d.getBase()), C, C, Rule::getBase),
             TableView.row("波动比率", d -> TextUtil.text(d.getRatio()), C, C, Rule::getRatio),
@@ -100,19 +100,17 @@ public class RuleListPage extends ListPage<Rule> {
 
     /**
      * 编辑操作
-     * @return 操作逻辑
+     * @param d 数据
      */
-    private Consumer<Rule> edit() {
-        return d -> {
-            this.makeWindowStructure();
-            this.name.setText(d.getName());
-            this.date.setText(d.getDate());
-            this.base.setText(d.getBase().toPlainString());
-            this.ratio.setText(d.getRatio().toPlainString());
-            this.expansion.setText(d.getExpansion().toPlainString());
-            this.statusSel.setValue(d.getStatus());
-            PopUtil.confirm(context, "编辑-" + d.getName(), page, () -> this.doEdit(ruleManager::edit));
-        };
+    private void edit(Rule d) {
+        this.makeWindowStructure();
+        this.name.setText(d.getName());
+        this.date.setText(d.getDate());
+        this.base.setText(d.getBase().toPlainString());
+        this.ratio.setText(d.getRatio().toPlainString());
+        this.expansion.setText(d.getExpansion().toPlainString());
+        this.statusSel.setValue(d.getStatus());
+        PopUtil.confirm(context, "编辑-" + d.getName(), page, () -> this.doEdit(ruleManager::edit));
     }
 
     /**
@@ -166,10 +164,10 @@ public class RuleListPage extends ListPage<Rule> {
 
     /**
      * 删除操作
-     * @return 操作逻辑
+     * @param d 数据
      */
-    private Consumer<Rule> delete() {
-        return d -> PopUtil.confirm(context, "删除项目-" + d.getName(), "确认删除吗？", () -> {
+    private void delete(Rule d) {
+        PopUtil.confirm(context, "删除项目-" + d.getName(), "确认删除吗？", () -> {
             ruleManager.delete(d);
             this.refreshData();
             PopUtil.alert(context, "删除成功！");
@@ -178,29 +176,27 @@ public class RuleListPage extends ListPage<Rule> {
 
     /**
      * 计算收益
-     * @return 操作逻辑
+     * @param d 数据
      */
-    private Consumer<Rule> calcProfit() {
-        return d -> {
-            int i = holdManager.calc(d);
-            PopUtil.alert(context, "持仓收益计算完成，数据量：" + i);
-        };
+    private void calcProfit(Rule d) {
+        int i = holdManager.calc(d);
+        PopUtil.alert(context, "持仓收益计算完成，数据量：" + i);
     }
 
     /**
      * 展示持有数据
-     * @return 操作逻辑
+     * @param d 数据
      */
-    private Consumer<Rule> showHold() {
-        return d -> this.show(HoldListPage.class, d);
+    private void showHold(Rule d) {
+        this.show(HoldListPage.class, d);
     }
 
     /**
      * 展示收益数据
-     * @return 操作逻辑
+     * @param d 数据
      */
-    private Consumer<Rule> showProfit() {
-        return d -> this.show(ProfitListPage.class, d);
+    private void showProfit(Rule d) {
+        this.show(ProfitListPage.class, d);
     }
 
     /**

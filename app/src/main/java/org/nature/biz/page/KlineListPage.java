@@ -1,7 +1,7 @@
 package org.nature.biz.page;
 
 import android.widget.Button;
-import org.nature.biz.manager.KlineManager;
+import org.nature.biz.mapper.KlineMapper;
 import org.nature.biz.model.Item;
 import org.nature.biz.model.Kline;
 import org.nature.common.ioc.annotation.Injection;
@@ -24,7 +24,7 @@ import java.util.List;
 public class KlineListPage extends ListPage<Kline> {
 
     @Injection
-    private KlineManager klineManager;
+    private KlineMapper klineMapper;
 
     private Button chart;
 
@@ -47,7 +47,7 @@ public class KlineListPage extends ListPage<Kline> {
     @Override
     protected List<Kline> listData() {
         Item item = this.getParam();
-        return klineManager.listByItem(item);
+        return klineMapper.listByItem(item.getCode(), item.getType());
     }
 
     @Override

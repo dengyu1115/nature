@@ -74,26 +74,8 @@ public class KlineManager {
      * @return int
      */
     public int reloadByItem(Item item) {
-        this.deleteByItem(item);
+        klineMapper.deleteByItem(item.getCode(), item.getType());
         return this.loadByItem(item);
-    }
-
-    /**
-     * 按项目查询
-     * @param item 项目
-     * @return list
-     */
-    public List<Kline> listByItem(Item item) {
-        return klineMapper.listByItem(item.getCode(), item.getType());
-    }
-
-    /**
-     * 按项目删除
-     * @param item 项目
-     * @return int
-     */
-    public int deleteByItem(Item item) {
-        return klineMapper.deleteByItem(item.getCode(), item.getType());
     }
 
     /**

@@ -2,6 +2,7 @@ package org.nature.biz.manager;
 
 import org.nature.biz.http.KlineHttp;
 import org.nature.biz.http.NetHttp;
+import org.nature.biz.mapper.BoundMapper;
 import org.nature.biz.model.BoundRate;
 import org.nature.biz.model.Kline;
 import org.nature.common.exception.Warn;
@@ -38,6 +39,8 @@ public class BoundManager {
     private NetHttp netHttp;
     @Injection
     private KlineHttp klineHttp;
+    @Injection
+    private BoundMapper boundMapper;
     @Injection
     private WorkdayManager workdayManager;
 

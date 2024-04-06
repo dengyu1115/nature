@@ -7,7 +7,7 @@ import android.view.Gravity;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import org.nature.biz.manager.KlineManager;
+import org.nature.biz.mapper.KlineMapper;
 import org.nature.biz.model.Item;
 import org.nature.biz.model.Kline;
 import org.nature.biz.model.KlineView;
@@ -105,7 +105,7 @@ public class KlineChartPage extends Page {
     private ViewTemplate template;
 
     @Injection
-    private KlineManager klineManager;
+    private KlineMapper klineMapper;
 
     /**
      * 图
@@ -144,7 +144,7 @@ public class KlineChartPage extends Page {
         Item item = this.getParam();
         name = item.getName();
         // 查询K线数据
-        list = klineManager.listByItem(item);
+        list = klineMapper.listByItem(item.getCode(), item.getType());
         // 按时间正序排序
         list.sort(Comparator.comparing(Kline::getDate));
         List<KlineView> viewList = KlineUtil.convert(list, name);

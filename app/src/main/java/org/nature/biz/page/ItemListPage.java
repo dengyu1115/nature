@@ -5,12 +5,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import org.apache.commons.lang3.StringUtils;
-import org.nature.biz.manager.GroupManager;
 import org.nature.biz.manager.HoldManager;
-import org.nature.biz.manager.ItemManager;
 import org.nature.biz.manager.KlineManager;
+import org.nature.biz.mapper.GroupMapper;
+import org.nature.biz.mapper.ItemMapper;
 import org.nature.biz.model.Group;
 import org.nature.biz.model.Item;
+import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
@@ -42,9 +43,9 @@ import static org.nature.common.constant.Const.*;
 public class ItemListPage extends ListPage<Item> {
 
     @Injection
-    private ItemManager itemManager;
+    private ItemMapper itemMapper;
     @Injection
-    private GroupManager groupManager;
+    private GroupMapper groupMapper;
     @Injection
     private KlineManager klineManager;
     @Injection
@@ -90,12 +91,12 @@ public class ItemListPage extends ListPage<Item> {
             TableView.row("编号", d -> TextUtil.text(d.getCode()), C, C, Item::getCode),
             TableView.row("类型", d -> TextUtil.text(d.getType()), C, C, Item::getType),
             TableView.row("分组", d -> TextUtil.text(groupMap.get(d.getGroup())), C, C, Sorter.nullsLast(d -> groupMap.get(d.getGroup()))),
-            TableView.row("编辑", d -> "+", C, C, this.edit()),
-            TableView.row("删除", d -> "-", C, C, this.delete()),
-            TableView.row("K线加载", d -> "加载", C, C, this.loadKline()),
-            TableView.row("K线重载", d -> "加载", C, C, this.reloadKline()),
-            TableView.row("K线查看", d -> "查看", C, C, this.showKline()),
-            TableView.row("规则查看", d -> "查看", C, C, this.showRule())
+            TableView.row("编辑", d -> "+", C, C, this::edit),
+            TableView.row("删除", d -> "-", C, C, this::delete),
+            TableView.row("K线加载", d -> "加载", C, C, this::loadKline),
+            TableView.row("K线重载", d -> "加载", C, C, this::reloadKline),
+            TableView.row("K线查看", d -> "查看", C, C, this::showKline),
+            TableView.row("规则查看", d -> "查看", C, C, this::showRule)
     );
 
     @Override
@@ -105,7 +106,7 @@ public class ItemListPage extends ListPage<Item> {
 
     @Override
     protected List<Item> listData() {
-        List<Item> list = itemManager.listAll();
+        List<Item> list = itemMapper.listAll();
         String keyword = this.keyword.getText().toString();
         if (StringUtils.isNotBlank(keyword)) {
             list = list.stream().filter(i -> i.getName().contains(keyword)).collect(Collectors.toList());
@@ -129,11 +130,11 @@ public class ItemListPage extends ListPage<Item> {
 
     @Override
     protected void initHeaderBehaviours() {
-        add.setOnClickListener(v -> this.add());
+        ClickUtil.onClick(add, this::add);
         ClickUtil.onAsyncClick(loadKline, this::loadKlineAll);
         ClickUtil.onPopConfirm(reloadKline, "K线重载", "确定重新加载全部K线数据？", this::reloadKlineAll);
         ClickUtil.onAsyncClick(calcRule, this::calcHold);
-        List<Group> groups = groupManager.listAll();
+        List<Group> groups = groupMapper.listAll();
         groupMap = groups.stream().collect(Collectors.toMap(Group::getCode, Group::getName));
         groups.sort(Comparator.comparing(Group::getCode));
         groups.add(0, new Group());
@@ -155,21 +156,19 @@ public class ItemListPage extends ListPage<Item> {
      */
     private void add() {
         this.makeWindowStructure();
-        PopUtil.confirm(context, "新增项目", editPop, () -> this.doEdit(itemManager::save));
+        PopUtil.confirm(context, "新增项目", editPop, () -> this.doEdit(this::save));
     }
 
     /**
      * 编辑
-     * @return 编辑操作
+     * @param d 数据
      */
-    private Consumer<Item> edit() {
-        return d -> {
-            this.makeWindowStructure();
-            this.code.setText(d.getCode());
-            this.name.setText(d.getName());
-            this.type.setValue(d.getType());
-            PopUtil.confirm(context, "编辑项目-" + d.getName(), editPop, () -> this.doEdit(itemManager::edit));
-        };
+    private void edit(Item d) {
+        this.makeWindowStructure();
+        this.code.setText(d.getCode());
+        this.name.setText(d.getName());
+        this.type.setValue(d.getType());
+        PopUtil.confirm(context, "编辑项目-" + d.getName(), editPop, () -> this.doEdit(itemMapper::merge));
     }
 
     /**
@@ -205,11 +204,11 @@ public class ItemListPage extends ListPage<Item> {
 
     /**
      * 删除操作
-     * @return 删除操作
+     * @param d 数据
      */
-    private Consumer<Item> delete() {
-        return d -> PopUtil.confirm(context, "删除项目-" + d.getName(), "确认删除吗？", () -> {
-            itemManager.delete(d);
+    private void delete(Item d) {
+        PopUtil.confirm(context, "删除项目-" + d.getName(), "确认删除吗？", () -> {
+            itemMapper.deleteById(d);
             this.refreshData();
             PopUtil.alert(context, "删除成功！");
         });
@@ -217,18 +216,18 @@ public class ItemListPage extends ListPage<Item> {
 
     /**
      * 加载K线
-     * @return 加载K线操作
+     * @param d 数据
      */
-    private Consumer<Item> loadKline() {
-        return d -> PopUtil.alert(context, "K线加载完成，数据量：" + klineManager.loadByItem(d));
+    private void loadKline(Item d) {
+        PopUtil.alert(context, "K线加载完成，数据量：" + klineManager.loadByItem(d));
     }
 
     /**
      * 重载K线
-     * @return 重载K线操作
+     * @param d 数据
      */
-    private Consumer<Item> reloadKline() {
-        return d -> PopUtil.alert(context, "K线重载完成，数据量：" + klineManager.reloadByItem(d));
+    private void reloadKline(Item d) {
+        PopUtil.alert(context, "K线重载完成，数据量：" + klineManager.reloadByItem(d));
     }
 
     /**
@@ -257,18 +256,18 @@ public class ItemListPage extends ListPage<Item> {
 
     /**
      * 显示K线
-     * @return 显示K线操作
+     * @param d 数据
      */
-    private Consumer<Item> showKline() {
-        return d -> this.show(KlineListPage.class, d);
+    private void showKline(Item d) {
+        this.show(KlineListPage.class, d);
     }
 
     /**
      * 显示规则
-     * @return 显示规则操作
+     * @param d 数据
      */
-    private Consumer<Item> showRule() {
-        return d -> this.show(RuleListPage.class, d);
+    private void showRule(Item d) {
+        this.show(RuleListPage.class, d);
     }
 
     /**
@@ -284,7 +283,21 @@ public class ItemListPage extends ListPage<Item> {
                 t.line(L_W, L_H)
         );
         type.mapper(i -> i).init().refreshData(Arrays.asList("0", "1"));
-        group.mapper(Group::getName).init().refreshData(groupManager.listAll());
+        group.mapper(Group::getName).init().refreshData(groupMapper.listAll());
+    }
+
+    /**
+     * 保存
+     * @param item 项目
+     */
+    private void save(Item item) {
+        Item exists = itemMapper.findById(item);
+        // 数据已存在
+        if (exists != null) {
+            throw new Warn("数据已存在");
+        }
+        // 保存
+        itemMapper.save(item);
     }
 
 }
