@@ -5,7 +5,6 @@ import org.nature.biz.http.KlineHttp;
 import org.nature.biz.mapper.KlineMapper;
 import org.nature.biz.mapper.RuleMapper;
 import org.nature.biz.model.Hold;
-import org.nature.biz.model.Item;
 import org.nature.biz.model.Kline;
 import org.nature.biz.model.Rule;
 import org.nature.biz.simulator.Simulator;
@@ -33,43 +32,6 @@ public class RuleManager {
     private KlineMapper klineMapper;
     @Injection
     private KlineHttp klineHttp;
-
-    /**
-     * 保存
-     * @param rule 规则
-     * @return int
-     */
-    public int save(Rule rule) {
-        Rule exists = ruleMapper.findById(rule);
-        // 数据已存在
-        if (exists != null) {
-            throw new RuntimeException("datum exists");
-        }
-        return ruleMapper.save(rule);
-    }
-
-    /**
-     * 编辑
-     * @param rule 规则
-     * @return int
-     */
-    public int edit(Rule rule) {
-        Rule exists = ruleMapper.findById(rule);
-        // 数据不存在
-        if (exists == null) {
-            throw new RuntimeException("datum not exists");
-        }
-        return ruleMapper.merge(rule);
-    }
-
-    /**
-     * 按项目查询规则
-     * @param item 项目
-     * @return list
-     */
-    public List<Rule> listByItem(Item item) {
-        return ruleMapper.listByItem(item.getCode(), item.getType());
-    }
 
     /**
      * 删除

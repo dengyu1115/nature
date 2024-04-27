@@ -5,9 +5,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import org.nature.biz.manager.HoldManager;
-import org.nature.biz.manager.RuleManager;
+import org.nature.biz.mapper.RuleMapper;
 import org.nature.biz.model.Item;
 import org.nature.biz.model.Rule;
+import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
@@ -36,7 +37,7 @@ import static org.nature.common.constant.Const.*;
 public class RuleListPage extends ListPage<Rule> {
 
     @Injection
-    private RuleManager ruleManager;
+    private RuleMapper ruleMapper;
     @Injection
     private HoldManager holdManager;
 
@@ -67,7 +68,8 @@ public class RuleListPage extends ListPage<Rule> {
 
     @Override
     protected List<Rule> listData() {
-        return ruleManager.listByItem(this.getParam());
+        Item d = this.getParam();
+        return ruleMapper.listByItem(d.getCode(), d.getType());
     }
 
     @Override
@@ -95,7 +97,7 @@ public class RuleListPage extends ListPage<Rule> {
      */
     private void add() {
         this.makeWindowStructure();
-        PopUtil.confirm(context, "新增", page, () -> this.doEdit(ruleManager::save));
+        PopUtil.confirm(context, "新增", page, () -> this.doEdit(this::save));
     }
 
     /**
@@ -110,7 +112,7 @@ public class RuleListPage extends ListPage<Rule> {
         this.ratio.setText(d.getRatio().toPlainString());
         this.expansion.setText(d.getExpansion().toPlainString());
         this.statusSel.setValue(d.getStatus());
-        PopUtil.confirm(context, "编辑-" + d.getName(), page, () -> this.doEdit(ruleManager::edit));
+        PopUtil.confirm(context, "编辑-" + d.getName(), page, () -> this.doEdit(ruleMapper::merge));
     }
 
     /**
@@ -119,33 +121,21 @@ public class RuleListPage extends ListPage<Rule> {
      */
     private void doEdit(Consumer<Rule> consumer) {
         String name = this.name.getText().toString();
-        if (name.isEmpty()) {
-            throw new RuntimeException("请填写名称");
-        }
+        Warn.check(name::isEmpty, "请填写名称");
         String date = this.date.getText().toString();
         if (date.isEmpty()) {
             date = null;
         }
         String base = this.base.getText().toString();
-        if (base.isEmpty()) {
-            throw new RuntimeException("请填写金额基数");
-        }
+        Warn.check(base::isEmpty, "请填写金额基数");
         String ratio = this.ratio.getText().toString();
-        if (ratio.isEmpty()) {
-            throw new RuntimeException("请填写波动比率");
-        }
+        Warn.check(ratio::isEmpty, "请填写波动比率");
         String expansion = this.expansion.getText().toString();
-        if (expansion.isEmpty()) {
-            throw new RuntimeException("请填写扩大幅度");
-        }
+        Warn.check(expansion::isEmpty, "请填写扩大幅度");
         String status = this.statusSel.getValue();
-        if (status.isEmpty()) {
-            throw new RuntimeException("请选择状态");
-        }
+        Warn.check(status::isEmpty, "请选择状态");
         String type = this.typeSel.getValue();
-        if (type.isEmpty()) {
-            throw new RuntimeException("请选择规则类型");
-        }
+        Warn.check(type::isEmpty, "请选择规则类型");
         Item item = this.getParam();
         Rule rule = new Rule();
         rule.setCode(item.getCode());
@@ -168,7 +158,7 @@ public class RuleListPage extends ListPage<Rule> {
      */
     private void delete(Rule d) {
         PopUtil.confirm(context, "删除项目-" + d.getName(), "确认删除吗？", () -> {
-            ruleManager.delete(d);
+            ruleMapper.deleteById(d);
             this.refreshData();
             PopUtil.alert(context, "删除成功！");
         });
@@ -233,6 +223,13 @@ public class RuleListPage extends ListPage<Rule> {
      */
     private String typeName(String i) {
         return Map.of("0", "网格", "1", "网格定投", "2", "复利").get(i);
+    }
+
+    private void save(Rule rule) {
+        Rule exists = ruleMapper.findById(rule);
+        // 数据已存在
+        Warn.check(() -> exists != null, "数据已存在");
+        ruleMapper.save(rule);
     }
 
 }

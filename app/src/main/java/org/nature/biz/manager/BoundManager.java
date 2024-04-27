@@ -2,7 +2,6 @@ package org.nature.biz.manager;
 
 import org.nature.biz.http.KlineHttp;
 import org.nature.biz.http.NetHttp;
-import org.nature.biz.mapper.BoundMapper;
 import org.nature.biz.model.BoundRate;
 import org.nature.biz.model.Kline;
 import org.nature.common.exception.Warn;
@@ -40,8 +39,6 @@ public class BoundManager {
     @Injection
     private KlineHttp klineHttp;
     @Injection
-    private BoundMapper boundMapper;
-    @Injection
     private WorkdayManager workdayManager;
 
     /**
@@ -51,7 +48,9 @@ public class BoundManager {
     public List<BoundRate> listRatio() {
         String today = DateUtil.today();
         Map<String, BigDecimal> netMap = this.getNetMap(today);
-        return LIST.parallelStream().map(i -> new BoundRate(i, NAME_MAP.get(i), EMPTY, EMPTY, this.calcRatio(i, today, netMap)))
+        String workday = workdayManager.latestWorkday(today);
+        return LIST.parallelStream()
+                .map(i -> new BoundRate(i, NAME_MAP.get(i), EMPTY, EMPTY, this.calcRatio(i, workday, netMap)))
                 .sorted(Comparator.comparing(BoundRate::getRatio)).collect(Collectors.toList());
     }
 
@@ -62,8 +61,9 @@ public class BoundManager {
     public List<BoundRate> listCompare() {
         String today = DateUtil.today();
         Map<String, BigDecimal> netMap = this.getNetMap(today);
+        String workday = workdayManager.latestWorkday(today);
         Map<String, BigDecimal> ratioMap = LIST.parallelStream()
-                .collect(Collectors.toMap(i -> i, i -> this.calcRatio(i, today, netMap)));
+                .collect(Collectors.toMap(i -> i, i -> this.calcRatio(i, workday, netMap)));
         return LIST.stream().map(i -> {
                     BigDecimal mv = ratioMap.get(i);
                     if (mv == null) {
@@ -114,17 +114,11 @@ public class BoundManager {
      */
     private BigDecimal calcRatio(String code, String date, Map<String, BigDecimal> netMap) {
         BigDecimal net = netMap.get(code);
-        if (net == null) {
-            throw new Warn("获取净值数据失败：" + code);
-        }
+        Warn.check(() -> net == null, "净值获取失败:" + code);
         List<Kline> list = klineHttp.list(code, "0", date, date);
-        if (list.isEmpty()) {
-            throw new Warn("获取K线数据失败：" + code);
-        }
+        Warn.check(list::isEmpty, "获取K线数据失败:" + code);
         BigDecimal latest = list.get(0).getLatest();
-        if (latest == null) {
-            throw new Warn("获取K线数据失败：" + code + " 最新价为空");
-        }
+        Warn.check(() -> latest == null, "获取K线数据失败：" + code + " 最新价为空");
         return latest.subtract(net).divide(net, SCALE, RoundingMode.HALF_UP);
     }
 

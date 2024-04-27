@@ -176,19 +176,11 @@ public class ProfitListPage extends ListPage<Profit> {
         String today = DateUtil.today();
         String dateEnd = this.dateEnd.getText().toString();
         if ("".equals(dateRule)) {
-            if (StringUtils.isBlank(dateEnd)) {
-                throw new Warn("请选择结束日期");
-            }
+            Warn.check(() -> StringUtils.isNotBlank(dateEnd), "请选择结束日期");
             String dateStart = this.dateStart.getText().toString();
-            if (StringUtils.isBlank(dateStart)) {
-                throw new Warn("请选择开始日期");
-            }
-            if (dateStart.compareTo(dateEnd) >= 0) {
-                throw new Warn("结束日期不可早于开始日期");
-            }
-            if (dateStart.compareTo(today) >= 0) {
-                throw new Warn("开始不可晚于今天");
-            }
+            Warn.check(() -> StringUtils.isNotBlank(dateStart), "请选择开始日期");
+            Warn.check(() -> dateStart.compareTo(dateEnd) >= 0, "结束日期不可早于开始日期");
+            Warn.check(() -> dateStart.compareTo(today) >= 0, "开始日期不可晚于今天");
             return List.of(dateStart, dateEnd);
         }
         if ("0".equals(dateRule)) {

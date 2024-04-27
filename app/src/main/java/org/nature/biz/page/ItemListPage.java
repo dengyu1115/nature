@@ -177,21 +177,13 @@ public class ItemListPage extends ListPage<Item> {
      */
     private void doEdit(Consumer<Item> consumer) {
         String code = this.code.getText().toString();
-        if (code.isEmpty()) {
-            throw new RuntimeException("请填写编号");
-        }
+        Warn.check(code::isEmpty, "请填写编号");
         String name = this.name.getText().toString();
-        if (name.isEmpty()) {
-            throw new RuntimeException("请填写名称");
-        }
+        Warn.check(name::isEmpty, "请填写名称");
         String type = this.type.getValue();
-        if (type.isEmpty()) {
-            throw new RuntimeException("请选择类型");
-        }
+        Warn.check(type::isEmpty, "请选择类型");
         Group group = this.group.getValue();
-        if (group == null) {
-            throw new RuntimeException("请选择分组");
-        }
+        Warn.check(() -> group == null, "请选择分组");
         Item item = new Item();
         item.setCode(code);
         item.setName(name);
@@ -293,9 +285,7 @@ public class ItemListPage extends ListPage<Item> {
     private void save(Item item) {
         Item exists = itemMapper.findById(item);
         // 数据已存在
-        if (exists != null) {
-            throw new Warn("数据已存在");
-        }
+        Warn.check(() -> exists != null, "数据已存在");
         // 保存
         itemMapper.save(item);
     }

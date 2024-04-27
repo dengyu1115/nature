@@ -95,9 +95,7 @@ public class BoundNoticeJob implements Job {
     private Map<String, BigDecimal> getRatioMap(String date, Map<String, BigDecimal> netMap) {
         return LIST.parallelStream().map(i -> {
             List<Kline> ks = klineHttp.list(i, "0", date, date);
-            if (ks.isEmpty()) {
-                throw new Warn("K线获取失败:" + i);
-            }
+            Warn.check(ks::isEmpty, "K线获取失败:" + i);
             return ks.get(0);
         }).collect(Collectors.toMap(Kline::getCode, i -> this.calcRatio(netMap, i)));
     }

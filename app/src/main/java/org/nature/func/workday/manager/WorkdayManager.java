@@ -84,6 +84,19 @@ public class WorkdayManager {
     }
 
     /**
+     * 最新工作日
+     * @param date 日期
+     * @return String
+     */
+    public String latestWorkday(String date) {
+        Workday workday = workdayMapper.findLatestWorkday(date);
+        if (workday == null) {
+            return null;
+        }
+        return workday.getDate();
+    }
+
+    /**
      * 按年查询月份数据
      * @param year 年
      * @return list

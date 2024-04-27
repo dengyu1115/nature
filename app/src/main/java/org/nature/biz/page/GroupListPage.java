@@ -104,13 +104,9 @@ public class GroupListPage extends ListPage<Group> {
      */
     private void doEdit(Consumer<Group> consumer) {
         String code = this.code.getText().toString();
-        if (code.isEmpty()) {
-            throw new RuntimeException("请填写编号");
-        }
+        Warn.check(code::isEmpty, "请填写编号");
         String name = this.name.getText().toString();
-        if (name.isEmpty()) {
-            throw new RuntimeException("请填写名称");
-        }
+        Warn.check(name::isEmpty, "请填写名称");
         Group item = new Group();
         item.setCode(code);
         item.setName(name);
@@ -150,9 +146,7 @@ public class GroupListPage extends ListPage<Group> {
     private void save(Group group) {
         Group exists = groupMapper.findById(group.getCode());
         // 分组已存在
-        if (exists != null) {
-            throw new Warn("datum exists");
-        }
+        Warn.check(() -> exists != null, "分组数据已存在");
         // 保存
         groupMapper.save(group);
     }

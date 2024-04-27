@@ -19,7 +19,7 @@ import java.util.List;
  * @version 1.0.0
  * @since 2024/3/19
  */
-@PageView(name = "债券涨幅", group = "ETF", col = 3, row = 2)
+@PageView(name = "债券涨幅", group = "ETF", col = 3, row = 1)
 public class BoundRatePage extends ListPage<BoundRate> {
 
     @Injection
