@@ -20,7 +20,7 @@ import org.nature.common.view.Selector;
 import org.nature.common.view.TableView;
 import org.nature.common.view.ViewTemplate;
 import org.nature.func.job.enums.Status;
-import org.nature.func.job.manager.ConfigInfoManager;
+import org.nature.func.job.mapper.ConfigInfoMapper;
 import org.nature.func.job.model.ConfigInfo;
 import org.nature.func.job.service.JobService;
 
@@ -41,7 +41,7 @@ import static org.nature.common.constant.Const.*;
 public class ConfigInfoPage extends ListPage<ConfigInfo> {
 
     @Injection
-    private ConfigInfoManager configInfoManager;
+    private ConfigInfoMapper configInfoMapper;
 
     private Button start, stop, add;
     private LinearLayout editPop;
@@ -69,7 +69,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
 
     @Override
     protected List<ConfigInfo> listData() {
-        return configInfoManager.listAll();
+        return configInfoMapper.listAll();
     }
 
 
@@ -122,7 +122,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
      */
     private void add() {
         this.makeWindowStructure();
-        PopUtil.confirm(context, "新增", editPop, () -> this.doEdit(configInfoManager::save));
+        PopUtil.confirm(context, "新增", editPop, () -> this.doEdit(this::save));
     }
 
     /**
@@ -141,7 +141,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
             this.second.setText(d.getSecond());
             this.statusSel.setValue(d.getStatus());
             String name = JobHolder.getName(d.getCode());
-            PopUtil.confirm(context, "编辑-" + name, editPop, () -> this.doEdit(configInfoManager::edit));
+            PopUtil.confirm(context, "编辑-" + name, editPop, () -> this.doEdit(configInfoMapper::merge));
         };
     }
 
@@ -153,7 +153,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         return d -> {
             String name = JobHolder.getName(d.getCode());
             PopUtil.confirm(context, "删除-" + name, "确认删除吗？", () -> {
-                configInfoManager.delete(d);
+                configInfoMapper.deleteById(d);
                 this.refreshData();
                 PopUtil.alert(context, "删除成功！");
             });
@@ -166,13 +166,9 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
      */
     private void doEdit(Consumer<ConfigInfo> consumer) {
         String code = this.jobSel.getValue();
-        if (code == null) {
-            throw new Warn("请选择任务");
-        }
+        Warn.check(() -> code == null, "请选择任务");
         String status = this.statusSel.getValue();
-        if (status.isEmpty()) {
-            throw new Warn("请选择状态");
-        }
+        Warn.check(status::isEmpty, "请选择状态");
         ConfigInfo d = new ConfigInfo();
         d.setCode(code);
         d.setStatus(status);
@@ -186,6 +182,16 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         consumer.accept(d);
         this.refreshData();
         PopUtil.alert(context, "编辑成功！");
+    }
+
+    /**
+     * 保存
+     * @param d 数据
+     */
+    private void save(ConfigInfo d) {
+        ConfigInfo exists = configInfoMapper.findById(d);
+        Warn.check(() -> exists != null, "数据已存在");
+        configInfoMapper.save(d);
     }
 
 }

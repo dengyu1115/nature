@@ -57,9 +57,7 @@ public class KlineListPage extends ListPage<Kline> {
 
     @Override
     protected void initHeaderBehaviours() {
-        chart.setOnClickListener(l -> {
-            this.show(KlineChartPage.class, this.getParam());
-        });
+        chart.setOnClickListener(l -> this.show(KlineChartPage.class, this.getParam()));
     }
 
     @Override

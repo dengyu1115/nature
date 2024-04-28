@@ -95,9 +95,7 @@ public class BoundManager {
             String lastWorkday = workdayManager.lastWorkday(date);
             netMap = LIST.parallelStream().collect(Collectors.toMap(i -> i, i -> {
                 BigDecimal value = netHttp.getNetValue(i, lastWorkday);
-                if (value == null) {
-                    throw new Warn("净值获取失败:" + i);
-                }
+                Warn.check(() -> value == null, "净值获取失败:" + i);
                 return value;
             }));
             NET_MAP.put(date, netMap);

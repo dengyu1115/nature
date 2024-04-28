@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.nature.common.constant.Const;
+import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
@@ -76,16 +77,12 @@ public class WorkdayPage extends ListPage<Month> {
         year.setValue(DateFormatUtils.format(new Date(), Const.FORMAT_YEAR));
         ClickUtil.onPopConfirm(reload, "重新加载数据", "确定重新加载吗？", () -> {
             String year = this.year.getValue();
-            if (StringUtils.isBlank(year)) {
-                throw new RuntimeException("请选择年份");
-            }
+            Warn.check(() -> StringUtils.isBlank(year), "请选择年份");
             return String.format("加载完成,共%s条", workDayManager.reload(year));
         });
         ClickUtil.onAsyncClick(loadLatest, () -> {
             String year = this.year.getValue();
-            if (StringUtils.isBlank(year)) {
-                throw new RuntimeException("请选择年份");
-            }
+            Warn.check(() -> StringUtils.isBlank(year), "请选择年份");
             return String.format("加载完成,共%s条", workDayManager.load(year));
         });
     }
