@@ -88,6 +88,10 @@ public class TextUtil {
         return new BigDecimal(s);
     }
 
+    public static String join(String... arr) {
+        return String.join(":", arr);
+    }
+
     /**
      * 转化为文本
      * @param t    对象

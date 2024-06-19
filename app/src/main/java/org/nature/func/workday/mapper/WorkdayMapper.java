@@ -4,6 +4,7 @@ package org.nature.func.workday.mapper;
 import org.nature.common.db.annotation.*;
 import org.nature.common.db.function.BatchSave;
 import org.nature.common.db.function.FindById;
+import org.nature.common.db.function.Merge;
 import org.nature.func.workday.model.Workday;
 
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
  * @since 2024/2/1
  */
 @TableModel(Workday.class)
-public interface WorkdayMapper extends BatchSave<Workday>, FindById<Workday, String> {
+public interface WorkdayMapper extends Merge<Workday>, BatchSave<Workday>, FindById<Workday, String> {
 
     /**
      * 根据年份查询工作日
@@ -48,4 +49,7 @@ public interface WorkdayMapper extends BatchSave<Workday>, FindById<Workday, Str
      */
     @QueryOne(where = "date <= #{date} and type='W' order by date desc limit 1")
     Workday findLatestWorkday(@Param("date") String date);
+
+    @QueryList(where = "date < #{date} and type='W' order by date desc limit #{n}")
+    List<Workday> listLast(@Param("date") String date, @Param("n") int n);
 }

@@ -66,6 +66,14 @@ public class DateUtil {
     }
 
     /**
+     * 获取当前时间
+     * @return String
+     */
+    public static String nowTime() {
+        return DateFormatUtils.format(new Date(), Const.FORMAT_TIME);
+    }
+
+    /**
      * 增加日
      * @param date 日期
      * @param num  数量

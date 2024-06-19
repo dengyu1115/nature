@@ -60,6 +60,7 @@ public class MainPage extends Page {
         header.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, (int) (40 * density)));
         header.addView(this.tabBtn("基础"));
         header.addView(this.tabBtn("ETF"));
+        header.addView(this.tabBtn("债券"));
     }
 
     /**

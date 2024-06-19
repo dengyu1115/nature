@@ -84,6 +84,19 @@ public class WorkdayManager {
     }
 
     /**
+     * 上一工作日
+     * @param date 日期
+     * @return String
+     */
+    public String lastWorkday(String date, int n) {
+        List<Workday> workdays = workdayMapper.listLast(date, n);
+        if (workdays.size() < n) {
+            return null;
+        }
+        return workdays.get(n - 1).getDate();
+    }
+
+    /**
      * 最新工作日
      * @param date 日期
      * @return String

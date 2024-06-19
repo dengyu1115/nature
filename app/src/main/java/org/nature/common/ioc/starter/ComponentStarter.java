@@ -24,7 +24,10 @@ import java.util.List;
  * @since 2019/8/6 12:41
  */
 public class ComponentStarter {
-
+    /**
+     * 需要扫描的目录
+     */
+    private static final List<String> PATHS = Arrays.asList(".page", ".job", ".manager", ".service", ".mapper");
     /**
      * 单例
      */
@@ -144,8 +147,7 @@ public class ComponentStarter {
      * @return boolean
      */
     private boolean isNeededPath(String element) {
-        List<String> paths = Arrays.asList(".page", ".job", ".manager", ".service", ".mapper");
-        for (String path : paths) {
+        for (String path : PATHS) {
             if (element.contains(path)) {
                 return true;
             }

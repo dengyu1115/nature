@@ -112,6 +112,18 @@ public class ViewTemplate {
     }
 
     /**
+     * 数字框
+     * @param w 宽
+     * @param h 高
+     * @return EditText
+     */
+    public EditText integer(int w, int h) {
+        EditText editText = this.editText(w, h);
+        editText.setInputType(TYPE_CLASS_NUMBER | TYPE_NUMBER_FLAG_SIGNED);
+        return editText;
+    }
+
+    /**
      * 编辑框
      * @param w 宽
      * @param h 高
