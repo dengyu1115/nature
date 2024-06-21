@@ -1,7 +1,7 @@
-package org.nature.biz.bound.mapper;
+package org.nature.biz.common.mapper;
 
 
-import org.nature.biz.bound.model.Net;
+import org.nature.biz.common.model.Net;
 import org.nature.common.db.annotation.*;
 import org.nature.common.db.function.BatchMerge;
 import org.nature.common.db.function.ListByIds;
@@ -32,6 +32,14 @@ public interface NetMapper extends ListByIds<Net, Net>, BatchMerge<Net> {
      */
     @Delete(where = "code=#{code}")
     int deleteByCode(@Param("code") String code);
+
+    /**
+     * 查询一段时间内的
+     * @param code code
+     * @return list
+     */
+    @QueryList(where = "code=#{code} order by date")
+    List<Net> listByCode(@Param("code") String code);
 
     /**
      * 查询一段时间内的

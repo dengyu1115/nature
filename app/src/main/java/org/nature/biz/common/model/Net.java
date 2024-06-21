@@ -1,4 +1,4 @@
-package org.nature.biz.bound.model;
+package org.nature.biz.common.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +14,7 @@ import java.math.BigDecimal;
  * @version 1.0.0
  * @since 2024/5/25
  */
-@Model(db = "nature/biz/bound.db", table = "net")
+@Model(db = "nature/biz/common.db", table = "net")
 @Getter
 @Setter
 public class Net extends BaseModel {

@@ -1,11 +1,13 @@
 package org.nature.biz.bound.manager;
 
 import org.nature.biz.bound.mapper.ItemMapper;
+import org.nature.biz.common.manager.NetManager;
 import org.nature.biz.common.model.KInfo;
+import org.nature.biz.common.model.NInfo;
 import org.nature.biz.common.protocol.KlineItems;
+import org.nature.biz.common.protocol.NetItems;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
-import org.nature.common.util.ExecUtil;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,30 +19,12 @@ import java.util.stream.Collectors;
  * @since 2024/5/31
  */
 @Component
-public class RuleManager implements KlineItems {
+public class RuleManager implements KlineItems, NetItems {
 
     @Injection
     private ItemMapper itemMapper;
     @Injection
     private NetManager netManager;
-
-    /**
-     * 加载
-     * @return int
-     */
-    public int loadNet() {
-        return ExecUtil.batch(itemMapper::listAll, i -> netManager.load(i.getCode()))
-                .stream().mapToInt(i -> i).sum();
-    }
-
-    /**
-     * 重新加载
-     * @return int
-     */
-    public int reloadNet() {
-        return ExecUtil.batch(itemMapper::listAll, i -> netManager.reload(i.getCode()))
-                .stream().mapToInt(i -> i).sum();
-    }
 
     @Override
     public List<KInfo> kItems() {
@@ -48,6 +32,16 @@ public class RuleManager implements KlineItems {
             KInfo info = new KInfo();
             info.setCode(i.getCode());
             info.setType(i.getType());
+            info.setName(i.getName());
+            return info;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<NInfo> nItems() {
+        return itemMapper.listAll().stream().map(i -> {
+            NInfo info = new NInfo();
+            info.setCode(i.getFund());
             info.setName(i.getName());
             return info;
         }).collect(Collectors.toList());

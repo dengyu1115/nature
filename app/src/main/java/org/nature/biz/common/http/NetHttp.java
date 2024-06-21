@@ -1,9 +1,9 @@
-package org.nature.biz.bound.http;
+package org.nature.biz.common.http;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import org.nature.biz.bound.model.Net;
+import org.nature.biz.common.model.Net;
 import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.util.HttpUtil;

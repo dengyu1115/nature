@@ -1,17 +1,16 @@
 package org.nature.biz.bound.manager;
 
 import org.apache.commons.lang3.StringUtils;
-import org.nature.biz.bound.http.NetHttp;
 import org.nature.biz.bound.mapper.ItemMapper;
-import org.nature.biz.bound.mapper.NetMapper;
 import org.nature.biz.bound.mapper.RuleMapper;
 import org.nature.biz.bound.model.Item;
-import org.nature.biz.bound.model.Net;
 import org.nature.biz.bound.model.Rate;
 import org.nature.biz.bound.model.Rule;
 import org.nature.biz.common.http.KlineHttp;
 import org.nature.biz.common.mapper.KlineMapper;
+import org.nature.biz.common.mapper.NetMapper;
 import org.nature.biz.common.model.Kline;
+import org.nature.biz.common.model.Net;
 import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
@@ -39,8 +38,6 @@ public class RateManager {
     public static final int SCALE = 8;
     public static final String NULL = null;
 
-    @Injection
-    private NetHttp netHttp;
     @Injection
     private KlineHttp klineHttp;
     @Injection
