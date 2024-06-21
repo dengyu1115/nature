@@ -3,6 +3,7 @@ package org.nature.common.ioc.starter;
 import android.content.Context;
 import dalvik.system.DexFile;
 import org.nature.common.db.annotation.TableModel;
+import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.JobExec;
@@ -11,9 +12,10 @@ import org.nature.common.ioc.holder.InstanceHolder;
 import org.nature.common.ioc.holder.JobHolder;
 import org.nature.common.ioc.holder.PageHolder;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -24,10 +26,7 @@ import java.util.List;
  * @since 2019/8/6 12:41
  */
 public class ComponentStarter {
-    /**
-     * 需要扫描的目录
-     */
-    private static final List<String> PATHS = Arrays.asList(".page", ".job", ".manager", ".service", ".mapper");
+
     /**
      * 单例
      */
@@ -60,35 +59,54 @@ public class ComponentStarter {
      * 开始注入/实例化处理
      * @param ctx projection context
      */
+    @SuppressWarnings("all")
     public synchronized void start(Context ctx) {
-        // ran,no secondary running
+        // 控制只执行一次
         if (ran) {
             return;
         }
+        String path = ctx.getPackageResourcePath();
+        DexFile home;
         try {
-            ClassLoader loader = Thread.currentThread().getContextClassLoader();
-            if (loader == null) {
-                throw new RuntimeException("no context class loader");
-            }
-            String path = ctx.getPackageResourcePath();
-            DexFile home = new DexFile(path);
-            Enumeration<String> entries = home.entries();
-            while (entries.hasMoreElements()) {
-                String element = entries.nextElement();
-                if (!element.startsWith("org.nature") || element.contains("$$ExternalSyntheticLambda")
-                        || !this.isNeededPath(element)) {
-                    continue;
-                }
-                Class<?> cls = loader.loadClass(element);
-                if (!this.isNeedType(cls)) {
-                    continue;
-                }
-                this.inject(cls);
-            }
-            ran = true;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+            home = new DexFile(path);
+        } catch (IOException e) {
+            throw new Warn("dex file init error:" + e.getMessage());
         }
+        Enumeration<String> entries = home.entries();
+        List<Class<?>> classes = this.collect(entries);
+        for (Class<?> i : classes) {
+            InstanceHolder.add(i);
+        }
+        for (Class<?> i : classes) {
+            this.inject(i);
+        }
+        ran = true;
+
+    }
+
+    private List<Class<?>> collect(Enumeration<String> entries) {
+        ClassLoader loader = Thread.currentThread().getContextClassLoader();
+        if (loader == null) {
+            throw new RuntimeException("no context class loader");
+        }
+        List<Class<?>> classes = new ArrayList<>();
+        while (entries.hasMoreElements()) {
+            String element = entries.nextElement();
+            if (!element.startsWith("org.nature") || element.contains("$$ExternalSyntheticLambda")) {
+                continue;
+            }
+            Class<?> cls;
+            try {
+                cls = loader.loadClass(element);
+            } catch (ClassNotFoundException e) {
+                throw new Warn("class not found:" + e.getMessage());
+            }
+            if (!this.isNeedType(cls)) {
+                continue;
+            }
+            classes.add(cls);
+        }
+        return classes;
     }
 
     /**
@@ -142,27 +160,17 @@ public class ComponentStarter {
     }
 
     /**
-     * 判断是否需要扫描
-     * @param element 元素
-     * @return boolean
-     */
-    private boolean isNeededPath(String element) {
-        for (String path : PATHS) {
-            if (element.contains(path)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * 判断是否满足类型
      * @param cls 类
      * @return boolean
      */
     private boolean isNeedType(Class<?> cls) {
         int modifiers = cls.getModifiers();
-        return !Modifier.isAbstract(modifiers) && Modifier.isPublic(modifiers);
+        return !cls.isInterface() && !Modifier.isAbstract(modifiers) && Modifier.isPublic(modifiers)
+                && (cls.getAnnotation(Component.class) != null
+                || cls.getAnnotation(PageView.class) != null
+                || cls.getAnnotation(JobExec.class) != null)
+                || cls.isInterface() && cls.getAnnotation(TableModel.class) != null;
     }
 
 }

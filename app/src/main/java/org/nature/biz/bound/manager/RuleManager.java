@@ -1,11 +1,14 @@
 package org.nature.biz.bound.manager;
 
 import org.nature.biz.bound.mapper.ItemMapper;
-import org.nature.biz.bound.mapper.RuleMapper;
-import org.nature.biz.common.manager.KlineManager;
+import org.nature.biz.common.model.KInfo;
+import org.nature.biz.common.protocol.KlineItems;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.util.ExecUtil;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 规则
@@ -14,34 +17,12 @@ import org.nature.common.util.ExecUtil;
  * @since 2024/5/31
  */
 @Component
-public class RuleManager {
+public class RuleManager implements KlineItems {
 
-    @Injection
-    private RuleMapper ruleMapper;
     @Injection
     private ItemMapper itemMapper;
     @Injection
-    private KlineManager klineManager;
-    @Injection
     private NetManager netManager;
-
-    /**
-     * 加载
-     * @return int
-     */
-    public int loadKline() {
-        return ExecUtil.batch(itemMapper::listAll, i -> klineManager.load(i.getCode(), i.getType()))
-                .stream().mapToInt(i -> i).sum();
-    }
-
-    /**
-     * 重新加载
-     * @return int
-     */
-    public int reloadKline() {
-        return ExecUtil.batch(itemMapper::listAll, i -> klineManager.reload(i.getCode(), i.getType()))
-                .stream().mapToInt(i -> i).sum();
-    }
 
     /**
      * 加载
@@ -61,4 +42,14 @@ public class RuleManager {
                 .stream().mapToInt(i -> i).sum();
     }
 
+    @Override
+    public List<KInfo> kItems() {
+        return itemMapper.listAll().stream().map(i -> {
+            KInfo info = new KInfo();
+            info.setCode(i.getCode());
+            info.setType(i.getType());
+            info.setName(i.getName());
+            return info;
+        }).collect(Collectors.toList());
+    }
 }

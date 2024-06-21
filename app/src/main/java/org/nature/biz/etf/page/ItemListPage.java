@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.nature.biz.common.model.KInfo;
 import org.nature.biz.common.page.KlineListPage;
 import org.nature.biz.etf.manager.HoldManager;
-import org.nature.biz.etf.manager.ItemManager;
 import org.nature.biz.etf.mapper.GroupMapper;
 import org.nature.biz.etf.mapper.ItemMapper;
 import org.nature.biz.etf.model.Group;
@@ -49,8 +48,6 @@ public class ItemListPage extends ListPage<Item> {
     @Injection
     private GroupMapper groupMapper;
     @Injection
-    private ItemManager itemManager;
-    @Injection
     private HoldManager holdManager;
 
     /**
@@ -80,7 +77,7 @@ public class ItemListPage extends ListPage<Item> {
     /**
      * 新增、加载K线、重新加载K线、计算规则按钮
      */
-    private Button add, loadKline, reloadKline, calcRule;
+    private Button add, calcRule;
     /**
      * 分组信息map
      */
@@ -123,16 +120,12 @@ public class ItemListPage extends ListPage<Item> {
         searchBar.addConditionView(add = template.button("+", 30, 30));
         searchBar.addConditionView(itemGroup = template.selector(80, 30));
         searchBar.addConditionView(keyword = template.editText(100, 30));
-        searchBar.addConditionView(loadKline = template.button("K线加载", 80, 30));
-        searchBar.addConditionView(reloadKline = template.button("K线重载", 80, 30));
         searchBar.addConditionView(calcRule = template.button("规则计算", 80, 30));
     }
 
     @Override
     protected void initHeaderBehaviours() {
         ClickUtil.onClick(add, this::add);
-        ClickUtil.onAsyncClick(loadKline, this::loadKline);
-        ClickUtil.onPopConfirm(reloadKline, "K线重载", "确定重新加载全部K线数据？", this::reloadKline);
         ClickUtil.onAsyncClick(calcRule, this::calcHold);
         List<Group> groups = groupMapper.listAll();
         groupMap = groups.stream().collect(Collectors.toMap(Group::getCode, Group::getName));
@@ -204,22 +197,6 @@ public class ItemListPage extends ListPage<Item> {
             this.refreshData();
             PopUtil.alert(context, "删除成功！");
         });
-    }
-
-    /**
-     * 加载全部K线
-     * @return 提示信息
-     */
-    private String loadKline() {
-        return "所有K线加载完成，数据量：" + itemManager.loadKline();
-    }
-
-    /**
-     * 重载全部K线
-     * @return 提示信息
-     */
-    private String reloadKline() {
-        return "所有K线重载完成，数据量：" + itemManager.reloadKline();
     }
 
     /**

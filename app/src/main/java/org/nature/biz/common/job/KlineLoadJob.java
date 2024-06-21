@@ -1,6 +1,6 @@
-package org.nature.biz.etf.job;
+package org.nature.biz.common.job;
 
-import org.nature.biz.etf.manager.ItemManager;
+import org.nature.biz.common.manager.KlineManager;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.JobExec;
 import org.nature.common.util.NotifyUtil;
@@ -18,11 +18,11 @@ import java.util.Date;
 public class KlineLoadJob implements Job {
 
     @Injection
-    private ItemManager itemManager;
+    private KlineManager klineManager;
 
     @Override
     public void exec(Date date) {
-        int load = itemManager.loadKline();
+        int load = klineManager.loadAll();
         NotifyUtil.notifyOne("K线加载", "K线加载完成，共加载" + load + "条数据");
     }
 

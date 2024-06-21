@@ -43,7 +43,7 @@ public class RuleListPage extends ListPage<Rule> {
     private LinearLayout page;
     private EditText code, name, dateStart, dateEnd, days, diff;
     private Selector<String> statusSel;
-    private Button add, loadKline, reloadKline, loadNet, reloadNet;
+    private Button add, loadNet, reloadNet;
 
     private final List<TableView.D<Rule>> ds = Arrays.asList(
             TableView.row("编号", d -> TextUtil.text(d.getCode()), C, S, Rule::getCode),
@@ -72,8 +72,6 @@ public class RuleListPage extends ListPage<Rule> {
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
         searchBar.addConditionView(add = template.button("+", 30, 30));
-        searchBar.addConditionView(loadKline = template.button("加载K线", 80, 30));
-        searchBar.addConditionView(reloadKline = template.button("重载K线", 80, 30));
         searchBar.addConditionView(loadNet = template.button("加载净值", 80, 30));
         searchBar.addConditionView(reloadNet = template.button("重载净值", 80, 30));
     }
@@ -81,8 +79,6 @@ public class RuleListPage extends ListPage<Rule> {
     @Override
     protected void initHeaderBehaviours() {
         ClickUtil.onClick(add, this::add);
-        ClickUtil.onAsyncClick(loadKline, () -> "K线数据加载完成，共" + ruleManager.loadKline() + "条");
-        ClickUtil.onAsyncClick(reloadKline, () -> "K线数据重载完成，共" + ruleManager.reloadKline() + "条");
         ClickUtil.onAsyncClick(loadNet, () -> "净值数据加载完成，共" + ruleManager.loadNet() + "条");
         ClickUtil.onAsyncClick(reloadNet, () -> "净值数据重载完成，共" + ruleManager.reloadNet() + "条");
     }
