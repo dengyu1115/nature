@@ -8,6 +8,7 @@ import org.nature.biz.common.protocol.NetItems;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.holder.InstanceHolder;
+import org.nature.common.util.DateUtil;
 import org.nature.common.util.ExecUtil;
 
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ public class NetManager {
      * @return String
      */
     private String getLastDate(Net net) {
-        return net == null ? "" : net.getDate();
+        return net == null ? "" : DateUtil.addDays(net.getDate(), 1);
     }
 
 }

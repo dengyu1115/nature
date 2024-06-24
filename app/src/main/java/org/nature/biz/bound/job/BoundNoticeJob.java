@@ -27,7 +27,7 @@ public class BoundNoticeJob implements Job {
      */
     private static final Map<String, Set<String>> NOTICE_MAP = new HashMap<>();
 
-    public static final BigDecimal HUNDRED = new BigDecimal("100");
+    private static final BigDecimal HUNDRED = new BigDecimal("100");
 
     private static boolean running;
 
