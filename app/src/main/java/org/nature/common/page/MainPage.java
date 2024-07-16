@@ -35,7 +35,7 @@ public class MainPage extends Page {
 
     @Override
     protected void onShow() {
-        this.showMain(PageHolder.get("基础"));
+        this.showMain(PageHolder.get(Const.GROUPS.get(0)));
     }
 
     /**
@@ -58,9 +58,9 @@ public class MainPage extends Page {
         LinearLayout header = new LinearLayout(context);
         page.addView(header);
         header.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, (int) (40 * density)));
-        header.addView(this.tabBtn("基础"));
-        header.addView(this.tabBtn("ETF"));
-        header.addView(this.tabBtn("债券"));
+        for (String i : Const.GROUPS) {
+            header.addView(this.tabBtn(i));
+        }
     }
 
     /**

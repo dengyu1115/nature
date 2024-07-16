@@ -2,6 +2,7 @@ package org.nature.biz.bound.job;
 
 import org.nature.biz.bound.manager.RateManager;
 import org.nature.biz.bound.model.Rate;
+import org.nature.biz.common.manager.RecordManager;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.JobExec;
 import org.nature.common.util.DateUtil;
@@ -22,12 +23,8 @@ import java.util.*;
 @JobExec(code = "bound_notice_job", name = "债券差价提醒")
 public class BoundNoticeJob implements Job {
 
-    /**
-     * 已通知数据map
-     */
-    private static final Map<String, Set<String>> NOTICE_MAP = new HashMap<>();
-
     private static final BigDecimal HUNDRED = new BigDecimal("100");
+    public static final String RECORD_TYPE = "BOUND_NOTICE";
 
     private static boolean running;
 
@@ -35,6 +32,8 @@ public class BoundNoticeJob implements Job {
     private WorkdayManager workdayManager;
     @Injection
     private RateManager rateManager;
+    @Injection
+    private RecordManager recordManager;
 
 
     @Override
@@ -48,28 +47,18 @@ public class BoundNoticeJob implements Job {
             if (!workdayManager.isWorkday()) {
                 return;
             }
-            this.boundHandle();
+            this.exec();
         });
     }
 
     /**
      * 债券处理
      */
-    private void boundHandle() {
+    private void exec() {
         String today = DateUtil.today();
         List<Rate> rates = rateManager.listTrigger();
-        this.notice(today, rates);
-        this.deleteExpired(today);
-    }
-
-    /**
-     * 进行通知操作
-     * @param date  日期
-     * @param rates 涨幅数据
-     */
-    private void notice(String date, List<Rate> rates) {
         // 已通知数据set
-        Set<String> set = NOTICE_MAP.computeIfAbsent(date, k -> new HashSet<>());
+        Set<String> recordSet = recordManager.get(RECORD_TYPE, today, new HashSet<>());
         // 记录需要通知的文案集合
         List<String> list = new ArrayList<>();
         // 遍历操作数据，进行通知操作
@@ -79,35 +68,19 @@ public class BoundNoticeJob implements Job {
             BigDecimal ratio = i.getRatio();
             String key = Md5Util.md5(code1, code2, ratio.toPlainString());
             // 如果已经通知过，则跳过
-            if (set.contains(key)) {
+            if (recordSet.contains(key)) {
                 continue;
             }
-            set.add(key);
+            recordSet.add(key);
             list.add(i.getName1() + "和" + i.getName2() + "相差" + ratio.multiply(HUNDRED) + "%");
         }
         if (list.isEmpty()) {
-            return;
+            // 通知
+            String text = "出现机会" + String.join("，", list) + "。";
+            NotifyUtil.speak(text);
+            NotifyUtil.notifyOne("债券差价", text);
         }
-        // 通知
-        String text = "出现机会" + String.join("，", list) + "。";
-        NotifyUtil.speak(text);
-        NotifyUtil.notifyOne("债券差价", text);
-    }
-
-    /**
-     * 删除过期数据
-     * @param date 日期
-     */
-    private void deleteExpired(String date) {
-        List<Map<String, ?>> list = List.of(NOTICE_MAP);
-        for (Map<String, ?> map : list) {
-            Set<String> set = new HashSet<>(map.keySet());
-            for (String s : set) {
-                if (!date.equals(s)) {
-                    map.remove(s);
-                }
-            }
-        }
+        recordManager.set(RECORD_TYPE, today, recordSet);
     }
 
     /**

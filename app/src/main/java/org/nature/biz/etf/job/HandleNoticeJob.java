@@ -1,5 +1,6 @@
 package org.nature.biz.etf.job;
 
+import org.nature.biz.common.manager.RecordManager;
 import org.nature.biz.etf.manager.RuleManager;
 import org.nature.biz.etf.mapper.ItemMapper;
 import org.nature.biz.etf.model.Hold;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 public class HandleNoticeJob implements Job {
 
     public static final BigDecimal HUNDRED = new BigDecimal("100");
+    public static final String RECORD_TYPE = "ETF_NOTICE", KEY_BUY = "buy", KEY_SELL = "sell";
 
     private static boolean running;
 
@@ -37,11 +39,8 @@ public class HandleNoticeJob implements Job {
     private ItemMapper itemMapper;
     @Injection
     private WorkdayManager workdayManager;
-
-    /**
-     * 已操作数据记录map
-     */
-    private static final Map<String, Set<String>> MAP = new HashMap<>();
+    @Injection
+    private RecordManager recordManager;
 
     @Override
     public void exec(Date date) {
@@ -54,22 +53,21 @@ public class HandleNoticeJob implements Job {
             if (!workdayManager.isWorkday()) {
                 return;
             }
-            this.etfLatestHandle();
+            this.exec();
         });
     }
 
     /**
      * etf最新操作数据处理
      */
-    private void etfLatestHandle() {
+    private void exec() {
         // 查询最新操作数据
         List<Hold> holds = ruleManager.latestHandle();
         // 转换买入、卖出数据
         String today = DateUtil.today();
-        String keyBuy = today + ":buy";
-        String keySell = today + ":sell";
-        Set<String> buyExists = MAP.computeIfAbsent(keyBuy, k -> new HashSet<>());
-        Set<String> sellExists = MAP.computeIfAbsent(keySell, k -> new HashSet<>());
+        Map<String, Set<String>> handleMap = recordManager.get(RECORD_TYPE, today, new HashMap<>());
+        Set<String> buyExists = handleMap.computeIfAbsent(KEY_BUY, k -> new HashSet<>());
+        Set<String> sellExists = handleMap.computeIfAbsent(KEY_SELL, k -> new HashSet<>());
         // 项目-操作-价格-数量
         Map<String, Map<String, Map<BigDecimal, BigDecimal>>> map = new HashMap<>();
         // 遍历数据，解析需要新执行的各个项目的买入、卖出-价格-份额数据
@@ -81,31 +79,25 @@ public class HandleNoticeJob implements Job {
                     continue;
                 }
                 // 买入操作数据添加
-                this.fillHandleData(map, i, keyBuy, i.getPriceBuy(), i.getShareBuy());
+                this.fillHandleData(map, i, KEY_BUY, i.getPriceBuy(), i.getShareBuy());
                 buyExists.add(key);
             } else {
                 if (sellExists.contains(key)) {
                     continue;
                 }
                 // 卖出操作数据添加
-                this.fillHandleData(map, i, keySell, i.getPriceSell(), i.getShareSell());
+                this.fillHandleData(map, i, KEY_SELL, i.getPriceSell(), i.getShareSell());
                 sellExists.add(key);
             }
         }
         // 构建文本
-        String text = this.buildText(map, keyBuy, keySell);
+        String text = this.buildText(map);
         // 转换语音进行提示
         if (text != null) {
             NotifyUtil.notifyOne("交易提醒", text);
             NotifyUtil.speak(text);
         }
-        // 删除过期数据
-        Set<String> set = new HashSet<>(MAP.keySet());
-        for (String s : set) {
-            if (!keyBuy.equals(s) && !keySell.equals(s)) {
-                MAP.remove(s);
-            }
-        }
+        recordManager.set(RECORD_TYPE, today, handleMap);
     }
 
     /**
@@ -156,12 +148,10 @@ public class HandleNoticeJob implements Job {
 
     /**
      * 构建语音文本
-     * @param map     数据map
-     * @param keyBuy  买入操作key
-     * @param keySell 卖出操作key
+     * @param map 数据map
      * @return String
      */
-    private String buildText(Map<String, Map<String, Map<BigDecimal, BigDecimal>>> map, String keyBuy, String keySell) {
+    private String buildText(Map<String, Map<String, Map<BigDecimal, BigDecimal>>> map) {
         // 无数据
         if (map.isEmpty()) {
             return null;
@@ -173,8 +163,8 @@ public class HandleNoticeJob implements Job {
         // 遍历map，拼接文本
         map.forEach((k, v) -> {
             builder.append(nameMap.get(k));
-            builder.append(this.handleText(v, keyBuy, "买入"));
-            builder.append(this.handleText(v, keySell, "卖出"));
+            builder.append(this.handleText(v, KEY_BUY, "买入"));
+            builder.append(this.handleText(v, KEY_SELL, "卖出"));
         });
         return builder.toString();
     }
