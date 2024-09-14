@@ -178,7 +178,7 @@ public class RuleListPage extends ListPage<Rule> {
      * @param d 数据
      */
     private void showHold(Rule d) {
-        this.show(HoldListPage.class, d);
+        this.show(LatestBsPage.class, d);
     }
 
     /**

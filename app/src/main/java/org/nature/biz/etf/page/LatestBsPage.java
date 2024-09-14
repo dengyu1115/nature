@@ -21,9 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
-
 /**
  * 持有数据
  * @author Nature
@@ -31,7 +28,7 @@ import static android.view.View.VISIBLE;
  * @since 2024/1/8
  */
 @PageView(name = "最新操作", group = "ETF", col = 1, row = 3)
-public class HoldListPage extends ListPage<Hold> {
+public class LatestBsPage extends ListPage<Hold> {
 
     @Injection
     private RuleManager ruleManager;
@@ -40,8 +37,7 @@ public class HoldListPage extends ListPage<Hold> {
     @Injection
     private HoldMapper holdMapper;
 
-    private Selector<String> typeSel, handleSel;
-    private Selector<Integer> countSel;
+    private Selector<String> handleSel;
 
     private final Map<String, String> itemNameMap = new HashMap<>();
 
@@ -75,12 +71,7 @@ public class HoldListPage extends ListPage<Hold> {
         if (rule != null) {
             list = holdMapper.listByRule(rule.getCode(), rule.getType(), rule.getName());
         } else {
-            String type = this.typeSel.getValue();
-            if ("0".equals(type)) {
-                list = ruleManager.latestHandle();
-            } else {
-                list = ruleManager.nextHandle(this.countSel.getValue());
-            }
+            list = ruleManager.latestHandle();
         }
         String handle = this.handleSel.getValue();
         list = list.stream().filter(i -> {
@@ -97,9 +88,7 @@ public class HoldListPage extends ListPage<Hold> {
 
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(typeSel = template.selector(60, 30));
         searchBar.addConditionView(handleSel = template.selector(60, 30));
-        searchBar.addConditionView(countSel = template.selector(60, 30));
     }
 
     @Override
@@ -108,13 +97,6 @@ public class HoldListPage extends ListPage<Hold> {
         itemNameMap.clear();
         itemNameMap.putAll(items.stream()
                 .collect(Collectors.toMap(i -> String.join(":", i.getCode(), i.getType()), Item::getName)));
-        typeSel.setVisibility(this.getParam() == null ? VISIBLE : GONE);
-        typeSel.mapper(i -> {
-            if ("0".equals(i)) {
-                return "最新";
-            }
-            return "预计";
-        }).init().refreshData(Arrays.asList("0", "1"));
         handleSel.mapper(i -> {
             if ("1".equals(i)) {
                 return "买";
@@ -124,11 +106,6 @@ public class HoldListPage extends ListPage<Hold> {
             }
             return "请选择";
         }).init().refreshData(Arrays.asList("0", "1", "2"));
-        countSel.mapper(Object::toString).init().refreshData(Arrays.asList(1, 2, 3, 4, 5));
-        // 默认展示3条
-        countSel.setValue(3);
-        countSel.setVisibility("0".equals(typeSel.getValue()) ? GONE : VISIBLE);
-        typeSel.onChangeRun(() -> countSel.setVisibility("0".equals(typeSel.getValue()) ? GONE : VISIBLE));
     }
 
     @Override
