@@ -1,5 +1,6 @@
 package org.nature.biz.bound.job;
 
+import com.alibaba.fastjson.TypeReference;
 import org.nature.biz.bound.manager.RateManager;
 import org.nature.biz.bound.model.Rate;
 import org.nature.biz.common.manager.RecordManager;
@@ -25,6 +26,8 @@ public class BoundNoticeJob implements Job {
 
     private static final BigDecimal HUNDRED = new BigDecimal("100");
     public static final String RECORD_TYPE = "BOUND_NOTICE";
+    public static final TypeReference<HashSet<String>> TYPE = new TypeReference<>() {
+    };
 
     private static boolean running;
 
@@ -58,7 +61,7 @@ public class BoundNoticeJob implements Job {
         String today = DateUtil.today();
         List<Rate> rates = rateManager.listTrigger();
         // 已通知数据set
-        Set<String> recordSet = recordManager.get(RECORD_TYPE, today, new HashSet<>());
+        Set<String> recordSet = recordManager.get(RECORD_TYPE, today, new HashSet<>(), TYPE);
         // 记录需要通知的文案集合
         List<String> list = new ArrayList<>();
         // 遍历操作数据，进行通知操作

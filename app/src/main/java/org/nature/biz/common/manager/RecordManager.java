@@ -19,7 +19,7 @@ public class RecordManager {
     @Injection
     private RecordMapper recordMapper;
 
-    public <T> T get(String code, String date, T t) {
+    public <T> T get(String code, String date, T t, TypeReference<T> type) {
         Record req = new Record();
         req.setCode(code);
         req.setDate(date);
@@ -27,8 +27,7 @@ public class RecordManager {
         if (record == null) {
             return t;
         }
-        return JSON.parseObject(record.getContent(), new TypeReference<>() {
-        });
+        return JSON.parseObject(record.getContent(), type);
     }
 
     public <T> void set(String code, String date, T t) {

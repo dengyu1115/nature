@@ -1,5 +1,6 @@
 package org.nature.biz.etf.job;
 
+import com.alibaba.fastjson.TypeReference;
 import org.nature.biz.common.manager.RecordManager;
 import org.nature.biz.etf.manager.RuleManager;
 import org.nature.biz.etf.mapper.ItemMapper;
@@ -30,6 +31,8 @@ public class HandleNoticeJob implements Job {
 
     public static final BigDecimal HUNDRED = new BigDecimal("100");
     public static final String RECORD_TYPE = "ETF_NOTICE", KEY_BUY = "buy", KEY_SELL = "sell";
+    public static final TypeReference<HashMap<String, Set<String>>> TYPE = new TypeReference<>() {
+    };
 
     private static boolean running;
 
@@ -65,7 +68,7 @@ public class HandleNoticeJob implements Job {
         List<Hold> holds = ruleManager.latestHandle();
         // 转换买入、卖出数据
         String today = DateUtil.today();
-        Map<String, Set<String>> handleMap = recordManager.get(RECORD_TYPE, today, new HashMap<>());
+        Map<String, Set<String>> handleMap = recordManager.get(RECORD_TYPE, today, new HashMap<>(), TYPE);
         Set<String> buyExists = handleMap.computeIfAbsent(KEY_BUY, k -> new HashSet<>());
         Set<String> sellExists = handleMap.computeIfAbsent(KEY_SELL, k -> new HashSet<>());
         // 项目-操作-价格-数量
