@@ -7,8 +7,9 @@ import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * 持有数据
@@ -38,7 +39,8 @@ public class PredictBsPage extends BaseBsPage {
     @Override
     protected void initHeaderBehaviours() {
         super.initHeaderBehaviours();
-        countSel.mapper(Object::toString).init().refreshData(Arrays.asList(1, 2, 3, 4, 5));
+        List<Integer> list = IntStream.range(1, 11).boxed().collect(Collectors.toList());
+        countSel.mapper(Object::toString).init().refreshData(list);
         // 默认展示3条
         countSel.setValue(3);
     }
