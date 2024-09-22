@@ -48,6 +48,12 @@ public class ProfitListPage extends ListPage<Profit> {
                     TableView.row("开始", d -> TextUtil.text(d.getDateStart()), C, C, Profit::getDateStart),
                     TableView.row("结束", d -> TextUtil.text(d.getDateEnd()), C, C, Profit::getDateEnd))
             ),
+            TableView.row("收益", C, Arrays.asList(
+                    TableView.row("已卖出", d -> TextUtil.amount(d.getProfitSold()), C, E, Profit::getProfitSold),
+                    TableView.row("持有中", d -> TextUtil.amount(d.getProfitHold()), C, E, Profit::getProfitHold),
+                    TableView.row("卖出+持有", d -> TextUtil.amount(d.getProfitTotal()), C, E, Profit::getProfitTotal),
+                    TableView.row("卖出/最大", d -> TextUtil.hundred(d.getProfitRatio()), C, E, Profit::getProfitRatio))
+            ),
             TableView.row("操作次数", C, Arrays.asList(
                     TableView.row("买入", d -> TextUtil.text(d.getTimesBuy()), C, C, Profit::getTimesBuy),
                     TableView.row("卖出", d -> TextUtil.text(d.getTimesSell()), C, C, Profit::getTimesSell))
@@ -58,12 +64,6 @@ public class ProfitListPage extends ListPage<Profit> {
                     TableView.row("投入-持有", d -> TextUtil.amount(d.getPaidLeft()), C, E, Profit::getPaidTotal),
                     TableView.row("投入-总额", d -> TextUtil.amount(d.getPaidTotal()), C, E, Profit::getTimesSell),
                     TableView.row("回收-总额", d -> TextUtil.amount(d.getReturned()), C, E, Profit::getReturned))
-            ),
-            TableView.row("收益", C, Arrays.asList(
-                    TableView.row("已卖出", d -> TextUtil.amount(d.getProfitSold()), C, E, Profit::getProfitSold),
-                    TableView.row("持有中", d -> TextUtil.amount(d.getProfitHold()), C, E, Profit::getProfitHold),
-                    TableView.row("卖出+持有", d -> TextUtil.amount(d.getProfitTotal()), C, E, Profit::getProfitTotal),
-                    TableView.row("卖出/最大", d -> TextUtil.hundred(d.getProfitRatio()), C, E, Profit::getProfitRatio))
             )
     );
 
