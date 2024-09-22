@@ -30,5 +30,4 @@ public class Record extends BaseModel {
      * 内容（通常为json串）
      */
     private String content;
-
 }

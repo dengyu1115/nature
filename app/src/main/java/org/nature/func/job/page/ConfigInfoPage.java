@@ -11,10 +11,7 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.ioc.holder.JobHolder;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.Md5Util;
-import org.nature.common.util.PopUtil;
-import org.nature.common.util.Sorter;
-import org.nature.common.util.TextUtil;
+import org.nature.common.util.*;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
 import org.nature.common.view.TableView;
@@ -83,9 +80,9 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
     @Override
     protected void initHeaderBehaviours() {
         Intent service = new Intent(context, JobService.class);
-        start.setOnClickListener(i -> context.startService(service));
-        stop.setOnClickListener(i -> context.stopService(service));
-        add.setOnClickListener(i -> this.add());
+        ClickUtil.onClick(start, () -> context.startService(service));
+        ClickUtil.onClick(stop, () -> context.stopService(service));
+        ClickUtil.onClick(add, this::add);
     }
 
     @Override

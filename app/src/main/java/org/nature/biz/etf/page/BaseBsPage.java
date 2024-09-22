@@ -48,8 +48,11 @@ public abstract class BaseBsPage extends ListPage<Hold> {
                     TableView.row("卖出", d -> TextUtil.price(d.getPriceSell()), C, E, Hold::getPriceSell))
             ),
             TableView.row("份额", d -> TextUtil.text(d.getShareBuy()), C, E, Hold::getShareBuy),
-            TableView.row("金额", d -> TextUtil.amount(this.getAmount(d)), C, E, this::getAmount),
-            TableView.row("盈利", d -> TextUtil.amount(d.getProfit()), C, E, Hold::getProfit)
+            TableView.row("金额", C, Arrays.asList(
+                    TableView.row("买入", d -> TextUtil.amount(this.getAmountBuy(d)), C, E, this::getAmountBuy),
+                    TableView.row("卖出", d -> TextUtil.amount(this.getAmountSell(d)), C, E, this::getAmountSell),
+                    TableView.row("盈利", d -> TextUtil.amount(d.getProfit()), C, E, Hold::getProfit))
+            )
     );
 
     @Override
@@ -97,7 +100,7 @@ public abstract class BaseBsPage extends ListPage<Hold> {
 
     @Override
     protected int getTotalColumns() {
-        return 11;
+        return 12;
     }
 
     @Override
@@ -124,12 +127,21 @@ public abstract class BaseBsPage extends ListPage<Hold> {
     }
 
     /**
-     * 获取数量
+     * 获取买入金额
      * @param d 持有数据
-     * @return String
+     * @return BigDecimal
      */
-    private BigDecimal getAmount(Hold d) {
-        return (d.getPriceSell() == null ? d.getPriceBuy() : d.getPriceSell()).multiply(d.getShareBuy());
+    private BigDecimal getAmountBuy(Hold d) {
+        return d.getPriceBuy().multiply(d.getShareBuy());
+    }
+
+    /**
+     * 获取卖出金额
+     * @param d 持有数据
+     * @return BigDecimal
+     */
+    private BigDecimal getAmountSell(Hold d) {
+        return d.getPriceSell() == null ? null : d.getPriceSell().multiply(d.getShareBuy());
     }
 
 }

@@ -77,17 +77,6 @@ public class ClickUtil {
     }
 
     /**
-     * 给view设置点击弹确认框事件
-     * @param view     view
-     * @param title    标题
-     * @param inner    内容
-     * @param supplier 处理逻辑
-     */
-    public static void onPopConfirm(View view, String title, View inner, Supplier<String> supplier) {
-        ClickUtil.onClick(view, () -> PopUtil.confirmAsync(view.getContext(), title, inner, supplier));
-    }
-
-    /**
      * 点击处理（主线程执行）
      * @param view     view
      * @param runnable 执行逻辑
@@ -187,9 +176,8 @@ public class ClickUtil {
                 // 进行消息提示
                 handler.sendMessage(message(e.getMessage()));
             } catch (Exception e) {
-                e.printStackTrace();
                 // 进行消息提示
-                handler.sendMessage(message("系统错误"));
+                handler.sendMessage(message("系统错误:" + e));
             } finally {
                 view.setClickable(true);
                 VIEW_TIME_MAP.remove(view);

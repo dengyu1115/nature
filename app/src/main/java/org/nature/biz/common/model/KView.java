@@ -73,5 +73,4 @@ public class KView extends BaseModel {
      * 60日均线
      */
     private Double ma60;
-
 }

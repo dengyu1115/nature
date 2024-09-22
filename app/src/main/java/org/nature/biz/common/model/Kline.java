@@ -57,5 +57,4 @@ public class Kline extends BaseModel {
      * 金额
      */
     private BigDecimal amount;
-
 }

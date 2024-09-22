@@ -40,5 +40,4 @@ public class Net extends BaseModel {
      * 单位净值
      */
     private BigDecimal dw;
-
 }

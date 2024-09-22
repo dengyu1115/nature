@@ -13,7 +13,6 @@ import org.nature.common.model.BaseModel;
 @Getter
 @Setter
 public class KInfo extends BaseModel {
-
     /**
      * code
      */
@@ -26,5 +25,4 @@ public class KInfo extends BaseModel {
      * 名称
      */
     private String name;
-
 }

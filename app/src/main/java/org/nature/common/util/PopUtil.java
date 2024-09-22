@@ -40,22 +40,22 @@ public class PopUtil {
      * 确认框
      * @param context  context
      * @param title    标题
-     * @param message  提示消息
-     * @param supplier 执行逻辑
+     * @param view     自定义的页面
+     * @param runnable 执行逻辑
      */
-    public static void confirmAsync(Context context, String title, String message, Supplier<String> supplier) {
-        PopUtil.buildAsyncDialog(context, title, builder -> builder.setMessage(message), supplier);
+    public static void confirm(Context context, String title, View view, Runnable runnable) {
+        PopUtil.buildAlertDialog(context, title, builder -> builder.setView(view), runnable);
     }
 
     /**
      * 确认框
      * @param context  context
      * @param title    标题
-     * @param view     自定义的页面
-     * @param runnable 执行逻辑
+     * @param message  提示消息
+     * @param supplier 执行逻辑
      */
-    public static void confirm(Context context, String title, View view, Runnable runnable) {
-        PopUtil.buildAlertDialog(context, title, builder -> builder.setView(view), runnable);
+    public static void confirmAsync(Context context, String title, String message, Supplier<String> supplier) {
+        PopUtil.buildAsyncDialog(context, title, builder -> builder.setMessage(message), supplier);
     }
 
     /**
@@ -81,12 +81,13 @@ public class PopUtil {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(title);
         consumer.accept(builder);
-        builder.setPositiveButton("确定", null);
-        builder.setNegativeButton("取消", (di, i) -> {
+        builder.setPositiveButton("确定", (di, i) -> {
+            runnable.run();
+            di.dismiss();
         });
+        builder.setNegativeButton("取消", (di, i) -> di.dismiss());
         AlertDialog dialog = builder.create();
         dialog.show();
-        ClickUtil.onClick(dialog.getButton(AlertDialog.BUTTON_POSITIVE), runnable, dialog::dismiss);
     }
 
     /**
@@ -106,6 +107,6 @@ public class PopUtil {
         });
         AlertDialog dialog = builder.create();
         dialog.show();
-        ClickUtil.onAsyncClick(dialog.getButton(AlertDialog.BUTTON_POSITIVE), supplier, dialog::dismiss);
+        ClickUtil.onAsyncClick(dialog.getButton(AlertDialog.BUTTON_POSITIVE), supplier, dialog::cancel);
     }
 }
