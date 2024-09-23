@@ -8,9 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.nature.biz.common.model.KInfo;
 import org.nature.biz.common.page.KlineListPage;
 import org.nature.biz.etf.manager.HoldManager;
-import org.nature.biz.etf.mapper.GroupMapper;
 import org.nature.biz.etf.mapper.ItemMapper;
-import org.nature.biz.etf.model.Group;
 import org.nature.biz.etf.model.Item;
 import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Injection;
@@ -18,7 +16,6 @@ import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.ClickUtil;
 import org.nature.common.util.PopUtil;
-import org.nature.common.util.Sorter;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
@@ -26,9 +23,7 @@ import org.nature.common.view.TableView;
 import org.nature.common.view.ViewTemplate;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -40,20 +35,13 @@ import static org.nature.common.constant.Const.*;
  * @version 1.0.0
  * @since 2023/12/29
  */
-@PageView(name = "项目", group = "ETF", col = 1, row = 2)
+@PageView(name = "项目", group = "ETF", col = 1, row = 1)
 public class ItemListPage extends ListPage<Item> {
 
     @Injection
     private ItemMapper itemMapper;
     @Injection
-    private GroupMapper groupMapper;
-    @Injection
     private HoldManager holdManager;
-
-    /**
-     * 项目分组
-     */
-    private Selector<Group> itemGroup;
     /**
      * 关键字
      */
@@ -71,17 +59,9 @@ public class ItemListPage extends ListPage<Item> {
      */
     private Selector<String> type;
     /**
-     * 分组下拉选项
-     */
-    private Selector<Group> group;
-    /**
      * 新增、加载K线、重新加载K线、计算规则按钮
      */
     private Button add, calcRule;
-    /**
-     * 分组信息map
-     */
-    private Map<String, String> groupMap;
     /**
      * 表头
      */
@@ -89,7 +69,6 @@ public class ItemListPage extends ListPage<Item> {
             TableView.row("名称", d -> TextUtil.text(d.getName()), C, S, Item::getName),
             TableView.row("编号", d -> TextUtil.text(d.getCode()), C, C, Item::getCode),
             TableView.row("类型", d -> TextUtil.text(d.getType()), C, C, Item::getType),
-            TableView.row("分组", d -> TextUtil.text(groupMap.get(d.getGroup())), C, C, Sorter.nullsLast(d -> groupMap.get(d.getGroup()))),
             TableView.row("编辑", d -> "+", C, C, this::edit),
             TableView.row("删除", d -> "-", C, C, this::delete),
             TableView.row("K线查看", d -> "查看", C, C, this::showKline),
@@ -108,17 +87,12 @@ public class ItemListPage extends ListPage<Item> {
         if (StringUtils.isNotBlank(keyword)) {
             list = list.stream().filter(i -> i.getName().contains(keyword)).collect(Collectors.toList());
         }
-        Group group = this.itemGroup.getValue();
-        if (StringUtils.isNotBlank(group.getCode())) {
-            list = list.stream().filter(i -> group.getCode().equals(i.getGroup())).collect(Collectors.toList());
-        }
         return list;
     }
 
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
         searchBar.addConditionView(add = template.button("+", 30, 30));
-        searchBar.addConditionView(itemGroup = template.selector(80, 30));
         searchBar.addConditionView(keyword = template.editText(100, 30));
         searchBar.addConditionView(calcRule = template.button("规则计算", 80, 30));
     }
@@ -127,11 +101,6 @@ public class ItemListPage extends ListPage<Item> {
     protected void initHeaderBehaviours() {
         ClickUtil.onClick(add, this::add);
         ClickUtil.onAsyncClick(calcRule, this::calcHold);
-        List<Group> groups = groupMapper.listAll();
-        groupMap = groups.stream().collect(Collectors.toMap(Group::getCode, Group::getName));
-        groups.sort(Comparator.comparing(Group::getCode));
-        groups.add(0, new Group());
-        itemGroup.mapper(Group::getName).init().refreshData(groups);
     }
 
     @Override
@@ -175,13 +144,10 @@ public class ItemListPage extends ListPage<Item> {
         Warn.check(name::isEmpty, "请填写名称");
         String type = this.type.getValue();
         Warn.check(type::isEmpty, "请选择类型");
-        Group group = this.group.getValue();
-        Warn.check(() -> group == null, "请选择分组");
         Item item = new Item();
         item.setCode(code);
         item.setName(name);
         item.setType(type);
-        item.setGroup(group.getCode());
         consumer.accept(item);
         this.refreshData();
         PopUtil.alert(context, "编辑成功！");
@@ -216,7 +182,7 @@ public class ItemListPage extends ListPage<Item> {
         info.setCode(d.getCode());
         info.setType(d.getType());
         info.setName(d.getName());
-        this.show(KlineListPage.class, d);
+        this.show(KlineListPage.class, info);
     }
 
     /**
@@ -236,11 +202,9 @@ public class ItemListPage extends ListPage<Item> {
                 t.line(L_W, L_H, t.textView("编号：", L_W_T, L_H), code = t.editText(L_W_C, L_H)),
                 t.line(L_W, L_H, t.textView("名称：", L_W_T, L_H), name = t.editText(L_W_C, L_H)),
                 t.line(L_W, L_H, t.textView("类型：", L_W_T, L_H), type = t.selector(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("分组：", L_W_T, L_H), group = t.selector(L_W_C, L_H)),
                 t.line(L_W, L_H)
         );
         type.mapper(i -> i).init().refreshData(Arrays.asList("0", "1"));
-        group.mapper(Group::getName).init().refreshData(groupMapper.listAll());
     }
 
     /**

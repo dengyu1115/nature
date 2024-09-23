@@ -2,7 +2,6 @@ package org.nature.biz.etf.model;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.nature.common.db.annotation.Column;
 import org.nature.common.db.annotation.Id;
 import org.nature.common.db.annotation.Model;
 import org.nature.common.model.BaseModel;
@@ -26,10 +25,5 @@ public class Item extends BaseModel {
      * 名称
      */
     private String name;
-    /**
-     * 分组
-     */
-    @Column("`group`")
-    private String group;
 
 }

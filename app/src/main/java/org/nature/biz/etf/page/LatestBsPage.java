@@ -13,7 +13,7 @@ import java.util.List;
  * @version 1.0.0
  * @since 2024/1/8
  */
-@PageView(name = "最新操作", group = "ETF", col = 1, row = 3)
+@PageView(name = "最新操作", group = "ETF", col = 1, row = 2)
 public class LatestBsPage extends BaseBsPage {
 
     @Injection

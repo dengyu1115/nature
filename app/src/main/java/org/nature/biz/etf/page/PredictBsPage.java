@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
  * @version 1.0.0
  * @since 2024/1/8
  */
-@PageView(name = "预测操作", group = "ETF", col = 1, row = 4)
+@PageView(name = "预测操作", group = "ETF", col = 1, row = 3)
 public class PredictBsPage extends BaseBsPage {
 
     @Injection
