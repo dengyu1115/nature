@@ -56,12 +56,12 @@ public class NotifyUtil {
         manager.createNotificationChannel(channel);
         NotifyUtil.tts = new TextToSpeech(context, status -> {
             if (status == TextToSpeech.SUCCESS) {
-                int result = NotifyUtil.tts.setLanguage(Locale.US);
+                int result = NotifyUtil.tts.setLanguage(Locale.CHINESE);
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
                     throw new RuntimeException("set language failed");
                 }
             }
-        });
+        }, "com.google.android.tts");
         AtomicInteger counter = new AtomicInteger(1);
         NotifyUtil.ctx = new Ctx(context, manager, NotifyUtil.tts, counter);
     }
