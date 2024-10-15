@@ -36,8 +36,9 @@ public class TestPage extends Page {
     @Override
     protected void onShow() {
         ClickUtil.onClick(ttsBtn, () -> {
-            EditText ttsText = template.areaText(160, 300);
-            PopUtil.confirm(ttsBtn.getContext(), "请输入要转语音的文本", ttsText, () -> {
+            EditText ttsText = template.areaText(360, 160);
+            LinearLayout line = template.line(500, 230, template.textView("内容", 60, 30), ttsText);
+            PopUtil.confirm(ttsBtn.getContext(), "请输入要转语音的文本", line, () -> {
                 String text = ttsText.getText().toString();
                 NotifyUtil.speak(text);
             });

@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
             // 单例组件加载
             ComponentStarter.getInstance().start(this);
             // 通知工具初始化
-            NotifyUtil.init(MainActivity.this);
+            NotifyUtil.init(this);
         }
         // 全局页面初始化
         view = new BasicPage(this);

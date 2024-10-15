@@ -34,49 +34,36 @@ public class NotifyUtil {
      * 服务通道name
      */
     private final static String CHANNEL_NAME = "NATURE服务通道";
-    /**
-     * 安卓上下文对象
-     */
-    @SuppressLint("StaticFieldLeak")
-    private static Context context;
-    /**
-     * 消息通道
-     */
-    private static NotificationChannel channel;
-    /**
-     * 消息发送管理器
-     */
-    private static NotificationManager manager;
+
     /**
      * TTS语音处理
      */
     private static TextToSpeech tts;
-    /**
-     * ID计数器
-     */
-    private static AtomicInteger counter;
+
+    @SuppressLint("StaticFieldLeak")
+    private static Ctx ctx;
 
     /**
      * 初始化
      * @param context 安卓上下文
      */
     public static void init(Context context) {
-        NotifyUtil.context = context;
-        NotifyUtil.manager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
-        NotifyUtil.channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
-        if (NotifyUtil.manager == null) {
+        NotificationManager manager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        if (manager == null) {
             throw new RuntimeException("there is no notification manager");
         }
-        NotifyUtil.manager.createNotificationChannel(NotifyUtil.channel);
+        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
+        manager.createNotificationChannel(channel);
         NotifyUtil.tts = new TextToSpeech(context, status -> {
             if (status == TextToSpeech.SUCCESS) {
-                int result = tts.setLanguage(Locale.CHINA);
+                int result = NotifyUtil.tts.setLanguage(Locale.US);
                 if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    throw new RuntimeException("init tts failed");
+                    throw new RuntimeException("set language failed");
                 }
             }
         });
-        counter = new AtomicInteger(1);
+        AtomicInteger counter = new AtomicInteger(1);
+        NotifyUtil.ctx = new Ctx(context, manager, NotifyUtil.tts, counter);
     }
 
     /**
@@ -85,7 +72,7 @@ public class NotifyUtil {
      * @param content 内容
      */
     public static void notify(String title, String content) {
-        NotifyUtil.manager.notify(NOTIFICATION_ID, NotifyUtil.notification(title, content));
+        ctx.manager.notify(NOTIFICATION_ID, NotifyUtil.notification(title, content));
     }
 
     /**
@@ -94,7 +81,7 @@ public class NotifyUtil {
      * @param content 内容
      */
     public static void notifyOne(String title, String content) {
-        NotifyUtil.manager.notify(counter.incrementAndGet(), NotifyUtil.notification(title, content));
+        ctx.manager.notify(ctx.counter.incrementAndGet(), NotifyUtil.notification(title, content));
     }
 
     /**
@@ -102,7 +89,7 @@ public class NotifyUtil {
      * @param text 文本
      */
     public static void speak(String text) {
-        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+        ctx.tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
     }
 
     /**
@@ -110,9 +97,35 @@ public class NotifyUtil {
      * @return Notification
      */
     public static Notification notification(String title, String content) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx.context, CHANNEL_ID);
         builder.setSmallIcon(R.drawable.app_icon).setContentTitle(title).setContentText(content);
         return builder.build();
     }
 
+    private static class Ctx {
+        /**
+         * 安卓上下文对象
+         */
+        private final Context context;
+        /**
+         * 消息发送管理器
+         */
+        private final NotificationManager manager;
+        /**
+         * TTS语音处理
+         */
+        private final TextToSpeech tts;
+        /**
+         * ID计数器
+         */
+        private final AtomicInteger counter;
+
+        public Ctx(Context context, NotificationManager manager, TextToSpeech tts, AtomicInteger counter) {
+            this.context = context;
+            this.manager = manager;
+            this.tts = tts;
+            this.counter = counter;
+        }
+
+    }
 }
