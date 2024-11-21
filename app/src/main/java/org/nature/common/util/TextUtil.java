@@ -1,6 +1,9 @@
 package org.nature.common.util;
 
 import android.annotation.SuppressLint;
+import android.widget.EditText;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.nature.common.exception.Warn;
 
 import java.math.BigDecimal;
 import java.util.function.Function;
@@ -86,6 +89,32 @@ public class TextUtil {
             s = s.replace("%", "");
         }
         return new BigDecimal(s);
+    }
+
+    public static String getString(EditText et) {
+        return et.getText().toString().trim();
+    }
+
+    public static BigDecimal getDecimal(EditText et) {
+        String val = et.getText().toString().trim();
+        if (val.isEmpty()) {
+            return null;
+        }
+        if (!NumberUtils.isCreatable(val)) {
+            throw new Warn("decimal format error:" + val);
+        }
+        return new BigDecimal(val);
+    }
+
+    public static Integer getInteger(EditText et) {
+        String val = et.getText().toString().trim();
+        if (val.isEmpty()) {
+            return null;
+        }
+        if (!NumberUtils.isDigits(val)) {
+            throw new Warn("number format error:" + val);
+        }
+        return Integer.valueOf(val);
     }
 
     public static String join(String... arr) {

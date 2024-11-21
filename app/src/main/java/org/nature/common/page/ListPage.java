@@ -17,6 +17,7 @@ import org.nature.common.view.TableView;
 import org.nature.common.view.ViewTemplate;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * 列表页面
@@ -71,6 +72,7 @@ public abstract class ListPage<T> extends Page {
      */
     private void initBehaviours() {
         this.button.setOnClickListener(v -> this.refreshData());
+        this.excel.setLongClick(this.longClick());
         this.excel.define(this.define());
         this.initHeaderBehaviours();
     }
@@ -155,6 +157,14 @@ public abstract class ListPage<T> extends Page {
      */
     protected int getFixedColumns() {
         return 1;
+    }
+
+    /**
+     * 长按操作
+     * @return Consumer
+     */
+    protected Consumer<T> longClick() {
+        return null;
     }
 
     /**

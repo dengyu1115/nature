@@ -31,6 +31,16 @@ public interface HoldMapper extends BatchSave<Hold>, BatchMerge<Hold> {
     List<Hold> listByRule(@Param("code") String code, @Param("type") String type, @Param("rule") String rule);
 
     /**
+     * 按规则查询
+     * @param code 项目编号
+     * @param type 项目类型
+     * @param rule 规则
+     * @return list
+     */
+    @QueryList(where = "code=#{code} and type=#{type} and rule=#{rule} and date_sell is null")
+    List<Hold> listLeftByRule(@Param("code") String code, @Param("type") String type, @Param("rule") String rule);
+
+    /**
      * 按规则删除
      * @param code 项目编号
      * @param type 项目类型

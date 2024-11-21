@@ -36,34 +36,32 @@ public class NotifyUtil {
     private final static String CHANNEL_NAME = "NATURE服务通道";
 
     /**
-     * TTS语音处理
+     * 安卓上下文对象
      */
-    private static TextToSpeech tts;
-
     @SuppressLint("StaticFieldLeak")
-    private static Ctx ctx;
+    private static Context context;
+    /**
+     * 消息发送管理器
+     */
+    private static NotificationManager manager;
+    /**
+     * ID计数器
+     */
+    private static AtomicInteger counter;
 
     /**
      * 初始化
      * @param context 安卓上下文
      */
     public static void init(Context context) {
-        NotificationManager manager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+        NotifyUtil.context = context;
+        NotifyUtil.manager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
         if (manager == null) {
             throw new RuntimeException("there is no notification manager");
         }
         NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
         manager.createNotificationChannel(channel);
-        NotifyUtil.tts = new TextToSpeech(context, status -> {
-            if (status == TextToSpeech.SUCCESS) {
-                int result = NotifyUtil.tts.setLanguage(Locale.CHINESE);
-                if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                    throw new RuntimeException("set language failed");
-                }
-            }
-        }, "com.google.android.tts");
-        AtomicInteger counter = new AtomicInteger(1);
-        NotifyUtil.ctx = new Ctx(context, manager, NotifyUtil.tts, counter);
+        NotifyUtil.counter = new AtomicInteger(1);
     }
 
     /**
@@ -72,7 +70,7 @@ public class NotifyUtil {
      * @param content 内容
      */
     public static void notify(String title, String content) {
-        ctx.manager.notify(NOTIFICATION_ID, NotifyUtil.notification(title, content));
+        manager.notify(NOTIFICATION_ID, NotifyUtil.notification(title, content));
     }
 
     /**
@@ -81,7 +79,7 @@ public class NotifyUtil {
      * @param content 内容
      */
     public static void notifyOne(String title, String content) {
-        ctx.manager.notify(ctx.counter.incrementAndGet(), NotifyUtil.notification(title, content));
+        manager.notify(counter.incrementAndGet(), NotifyUtil.notification(title, content));
     }
 
     /**
@@ -89,7 +87,7 @@ public class NotifyUtil {
      * @param text 文本
      */
     public static void speak(String text) {
-        ctx.tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+        new TTS(context, text);
     }
 
     /**
@@ -97,34 +95,33 @@ public class NotifyUtil {
      * @return Notification
      */
     public static Notification notification(String title, String content) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(ctx.context, CHANNEL_ID);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID);
         builder.setSmallIcon(R.drawable.app_icon).setContentTitle(title).setContentText(content);
         return builder.build();
     }
 
-    private static class Ctx {
-        /**
-         * 安卓上下文对象
-         */
-        private final Context context;
-        /**
-         * 消息发送管理器
-         */
-        private final NotificationManager manager;
-        /**
-         * TTS语音处理
-         */
-        private final TextToSpeech tts;
-        /**
-         * ID计数器
-         */
-        private final AtomicInteger counter;
+    private static class TTS {
 
-        public Ctx(Context context, NotificationManager manager, TextToSpeech tts, AtomicInteger counter) {
-            this.context = context;
-            this.manager = manager;
-            this.tts = tts;
-            this.counter = counter;
+        /**
+         * tts实例
+         */
+        private TextToSpeech tts;
+
+        public TTS(Context context, String text) {
+            // 创建实例
+            tts = new TextToSpeech(context, status -> {
+                if (status == TextToSpeech.SUCCESS) {
+                    // 实例初始化成功，设置语言类型
+                    int result = tts.setLanguage(Locale.CHINESE);
+                    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        throw new RuntimeException("tts set language failed");
+                    }
+                    // 语言设置成功后输入语音
+                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+                } else {
+                    throw new RuntimeException("tts init failed:" + status);
+                }
+            });
         }
 
     }

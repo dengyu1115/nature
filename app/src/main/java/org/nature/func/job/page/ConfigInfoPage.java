@@ -22,8 +22,10 @@ import org.nature.func.job.model.ConfigInfo;
 import org.nature.func.job.service.JobService;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static org.nature.common.constant.Const.*;
 
@@ -49,8 +51,6 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
             TableView.row("名称", d -> JobHolder.getName(d.getCode()), C, S, Sorter.nullsLast(d -> JobHolder.getName(d.getCode()))),
             TableView.row("编号", d -> TextUtil.text(d.getCode()), C, S, ConfigInfo::getCode),
             TableView.row("状态", d -> TextUtil.text(Status.name(d.getStatus())), C, C, ConfigInfo::getStatus),
-            TableView.row("编辑", d -> "+", C, C, this.edit()),
-            TableView.row("删除", d -> "-", C, C, this.delete()),
             TableView.row("年", d -> TextUtil.text(d.getYear()), C, C, ConfigInfo::getYear),
             TableView.row("月", d -> TextUtil.text(d.getMonth()), C, C, ConfigInfo::getMonth),
             TableView.row("日", d -> TextUtil.text(d.getDay()), C, C, ConfigInfo::getDay),
@@ -66,7 +66,8 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
 
     @Override
     protected List<ConfigInfo> listData() {
-        return configInfoMapper.listAll();
+        return configInfoMapper.listAll().stream().sorted(Comparator.comparing(ConfigInfo::getCode))
+                .collect(Collectors.toList());
     }
 
 
@@ -124,37 +125,33 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
 
     /**
      * 编辑操作
-     * @return 操作逻辑
+     * @param d 数据
      */
-    private Consumer<ConfigInfo> edit() {
-        return d -> {
-            this.makeWindowStructure();
-            this.jobSel.setValue(d.getCode());
-            this.year.setText(d.getYear());
-            this.month.setText(d.getMonth());
-            this.day.setText(d.getDay());
-            this.hour.setText(d.getHour());
-            this.minute.setText(d.getMinute());
-            this.second.setText(d.getSecond());
-            this.statusSel.setValue(d.getStatus());
-            String name = JobHolder.getName(d.getCode());
-            PopUtil.confirm(context, "编辑-" + name, editPop, () -> this.doEdit(configInfoMapper::merge));
-        };
+    private void edit(ConfigInfo d) {
+        this.makeWindowStructure();
+        this.jobSel.setValue(d.getCode());
+        this.year.setText(d.getYear());
+        this.month.setText(d.getMonth());
+        this.day.setText(d.getDay());
+        this.hour.setText(d.getHour());
+        this.minute.setText(d.getMinute());
+        this.second.setText(d.getSecond());
+        this.statusSel.setValue(d.getStatus());
+        String name = JobHolder.getName(d.getCode());
+        PopUtil.confirm(context, "编辑-" + name, editPop, () -> this.doEdit(configInfoMapper::merge));
     }
 
     /**
      * 删除操作
-     * @return 操作逻辑
+     * @param d 数据
      */
-    private Consumer<ConfigInfo> delete() {
-        return d -> {
-            String name = JobHolder.getName(d.getCode());
-            PopUtil.confirm(context, "删除-" + name, "确认删除吗？", () -> {
-                configInfoMapper.deleteById(d);
-                this.refreshData();
-                PopUtil.alert(context, "删除成功！");
-            });
-        };
+    private void delete(ConfigInfo d) {
+        String name = JobHolder.getName(d.getCode());
+        PopUtil.confirm(context, "删除-" + name, "确认删除吗？", () -> {
+            configInfoMapper.deleteById(d);
+            this.refreshData();
+            PopUtil.alert(context, "删除成功！");
+        });
     }
 
     /**
@@ -169,12 +166,12 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         ConfigInfo d = new ConfigInfo();
         d.setCode(code);
         d.setStatus(status);
-        d.setYear(this.year.getText().toString());
-        d.setMonth(this.month.getText().toString());
-        d.setDay(this.day.getText().toString());
-        d.setHour(this.hour.getText().toString());
-        d.setMinute(this.minute.getText().toString());
-        d.setSecond(this.second.getText().toString());
+        d.setYear(TextUtil.getString(this.year));
+        d.setMonth(TextUtil.getString(this.month));
+        d.setDay(TextUtil.getString(this.day));
+        d.setHour(TextUtil.getString(this.hour));
+        d.setMinute(TextUtil.getString(this.minute));
+        d.setSecond(TextUtil.getString(this.second));
         d.setSignature(Md5Util.md5(code, d.getYear(), d.getMonth(), d.getDay(), d.getHour(), d.getMinute(), d.getSecond()));
         consumer.accept(d);
         this.refreshData();
@@ -189,6 +186,11 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         ConfigInfo exists = configInfoMapper.findById(d);
         Warn.check(() -> exists != null, "数据已存在");
         configInfoMapper.save(d);
+    }
+
+    @Override
+    protected Consumer<ConfigInfo> longClick() {
+        return i -> PopUtil.handle(context, i, this::delete, this::edit);
     }
 
 }

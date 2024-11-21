@@ -79,14 +79,6 @@ public abstract class BaseBsPage extends ListPage<Hold> {
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
         searchBar.addConditionView(handleSel = template.selector(60, 30));
-    }
-
-    @Override
-    protected void initHeaderBehaviours() {
-        List<Item> items = itemMapper.listAll();
-        itemNameMap.clear();
-        itemNameMap.putAll(items.stream()
-                .collect(Collectors.toMap(i -> String.join(":", i.getCode(), i.getType()), Item::getName)));
         handleSel.mapper(i -> {
             if ("1".equals(i)) {
                 return "买";
@@ -96,6 +88,14 @@ public abstract class BaseBsPage extends ListPage<Hold> {
             }
             return "请选择";
         }).init().refreshData(Arrays.asList("0", "1", "2"));
+    }
+
+    @Override
+    protected void initHeaderBehaviours() {
+        List<Item> items = itemMapper.listAll();
+        itemNameMap.clear();
+        itemNameMap.putAll(items.stream()
+                .collect(Collectors.toMap(i -> String.join(":", i.getCode(), i.getType()), Item::getName)));
     }
 
     @Override

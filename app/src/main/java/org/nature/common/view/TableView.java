@@ -32,20 +32,45 @@ import static org.nature.common.constant.Const.PAGE_WIDTH;
 @SuppressLint({"DefaultLocale", "ClickableViewAccessibility"})
 public class TableView<T> extends BasicView {
 
-    public static final int HEIGHT = 33;
-    public static final int PADDING = 8;
-    public static final int SCROLL_BAR_SIZE = 3;
+    public static final int HEIGHT = 33, PADDING = 8, SCROLL_BAR_SIZE = 3;
     private final int columns, fixed;
     private final float widthRate;
     private final LayoutParams param = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
-    private final List<HorizontalScrollView> horizontalScrollViews = new ArrayList<>();
+    /**
+     * 水平滚动的view集合
+     */
+    private final Set<HorizontalScrollView> horizontalScrollViews = new HashSet<>();
+    /**
+     * 排序点击计数
+     */
     private final AtomicInteger sc = new AtomicInteger(-1);
+    /**
+     * 移动取消标记
+     */
     private final AtomicBoolean canceled = new AtomicBoolean();
+    /**
+     * 移动状态标记
+     */
     private final AtomicBoolean running = new AtomicBoolean();
+    /**
+     * listview适配器
+     */
     private final Adapter adapter = new Adapter();
+    /**
+     * 异步处理类
+     */
     private final Handler handler = new Handler(this::handleMessage);
+    /**
+     * 表格定义
+     */
     private List<D<T>> ds;
+    /**
+     * 表格需要展示的数据集合
+     */
     private List<T> list = new ArrayList<>();
+    /**
+     * 临时集合
+     */
     private List<T> tempList;
     private float colWidth;
     private HorizontalScrollView touchView;
@@ -56,6 +81,8 @@ public class TableView<T> extends BasicView {
     private boolean sortClicked;
     private float clickX, clickY;
     private int titleGroup, titleCol;
+
+    private Consumer<T> longClick;
 
     public TableView(Context context) {
         this(context, 3, 1);
@@ -89,6 +116,14 @@ public class TableView<T> extends BasicView {
     public void data(List<T> list) {
         this.tempList = list;
         handler.sendMessage(new Message());
+    }
+
+    /**
+     * 设置长按事件
+     * @param click 长按处理逻辑
+     */
+    public void setLongClick(Consumer<T> click) {
+        this.longClick = click;
     }
 
     /**
@@ -211,7 +246,7 @@ public class TableView<T> extends BasicView {
         }
         return line;
     }
-    
+
     /**
      * 内容view
      * @return LinearLayout
@@ -697,6 +732,12 @@ public class TableView<T> extends BasicView {
                         num++;
                     }
                 }
+            }
+            if (longClick != null) {
+                convertView.setOnLongClickListener(v -> {
+                    longClick.accept(item);
+                    return false;
+                });
             }
             return convertView;
         }

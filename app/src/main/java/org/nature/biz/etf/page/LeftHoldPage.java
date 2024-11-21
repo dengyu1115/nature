@@ -8,20 +8,20 @@ import org.nature.common.ioc.annotation.PageView;
 import java.util.List;
 
 /**
- * 持有数据
+ * 剩余持仓
  * @author Nature
  * @version 1.0.0
- * @since 2024/1/8
+ * @since 2024/11/18
  */
-@PageView(name = "最新操作", group = "ETF", col = 1, row = 3)
-public class LatestBsPage extends BaseBsPage {
+@PageView(name = "剩余持仓", group = "ETF", col = 1, row = 2)
+public class LeftHoldPage extends BaseBsPage {
 
     @Injection
     private RuleManager ruleManager;
 
     @Override
     protected List<Hold> data() {
-        return ruleManager.latestHandle();
+        return ruleManager.leftHold();
     }
 
 }

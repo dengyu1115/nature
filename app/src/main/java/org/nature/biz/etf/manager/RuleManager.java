@@ -6,6 +6,7 @@ import org.nature.biz.common.mapper.KlineMapper;
 import org.nature.biz.common.model.KInfo;
 import org.nature.biz.common.model.Kline;
 import org.nature.biz.common.protocol.KlineItems;
+import org.nature.biz.etf.mapper.HoldMapper;
 import org.nature.biz.etf.mapper.ItemMapper;
 import org.nature.biz.etf.mapper.RuleMapper;
 import org.nature.biz.etf.model.Hold;
@@ -36,7 +37,20 @@ public class RuleManager implements KlineItems {
     @Injection
     private KlineMapper klineMapper;
     @Injection
+    private HoldMapper holdMapper;
+    @Injection
     private KlineHttp klineHttp;
+
+    @Override
+    public List<KInfo> kItems() {
+        return itemMapper.listAll().stream().map(i -> {
+            KInfo info = new KInfo();
+            info.setCode(i.getCode());
+            info.setType(i.getType());
+            info.setName(i.getName());
+            return info;
+        }).collect(Collectors.toList());
+    }
 
     /**
      * 删除
@@ -142,6 +156,16 @@ public class RuleManager implements KlineItems {
         return holds;
     }
 
+    public List<Hold> leftHold() {
+        List<Rule> rules = this.listValid();
+        // 无规则数据直接返回
+        if (rules.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return rules.stream().map(i -> holdMapper.listLeftByRule(i.getCode(), i.getType(), i.getName()))
+                .flatMap(List::stream).collect(Collectors.toList());
+    }
+
     /**
      * 查询有效规则
      * @return list
@@ -183,16 +207,5 @@ public class RuleManager implements KlineItems {
         // 库中数据和网络数据合并
         kList.addAll(list);
         return kList;
-    }
-
-    @Override
-    public List<KInfo> kItems() {
-        return itemMapper.listAll().stream().map(i -> {
-            KInfo info = new KInfo();
-            info.setCode(i.getCode());
-            info.setType(i.getType());
-            info.setName(i.getName());
-            return info;
-        }).collect(Collectors.toList());
     }
 }
