@@ -23,27 +23,24 @@ import java.util.function.Function;
  * @version 1.0.0
  * @since 2024/1/14
  */
+@SuppressLint("ViewConstructor")
 public class Selector<T> extends BasicView {
 
     private final Context context;
     private final LayoutParams params, tps;
     private final int height;
-    private TextView valueView;
-    private T value;
-    private PopupWindow popupWindow;
+    private PopupWindow popup;
     private ListView listView;
-    private List<T> items;
+    private TextView valueView;
     private Function<T, String> mapper;
     private Runnable changeRun;
-
-    public Selector(Context context) {
-        this(context, 100, 30);
-    }
+    private List<T> data;
+    private T value;
 
     public Selector(Context context, int w, int h) {
         super(context);
         this.context = context;
-        this.items = new ArrayList<>();
+        this.data = new ArrayList<>();
         this.height = this.dpToPx(h * 5);
         this.params = new LayoutParams(this.dpToPx(w), this.dpToPx(h));
         this.tps = new LayoutParams(this.dpToPx(w), this.dpToPx(h) - 3);
@@ -88,7 +85,7 @@ public class Selector<T> extends BasicView {
     @SuppressLint({"ResourceAsColor", "UseCompatLoadingForDrawables"})
     private void makeStructure() {
         Drawable drawable = context.getDrawable(R.drawable.common_background);
-        popupWindow = new PopupWindow(context);
+        popup = new PopupWindow(context);
         valueView = this.textView();
         this.setOrientation(VERTICAL);
         this.addView(valueView);
@@ -96,18 +93,18 @@ public class Selector<T> extends BasicView {
         listView = new ListView(context);
         LayoutParams param = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
         listView.setLayoutParams(param);
-        popupWindow.setContentView(listView);
-        popupWindow.setHeight(this.height);
-        popupWindow.setFocusable(true);
-        popupWindow.setBackgroundDrawable(drawable);
+        popup.setContentView(listView);
+        popup.setHeight(this.height);
+        popup.setFocusable(true);
+        popup.setBackgroundDrawable(drawable);
         this.setLayoutParams(params);
         this.setBackground(drawable);
         this.setOnClickListener(v -> {
-            popupWindow.setWidth(this.getWidth());
-            popupWindow.showAsDropDown(this, 0, 1);
+            popup.setWidth(this.getWidth());
+            popup.showAsDropDown(this, 0, 1);
         });
         listView.setOnItemClickListener((parent, view, position, id) -> {
-            popupWindow.dismiss();
+            popup.dismiss();
             TextView textView = (TextView) view;
             valueView.setText(textView.getText());
             Object tag = textView.getTag();
@@ -122,15 +119,15 @@ public class Selector<T> extends BasicView {
     }
 
     private void doSelect(int i, TextView valueView) {
-        T t = items.get(i);
+        T t = data.get(i);
         valueView.setTag(t);
         valueView.setText(mapper.apply(t));
     }
 
     @SuppressWarnings("unchecked")
-    public void refreshData(List<T> items) {
-        this.items = items;
-        if (!items.isEmpty() && (valueView.getText() == null || valueView.getText().length() == 0)) {
+    public void refreshData(List<T> data) {
+        this.data = data;
+        if (!data.isEmpty() && (valueView.getText() == null || valueView.getText().length() == 0)) {
             this.doSelect(0, valueView);
             value = (T) valueView.getTag();
             if (changeRun != null) {
@@ -159,12 +156,12 @@ public class Selector<T> extends BasicView {
 
         @Override
         public int getCount() {
-            return items.size();
+            return data.size();
         }
 
         @Override
         public T getItem(int pos) {
-            return items.get(pos);
+            return data.get(pos);
         }
 
         @Override

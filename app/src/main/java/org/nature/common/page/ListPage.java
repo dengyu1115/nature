@@ -11,10 +11,9 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import org.apache.commons.lang3.StringUtils;
-import org.nature.common.util.PopUtil;
+import org.nature.common.util.PopupUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Table;
-import org.nature.common.view.ViewTemplate;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -55,7 +54,6 @@ public abstract class ListPage<T> extends Page {
      * 布局页面
      */
     private void makeStructure() {
-        template = ViewTemplate.build(context);
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         page.setOrientation(LinearLayout.VERTICAL);
         height = metrics.heightPixels;
@@ -127,7 +125,7 @@ public abstract class ListPage<T> extends Page {
                 Looper.prepare();
                 String message = e.getMessage();
                 message = StringUtils.isBlank(message) ? "未知错误" : message;
-                PopUtil.alert(context, message);
+                PopupUtil.alert(context, message);
             } finally {
                 button.setClickable(true);
             }

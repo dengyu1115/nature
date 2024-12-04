@@ -17,7 +17,7 @@ import java.util.function.Supplier;
  * @version 1.0.0
  * @since 2020/6/6 11:00
  */
-public class PopUtil {
+public class PopupUtil {
 
     /**
      * 提示消息
@@ -36,7 +36,7 @@ public class PopUtil {
      * @param runnable 执行逻辑
      */
     public static void confirm(Context context, String title, String message, Runnable runnable) {
-        PopUtil.buildAlertDialog(context, title, builder -> builder.setMessage(message), runnable);
+        PopupUtil.buildAlertDialog(context, title, builder -> builder.setMessage(message), runnable);
     }
 
     /**
@@ -47,7 +47,7 @@ public class PopUtil {
      * @param runnable 执行逻辑
      */
     public static void confirm(Context context, String title, View view, Runnable runnable) {
-        PopUtil.buildAlertDialog(context, title, builder -> builder.setView(view), runnable);
+        PopupUtil.buildAlertDialog(context, title, builder -> builder.setView(view), runnable);
     }
 
     /**
@@ -58,7 +58,7 @@ public class PopUtil {
      * @param supplier 执行逻辑
      */
     public static void confirmAsync(Context context, String title, String message, Supplier<String> supplier) {
-        PopUtil.buildAsyncDialog(context, title, builder -> builder.setMessage(message), supplier);
+        PopupUtil.buildAsyncDialog(context, title, builder -> builder.setMessage(message), supplier);
     }
 
     /**

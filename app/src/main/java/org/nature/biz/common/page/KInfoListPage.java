@@ -7,7 +7,7 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.ClickUtil;
-import org.nature.common.util.PopUtil;
+import org.nature.common.util.PopupUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Table;
@@ -97,12 +97,12 @@ public class KInfoListPage extends ListPage<KInfo> {
     }
 
     private void load(KInfo info) {
-        PopUtil.alert(this.context, "加载完成，数据量：" + klineManager.load(info));
+        PopupUtil.alert(this.context, "加载完成，数据量：" + klineManager.load(info));
     }
 
     private void reload(KInfo info) {
-        PopUtil.confirm(this.context, "重载K线", "确定重载吗？",
-                () -> PopUtil.alert(this.context, "重载完成，数据量：" + klineManager.reload(info)));
+        PopupUtil.confirm(this.context, "重载K线", "确定重载吗？",
+                () -> PopupUtil.alert(this.context, "重载完成，数据量：" + klineManager.reload(info)));
     }
 
 }

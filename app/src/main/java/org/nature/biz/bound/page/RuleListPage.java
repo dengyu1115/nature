@@ -12,7 +12,7 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.ClickUtil;
-import org.nature.common.util.PopUtil;
+import org.nature.common.util.PopupUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
@@ -94,7 +94,7 @@ public class RuleListPage extends ListPage<Rule> {
      */
     private void add() {
         this.makeWindowStructure();
-        PopUtil.confirm(context, "新增", page, () -> this.doEdit(this::save));
+        PopupUtil.confirm(context, "新增", page, () -> this.doEdit(this::save));
     }
 
     /**
@@ -110,7 +110,7 @@ public class RuleListPage extends ListPage<Rule> {
         this.days.setText(String.valueOf(d.getDays()));
         this.diff.setText(d.getDiff().toPlainString());
         this.statusSel.setValue(d.getStatus());
-        PopUtil.confirm(context, "编辑-" + d.getName(), page, () -> this.doEdit(ruleMapper::merge));
+        PopupUtil.confirm(context, "编辑-" + d.getName(), page, () -> this.doEdit(ruleMapper::merge));
     }
 
     /**
@@ -141,7 +141,7 @@ public class RuleListPage extends ListPage<Rule> {
         rule.setStatus(status);
         consumer.accept(rule);
         this.refreshData();
-        PopUtil.alert(context, "编辑成功！");
+        PopupUtil.alert(context, "编辑成功！");
     }
 
     /**
@@ -157,10 +157,10 @@ public class RuleListPage extends ListPage<Rule> {
      * @param d 数据
      */
     private void delete(Rule d) {
-        PopUtil.confirm(context, "删除项目-" + d.getName(), "确认删除吗？", () -> {
+        PopupUtil.confirm(context, "删除项目-" + d.getName(), "确认删除吗？", () -> {
             ruleMapper.deleteById(d.getCode());
             this.refreshData();
-            PopUtil.alert(context, "删除成功！");
+            PopupUtil.alert(context, "删除成功！");
         });
     }
 

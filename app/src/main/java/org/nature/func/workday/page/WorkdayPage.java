@@ -14,7 +14,7 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.ClickUtil;
-import org.nature.common.util.PopUtil;
+import org.nature.common.util.PopupUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
@@ -135,7 +135,7 @@ public class WorkdayPage extends ListPage<Month> {
         this.makeWindowStructure();
         this.date.setText(day);
         this.type.setValue(type);
-        PopUtil.confirm(context, "编辑-" + day, page, () -> this.doEdit(workdayMapper::merge));
+        PopupUtil.confirm(context, "编辑-" + day, page, () -> this.doEdit(workdayMapper::merge));
     }
 
     /**
@@ -152,7 +152,7 @@ public class WorkdayPage extends ListPage<Month> {
         workday.setType(type);
         consumer.accept(workday);
         this.refreshData();
-        PopUtil.alert(context, "编辑成功！");
+        PopupUtil.alert(context, "编辑成功！");
     }
 
     /**

@@ -120,7 +120,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
      */
     private void add() {
         this.makeWindowStructure();
-        PopUtil.confirm(context, "新增", editPop, () -> this.doEdit(this::save));
+        PopupUtil.confirm(context, "新增", editPop, () -> this.doEdit(this::save));
     }
 
     /**
@@ -138,7 +138,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         this.second.setText(d.getSecond());
         this.statusSel.setValue(d.getStatus());
         String name = JobHolder.getName(d.getCode());
-        PopUtil.confirm(context, "编辑-" + name, editPop, () -> this.doEdit(configInfoMapper::merge));
+        PopupUtil.confirm(context, "编辑-" + name, editPop, () -> this.doEdit(configInfoMapper::merge));
     }
 
     /**
@@ -147,10 +147,10 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
      */
     private void delete(ConfigInfo d) {
         String name = JobHolder.getName(d.getCode());
-        PopUtil.confirm(context, "删除-" + name, "确认删除吗？", () -> {
+        PopupUtil.confirm(context, "删除-" + name, "确认删除吗？", () -> {
             configInfoMapper.deleteById(d);
             this.refreshData();
-            PopUtil.alert(context, "删除成功！");
+            PopupUtil.alert(context, "删除成功！");
         });
     }
 
@@ -175,7 +175,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         d.setSignature(Md5Util.md5(code, d.getYear(), d.getMonth(), d.getDay(), d.getHour(), d.getMinute(), d.getSecond()));
         consumer.accept(d);
         this.refreshData();
-        PopUtil.alert(context, "编辑成功！");
+        PopupUtil.alert(context, "编辑成功！");
     }
 
     /**
@@ -190,7 +190,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
 
     @Override
     protected Consumer<ConfigInfo> longClick() {
-        return i -> PopUtil.handle(context, i, this::delete, this::edit);
+        return i -> PopupUtil.handle(context, i, this::delete, this::edit);
     }
 
 }

@@ -15,7 +15,7 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.ClickUtil;
-import org.nature.common.util.PopUtil;
+import org.nature.common.util.PopupUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
@@ -118,7 +118,7 @@ public class ItemListPage extends ListPage<Item> {
      */
     private void add() {
         this.makeWindowStructure();
-        PopUtil.confirm(context, "新增项目", editPop, () -> this.doEdit(this::save));
+        PopupUtil.confirm(context, "新增项目", editPop, () -> this.doEdit(this::save));
     }
 
     /**
@@ -130,7 +130,7 @@ public class ItemListPage extends ListPage<Item> {
         this.code.setText(d.getCode());
         this.name.setText(d.getName());
         this.type.setValue(d.getType());
-        PopUtil.confirm(context, "编辑项目-" + d.getName(), editPop, () -> this.doEdit(itemMapper::merge));
+        PopupUtil.confirm(context, "编辑项目-" + d.getName(), editPop, () -> this.doEdit(itemMapper::merge));
     }
 
     /**
@@ -150,7 +150,7 @@ public class ItemListPage extends ListPage<Item> {
         item.setType(type);
         consumer.accept(item);
         this.refreshData();
-        PopUtil.alert(context, "编辑成功！");
+        PopupUtil.alert(context, "编辑成功！");
     }
 
     /**
@@ -158,10 +158,10 @@ public class ItemListPage extends ListPage<Item> {
      * @param d 数据
      */
     private void delete(Item d) {
-        PopUtil.confirm(context, "删除项目-" + d.getName(), "确认删除吗？", () -> {
+        PopupUtil.confirm(context, "删除项目-" + d.getName(), "确认删除吗？", () -> {
             itemMapper.deleteById(d);
             this.refreshData();
-            PopUtil.alert(context, "删除成功！");
+            PopupUtil.alert(context, "删除成功！");
         });
     }
 

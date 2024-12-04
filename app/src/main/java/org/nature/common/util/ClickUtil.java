@@ -73,7 +73,7 @@ public class ClickUtil {
      * @param supplier 处理逻辑
      */
     public static void onPopConfirm(View view, String title, String content, Supplier<String> supplier) {
-        ClickUtil.onClick(view, () -> PopUtil.confirmAsync(view.getContext(), title, content, supplier));
+        ClickUtil.onClick(view, () -> PopupUtil.confirmAsync(view.getContext(), title, content, supplier));
     }
 
     /**
@@ -104,11 +104,11 @@ public class ClickUtil {
             handled.run();
         } catch (Warn e) {
             // 弹出提示
-            PopUtil.alert(view.getContext(), e.getMessage());
+            PopupUtil.alert(view.getContext(), e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             // 弹出提示
-            PopUtil.alert(view.getContext(), "系统错误");
+            PopupUtil.alert(view.getContext(), "系统错误");
         } finally {
             // 恢复view可点击
             view.setClickable(true);
@@ -151,7 +151,7 @@ public class ClickUtil {
         Handler handler = new Handler(msg -> {
             String message = msg.getData().getString("data");
             if (message != null) {
-                PopUtil.alert(view.getContext(), message);
+                PopupUtil.alert(view.getContext(), message);
             } else {
                 handled.run();
             }
