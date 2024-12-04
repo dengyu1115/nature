@@ -10,7 +10,7 @@ import org.nature.common.util.ClickUtil;
 import org.nature.common.util.PopUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
-import org.nature.common.view.TableView;
+import org.nature.common.view.Table;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,18 +33,18 @@ public class NInfoListPage extends ListPage<NInfo> {
     /**
      * 表头
      */
-    private final List<TableView.D<NInfo>> ds = Arrays.asList(
-            TableView.row("名称", d -> TextUtil.text(d.getName()), C, S, NInfo::getName),
-            TableView.row("编号", d -> TextUtil.text(d.getCode()), C, C, NInfo::getCode),
-            TableView.row("明细", d -> "+", C, C, this::detail),
-            TableView.row("加载", d -> "+", C, C, this::load),
-            TableView.row("重载", d -> "+", C, C, this::reload)
+    private final List<Table.Header<NInfo>> headers = Arrays.asList(
+            Table.header("名称", d -> TextUtil.text(d.getName()), C, S, NInfo::getName),
+            Table.header("编号", d -> TextUtil.text(d.getCode()), C, C, NInfo::getCode),
+            Table.header("明细", d -> "+", C, C, this::detail),
+            Table.header("加载", d -> "+", C, C, this::load),
+            Table.header("重载", d -> "+", C, C, this::reload)
 
     );
 
     @Override
-    protected List<TableView.D<NInfo>> define() {
-        return ds;
+    protected List<Table.Header<NInfo>> define() {
+        return headers;
     }
 
     @Override
@@ -66,12 +66,12 @@ public class NInfoListPage extends ListPage<NInfo> {
 
     @Override
     protected int getTotalColumns() {
-        return ds.size();
+        return headers.size();
     }
 
     @Override
     protected int getFixedColumns() {
-        return ds.size();
+        return headers.size();
     }
 
 

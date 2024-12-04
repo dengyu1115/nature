@@ -11,7 +11,7 @@ import org.nature.common.page.ListPage;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
-import org.nature.common.view.TableView;
+import org.nature.common.view.Table;
 
 import java.util.Arrays;
 import java.util.List;
@@ -37,21 +37,21 @@ public class RateListPage extends ListPage<Rate> {
     private Button date;
 
 
-    private final List<TableView.D<Rate>> ds = Arrays.asList(
-            TableView.row("规则编号", d -> TextUtil.text(d.getRuleCode()), C, S, Rate::getRuleCode),
-            TableView.row("规则名称", d -> TextUtil.text(d.getRuleName()), C, S, Rate::getRuleName),
-            TableView.row("CODE1", d -> TextUtil.text(d.getCode1()), C, S, Rate::getCode1),
-            TableView.row("名称1", d -> TextUtil.text(d.getName1()), C, S, Rate::getName1),
-            TableView.row("CODE2", d -> TextUtil.text(d.getCode2()), C, E, Rate::getCode2),
-            TableView.row("名称2", d -> TextUtil.text(d.getName2()), C, E, Rate::getName2),
-            TableView.row("价格1", d -> TextUtil.price(d.getPrice1()), C, E, Rate::getPrice1),
-            TableView.row("价格2", d -> TextUtil.price(d.getPrice2()), C, E, Rate::getPrice2),
-            TableView.row("幅度", d -> TextUtil.hundred(d.getRatio()), C, E, Rate::getRatio)
+    private final List<Table.Header<Rate>> headers = Arrays.asList(
+            Table.header("规则编号", d -> TextUtil.text(d.getRuleCode()), C, S, Rate::getRuleCode),
+            Table.header("规则名称", d -> TextUtil.text(d.getRuleName()), C, S, Rate::getRuleName),
+            Table.header("CODE1", d -> TextUtil.text(d.getCode1()), C, S, Rate::getCode1),
+            Table.header("名称1", d -> TextUtil.text(d.getName1()), C, S, Rate::getName1),
+            Table.header("CODE2", d -> TextUtil.text(d.getCode2()), C, E, Rate::getCode2),
+            Table.header("名称2", d -> TextUtil.text(d.getName2()), C, E, Rate::getName2),
+            Table.header("价格1", d -> TextUtil.price(d.getPrice1()), C, E, Rate::getPrice1),
+            Table.header("价格2", d -> TextUtil.price(d.getPrice2()), C, E, Rate::getPrice2),
+            Table.header("幅度", d -> TextUtil.hundred(d.getRatio()), C, E, Rate::getRatio)
     );
 
     @Override
-    protected List<TableView.D<Rate>> define() {
-        return ds;
+    protected List<Table.Header<Rate>> define() {
+        return headers;
     }
 
     @Override
@@ -83,7 +83,7 @@ public class RateListPage extends ListPage<Rate> {
 
     @Override
     protected int getTotalColumns() {
-        return ds.size();
+        return headers.size();
     }
 
 }

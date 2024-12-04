@@ -18,7 +18,7 @@ import org.nature.common.util.DateUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
-import org.nature.common.view.TableView;
+import org.nature.common.view.Table;
 
 import java.util.*;
 import java.util.function.Function;
@@ -41,29 +41,29 @@ public class ProfitListPage extends ListPage<Profit> {
     private Button dateStart, dateEnd, item, rule, total;
     private Selector<String> dateRule;
 
-    private final List<TableView.D<Profit>> ds = Arrays.asList(
-            TableView.row("项目", d -> TextUtil.text(d.getName()), C, S, Profit::getName),
-            TableView.row("规则", d -> TextUtil.text(d.getRule()), C, S, Profit::getRule),
-            TableView.row("日期", C, Arrays.asList(
-                    TableView.row("开始", d -> TextUtil.text(d.getDateStart()), C, C, Profit::getDateStart),
-                    TableView.row("结束", d -> TextUtil.text(d.getDateEnd()), C, C, Profit::getDateEnd))
+    private final List<Table.Header<Profit>> headers = Arrays.asList(
+            Table.header("项目", d -> TextUtil.text(d.getName()), C, S, Profit::getName),
+            Table.header("规则", d -> TextUtil.text(d.getRule()), C, S, Profit::getRule),
+            Table.header("日期", C, Arrays.asList(
+                    Table.header("开始", d -> TextUtil.text(d.getDateStart()), C, C, Profit::getDateStart),
+                    Table.header("结束", d -> TextUtil.text(d.getDateEnd()), C, C, Profit::getDateEnd))
             ),
-            TableView.row("收益", C, Arrays.asList(
-                    TableView.row("已卖出", d -> TextUtil.amount(d.getProfitSold()), C, E, Profit::getProfitSold),
-                    TableView.row("持有中", d -> TextUtil.amount(d.getProfitHold()), C, E, Profit::getProfitHold),
-                    TableView.row("卖出+持有", d -> TextUtil.amount(d.getProfitTotal()), C, E, Profit::getProfitTotal),
-                    TableView.row("卖出/最大", d -> TextUtil.hundred(d.getProfitRatio()), C, E, Profit::getProfitRatio))
+            Table.header("收益", C, Arrays.asList(
+                    Table.header("已卖出", d -> TextUtil.amount(d.getProfitSold()), C, E, Profit::getProfitSold),
+                    Table.header("持有中", d -> TextUtil.amount(d.getProfitHold()), C, E, Profit::getProfitHold),
+                    Table.header("卖出+持有", d -> TextUtil.amount(d.getProfitTotal()), C, E, Profit::getProfitTotal),
+                    Table.header("卖出/最大", d -> TextUtil.hundred(d.getProfitRatio()), C, E, Profit::getProfitRatio))
             ),
-            TableView.row("操作次数", C, Arrays.asList(
-                    TableView.row("买入", d -> TextUtil.text(d.getTimesBuy()), C, C, Profit::getTimesBuy),
-                    TableView.row("卖出", d -> TextUtil.text(d.getTimesSell()), C, C, Profit::getTimesSell))
+            Table.header("操作次数", C, Arrays.asList(
+                    Table.header("买入", d -> TextUtil.text(d.getTimesBuy()), C, C, Profit::getTimesBuy),
+                    Table.header("卖出", d -> TextUtil.text(d.getTimesSell()), C, C, Profit::getTimesSell))
             ),
-            TableView.row("份额", d -> TextUtil.amount(d.getShareTotal()), C, E, Profit::getShareTotal),
-            TableView.row("资金", C, Arrays.asList(
-                    TableView.row("投入-最大", d -> TextUtil.amount(d.getPaidMax()), C, E, Profit::getPaidMax),
-                    TableView.row("投入-持有", d -> TextUtil.amount(d.getPaidLeft()), C, E, Profit::getPaidTotal),
-                    TableView.row("投入-总额", d -> TextUtil.amount(d.getPaidTotal()), C, E, Profit::getTimesSell),
-                    TableView.row("回收-总额", d -> TextUtil.amount(d.getReturned()), C, E, Profit::getReturned))
+            Table.header("份额", d -> TextUtil.amount(d.getShareTotal()), C, E, Profit::getShareTotal),
+            Table.header("资金", C, Arrays.asList(
+                    Table.header("投入-最大", d -> TextUtil.amount(d.getPaidMax()), C, E, Profit::getPaidMax),
+                    Table.header("投入-持有", d -> TextUtil.amount(d.getPaidLeft()), C, E, Profit::getPaidTotal),
+                    Table.header("投入-总额", d -> TextUtil.amount(d.getPaidTotal()), C, E, Profit::getTimesSell),
+                    Table.header("回收-总额", d -> TextUtil.amount(d.getReturned()), C, E, Profit::getReturned))
             )
     );
 
@@ -79,8 +79,8 @@ public class ProfitListPage extends ListPage<Profit> {
     private Map<String, String> nameMap;
 
     @Override
-    protected List<TableView.D<Profit>> define() {
-        return ds;
+    protected List<Table.Header<Profit>> define() {
+        return headers;
     }
 
     @Override

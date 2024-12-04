@@ -15,7 +15,8 @@ import org.nature.common.util.PopUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
-import org.nature.common.view.TableView;
+import org.nature.common.view.Table;
+import org.nature.common.view.Table.Header;
 import org.nature.common.view.ViewTemplate;
 
 import java.math.BigDecimal;
@@ -60,19 +61,19 @@ public class ItemListPage extends ListPage<Item> {
     /**
      * 表头
      */
-    private final List<TableView.D<Item>> ds = Arrays.asList(
-            TableView.row("名称", d -> TextUtil.text(d.getName()), C, S, Item::getName),
-            TableView.row("编号", d -> TextUtil.text(d.getCode()), C, C, Item::getCode),
-            TableView.row("类型", d -> TextUtil.text(d.getType()), C, C, Item::getType),
-            TableView.row("基金编号", d -> TextUtil.text(d.getFund()), C, C, Item::getType),
-            TableView.row("比例系数", d -> TextUtil.text(d.getRatio()), C, C, Item::getRatio),
-            TableView.row("编辑", d -> "+", C, C, this::edit),
-            TableView.row("删除", d -> "-", C, C, this::delete)
+    private final List<Header<Item>> headers = Arrays.asList(
+            Table.header("名称", d -> TextUtil.text(d.getName()), C, S, Item::getName),
+            Table.header("编号", d -> TextUtil.text(d.getCode()), C, C, Item::getCode),
+            Table.header("类型", d -> TextUtil.text(d.getType()), C, C, Item::getType),
+            Table.header("基金编号", d -> TextUtil.text(d.getFund()), C, C, Item::getType),
+            Table.header("比例系数", d -> TextUtil.text(d.getRatio()), C, C, Item::getRatio),
+            Table.header("编辑", d -> "+", C, C, this::edit),
+            Table.header("删除", d -> "-", C, C, this::delete)
     );
 
     @Override
-    protected List<TableView.D<Item>> define() {
-        return ds;
+    protected List<Header<Item>> define() {
+        return headers;
     }
 
     @Override
@@ -93,12 +94,12 @@ public class ItemListPage extends ListPage<Item> {
 
     @Override
     protected int getTotalColumns() {
-        return ds.size();
+        return headers.size();
     }
 
     @Override
     protected int getFixedColumns() {
-        return ds.size();
+        return headers.size();
     }
 
     /**
@@ -167,13 +168,13 @@ public class ItemListPage extends ListPage<Item> {
      */
     private void makeWindowStructure() {
         ViewTemplate t = template;
-        editPop = t.linearPage(Gravity.CENTER,
+        editPop = t.block(Gravity.CENTER,
                 t.line(L_W, L_H, t.textView("选择复制:", L_W_T, L_H), item = t.selector(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("名称：", L_W_T, L_H), name = t.editText(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("编号：", L_W_T, L_H), code = t.editText(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("名称：", L_W_T, L_H), name = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("编号：", L_W_T, L_H), code = t.input(L_W_C, L_H)),
                 t.line(L_W, L_H, t.textView("类型：", L_W_T, L_H), type = t.selector(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("基金编号：", L_W_T, L_H), fund = t.editText(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("比例系数：", L_W_T, L_H), ratio = t.numeric(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("基金编号：", L_W_T, L_H), fund = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("比例系数：", L_W_T, L_H), ratio = t.decimal(L_W_C, L_H)),
                 t.line(L_W, L_H)
         );
         type.mapper(i -> i).init().refreshData(Arrays.asList("0", "1"));

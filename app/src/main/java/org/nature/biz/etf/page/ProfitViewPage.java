@@ -9,7 +9,7 @@ import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.DateUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.TableView;
+import org.nature.common.view.Table;
 import org.nature.common.view.SearchBar;
 
 import java.util.Arrays;
@@ -27,21 +27,21 @@ public class ProfitViewPage extends ListPage<ProfitView> {
     @Injection
     private ProfitManager profitManager;
 
-    private final List<TableView.D<ProfitView>> ds = Arrays.asList(
-            TableView.row("项目", d -> TextUtil.text(d.getTitle()), C, C),
-            TableView.row("子项目1", d -> TextUtil.text(d.getTitle1()), C, C),
-            TableView.row("值", d -> TextUtil.text(d.getValue1()), C, E),
-            TableView.row("子项目2", d -> TextUtil.text(d.getTitle2()), C, C),
-            TableView.row("值", d -> TextUtil.text(d.getValue2()), C, E),
-            TableView.row("子项目3", d -> TextUtil.text(d.getTitle3()), C, C),
-            TableView.row("值", d -> TextUtil.text(d.getValue3()), C, E)
+    private final List<Table.Header<ProfitView>> headers = Arrays.asList(
+            Table.header("项目", d -> TextUtil.text(d.getTitle()), C, C),
+            Table.header("子项目1", d -> TextUtil.text(d.getTitle1()), C, C),
+            Table.header("值", d -> TextUtil.text(d.getValue1()), C, E),
+            Table.header("子项目2", d -> TextUtil.text(d.getTitle2()), C, C),
+            Table.header("值", d -> TextUtil.text(d.getValue2()), C, E),
+            Table.header("子项目3", d -> TextUtil.text(d.getTitle3()), C, C),
+            Table.header("值", d -> TextUtil.text(d.getValue3()), C, E)
     );
 
     private Button dateBtn;
 
     @Override
-    protected List<TableView.D<ProfitView>> define() {
-        return ds;
+    protected List<Table.Header<ProfitView>> define() {
+        return headers;
     }
 
     @Override

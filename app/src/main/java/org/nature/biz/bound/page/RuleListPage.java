@@ -16,7 +16,7 @@ import org.nature.common.util.PopUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
-import org.nature.common.view.TableView;
+import org.nature.common.view.Table;
 import org.nature.common.view.ViewTemplate;
 
 import java.math.BigDecimal;
@@ -45,23 +45,23 @@ public class RuleListPage extends ListPage<Rule> {
     private Selector<String> statusSel;
     private Button add;
 
-    private final List<TableView.D<Rule>> ds = Arrays.asList(
-            TableView.row("编号", d -> TextUtil.text(d.getCode()), C, S, Rule::getCode),
-            TableView.row("名称", d -> TextUtil.text(d.getName()), C, S, Rule::getName),
-            TableView.row("开始日期", d -> TextUtil.text(d.getDateStart()), C, C, Rule::getDateStart),
-            TableView.row("结束日期", d -> TextUtil.text(d.getDateEnd()), C, C, Rule::getDateEnd),
-            TableView.row("数据天数", d -> TextUtil.text(d.getDays()), C, C, Rule::getDays),
-            TableView.row("出发差值", d -> TextUtil.text(d.getDiff()), C, C, Rule::getDiff),
-            TableView.row("状态", d -> TextUtil.text(this.statusName(d.getStatus())), C, C, Rule::getStatus),
-            TableView.row("项目集合", d -> "+", C, C, this::items),
-            TableView.row("计算", d -> "+", C, C, this::calc),
-            TableView.row("编辑", d -> "+", C, C, this::edit),
-            TableView.row("删除", d -> "-", C, C, this::delete)
+    private final List<Table.Header<Rule>> headers = Arrays.asList(
+            Table.header("编号", d -> TextUtil.text(d.getCode()), C, S, Rule::getCode),
+            Table.header("名称", d -> TextUtil.text(d.getName()), C, S, Rule::getName),
+            Table.header("开始日期", d -> TextUtil.text(d.getDateStart()), C, C, Rule::getDateStart),
+            Table.header("结束日期", d -> TextUtil.text(d.getDateEnd()), C, C, Rule::getDateEnd),
+            Table.header("数据天数", d -> TextUtil.text(d.getDays()), C, C, Rule::getDays),
+            Table.header("出发差值", d -> TextUtil.text(d.getDiff()), C, C, Rule::getDiff),
+            Table.header("状态", d -> TextUtil.text(this.statusName(d.getStatus())), C, C, Rule::getStatus),
+            Table.header("项目集合", d -> "+", C, C, this::items),
+            Table.header("计算", d -> "+", C, C, this::calc),
+            Table.header("编辑", d -> "+", C, C, this::edit),
+            Table.header("删除", d -> "-", C, C, this::delete)
     );
 
     @Override
-    protected List<TableView.D<Rule>> define() {
-        return ds;
+    protected List<Table.Header<Rule>> define() {
+        return headers;
     }
 
     @Override
@@ -177,13 +177,13 @@ public class RuleListPage extends ListPage<Rule> {
      */
     private void makeWindowStructure() {
         ViewTemplate t = template;
-        page = t.linearPage(Gravity.CENTER,
-                t.line(L_W, L_H, t.textView("编号：", L_W_T, L_H), code = t.editText(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("名称：", L_W_T, L_H), name = t.editText(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("开始日期：", L_W_T, L_H), dateStart = t.editText(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("结束日期：", L_W_T, L_H), dateEnd = t.editText(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("数据天数：", L_W_T, L_H), days = t.integer(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("触发差值：", L_W_T, L_H), diff = t.numeric(L_W_C, L_H)),
+        page = t.block(Gravity.CENTER,
+                t.line(L_W, L_H, t.textView("编号：", L_W_T, L_H), code = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("名称：", L_W_T, L_H), name = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("开始日期：", L_W_T, L_H), dateStart = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("结束日期：", L_W_T, L_H), dateEnd = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("数据天数：", L_W_T, L_H), days = t.number(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("触发差值：", L_W_T, L_H), diff = t.decimal(L_W_C, L_H)),
                 t.line(L_W, L_H, t.textView("状态：", L_W_T, L_H), statusSel = t.selector(L_W_C, L_H))
         );
         statusSel.init().mapper(this::statusName).refreshData(Arrays.asList("1", "0"));

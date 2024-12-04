@@ -16,7 +16,7 @@ import org.nature.common.util.PopUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
-import org.nature.common.view.TableView;
+import org.nature.common.view.Table;
 import org.nature.common.view.ViewTemplate;
 
 import java.math.BigDecimal;
@@ -46,24 +46,24 @@ public class RuleListPage extends ListPage<Rule> {
     private Selector<String> statusSel, typeSel;
     private Button add;
 
-    private final List<TableView.D<Rule>> ds = Arrays.asList(
-            TableView.row("名称", d -> TextUtil.text(d.getName()), C, S, Rule::getName),
-            TableView.row("规则类型", d -> TextUtil.text(this.typeName(d.getRuleType())), C, C, Rule::getRuleType),
-            TableView.row("状态", d -> TextUtil.text(this.statusName(d.getStatus())), C, C, Rule::getStatus),
-            TableView.row("编辑", d -> "+", C, C, this::edit),
-            TableView.row("删除", d -> "-", C, C, this::delete),
-            TableView.row("持仓计算", d -> "计算", C, C, this::calcProfit),
-            TableView.row("持仓查看", d -> "查看", C, C, this::showHold),
-            TableView.row("收益查看", d -> "查看", C, C, this::showProfit),
-            TableView.row("开始日期", d -> TextUtil.text(d.getDate()), C, C, Rule::getDate),
-            TableView.row("金额基数", d -> TextUtil.text(d.getBase()), C, C, Rule::getBase),
-            TableView.row("波动比率", d -> TextUtil.text(d.getRatio()), C, C, Rule::getRatio),
-            TableView.row("扩大幅度", d -> TextUtil.text(d.getExpansion()), C, C, Rule::getExpansion)
+    private final List<Table.Header<Rule>> headers = Arrays.asList(
+            Table.header("名称", d -> TextUtil.text(d.getName()), C, S, Rule::getName),
+            Table.header("规则类型", d -> TextUtil.text(this.typeName(d.getRuleType())), C, C, Rule::getRuleType),
+            Table.header("状态", d -> TextUtil.text(this.statusName(d.getStatus())), C, C, Rule::getStatus),
+            Table.header("编辑", d -> "+", C, C, this::edit),
+            Table.header("删除", d -> "-", C, C, this::delete),
+            Table.header("持仓计算", d -> "计算", C, C, this::calcProfit),
+            Table.header("持仓查看", d -> "查看", C, C, this::showHold),
+            Table.header("收益查看", d -> "查看", C, C, this::showProfit),
+            Table.header("开始日期", d -> TextUtil.text(d.getDate()), C, C, Rule::getDate),
+            Table.header("金额基数", d -> TextUtil.text(d.getBase()), C, C, Rule::getBase),
+            Table.header("波动比率", d -> TextUtil.text(d.getRatio()), C, C, Rule::getRatio),
+            Table.header("扩大幅度", d -> TextUtil.text(d.getExpansion()), C, C, Rule::getExpansion)
     );
 
     @Override
-    protected List<TableView.D<Rule>> define() {
-        return ds;
+    protected List<Table.Header<Rule>> define() {
+        return headers;
     }
 
     @Override
@@ -194,12 +194,12 @@ public class RuleListPage extends ListPage<Rule> {
      */
     private void makeWindowStructure() {
         ViewTemplate t = template;
-        page = t.linearPage(Gravity.CENTER,
-                t.line(L_W, L_H, t.textView("名称：", L_W_T, L_H), name = t.editText(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("开始日期：", L_W_T, L_H), date = t.editText(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("金额基数：", L_W_T, L_H), base = t.numeric(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("波动比率：", L_W_T, L_H), ratio = t.numeric(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("扩大幅度：", L_W_T, L_H), expansion = t.numeric(L_W_C, L_H)),
+        page = t.block(Gravity.CENTER,
+                t.line(L_W, L_H, t.textView("名称：", L_W_T, L_H), name = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("开始日期：", L_W_T, L_H), date = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("金额基数：", L_W_T, L_H), base = t.decimal(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("波动比率：", L_W_T, L_H), ratio = t.decimal(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("扩大幅度：", L_W_T, L_H), expansion = t.decimal(L_W_C, L_H)),
                 t.line(L_W, L_H, t.textView("状态：", L_W_T, L_H), statusSel = t.selector(L_W_C, L_H)),
                 t.line(L_W, L_H, t.textView("规则类型：", L_W_T, L_H), typeSel = t.selector(L_W_C, L_H))
         );

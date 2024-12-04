@@ -14,7 +14,7 @@ import org.nature.common.page.ListPage;
 import org.nature.common.util.*;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
-import org.nature.common.view.TableView;
+import org.nature.common.view.Table;
 import org.nature.common.view.ViewTemplate;
 import org.nature.func.job.enums.Status;
 import org.nature.func.job.mapper.ConfigInfoMapper;
@@ -47,21 +47,21 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
     private Selector<String> jobSel, statusSel;
     private EditText year, month, day, hour, minute, second;
 
-    private final List<TableView.D<ConfigInfo>> ds = Arrays.asList(
-            TableView.row("名称", d -> JobHolder.getName(d.getCode()), C, S, Sorter.nullsLast(d -> JobHolder.getName(d.getCode()))),
-            TableView.row("编号", d -> TextUtil.text(d.getCode()), C, S, ConfigInfo::getCode),
-            TableView.row("状态", d -> TextUtil.text(Status.name(d.getStatus())), C, C, ConfigInfo::getStatus),
-            TableView.row("年", d -> TextUtil.text(d.getYear()), C, C, ConfigInfo::getYear),
-            TableView.row("月", d -> TextUtil.text(d.getMonth()), C, C, ConfigInfo::getMonth),
-            TableView.row("日", d -> TextUtil.text(d.getDay()), C, C, ConfigInfo::getDay),
-            TableView.row("时", d -> TextUtil.text(d.getHour()), C, C, ConfigInfo::getHour),
-            TableView.row("分", d -> TextUtil.text(d.getMinute()), C, C, ConfigInfo::getMinute),
-            TableView.row("秒", d -> TextUtil.text(d.getSecond()), C, C, ConfigInfo::getSecond)
+    private final List<Table.Header<ConfigInfo>> headers = Arrays.asList(
+            Table.header("名称", d -> JobHolder.getName(d.getCode()), C, S, Sorter.nullsLast(d -> JobHolder.getName(d.getCode()))),
+            Table.header("编号", d -> TextUtil.text(d.getCode()), C, S, ConfigInfo::getCode),
+            Table.header("状态", d -> TextUtil.text(Status.name(d.getStatus())), C, C, ConfigInfo::getStatus),
+            Table.header("年", d -> TextUtil.text(d.getYear()), C, C, ConfigInfo::getYear),
+            Table.header("月", d -> TextUtil.text(d.getMonth()), C, C, ConfigInfo::getMonth),
+            Table.header("日", d -> TextUtil.text(d.getDay()), C, C, ConfigInfo::getDay),
+            Table.header("时", d -> TextUtil.text(d.getHour()), C, C, ConfigInfo::getHour),
+            Table.header("分", d -> TextUtil.text(d.getMinute()), C, C, ConfigInfo::getMinute),
+            Table.header("秒", d -> TextUtil.text(d.getSecond()), C, C, ConfigInfo::getSecond)
     );
 
     @Override
-    protected List<TableView.D<ConfigInfo>> define() {
-        return ds;
+    protected List<Table.Header<ConfigInfo>> define() {
+        return headers;
     }
 
     @Override
@@ -101,14 +101,14 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
      */
     private void makeWindowStructure() {
         ViewTemplate t = template;
-        editPop = t.linearPage(Gravity.CENTER,
+        editPop = t.block(Gravity.CENTER,
                 t.line(L_W, L_H, t.textView("任务：", L_W_T, L_H), jobSel = t.selector(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("年：", L_W_T, L_H), year = t.editText(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("月：", L_W_T, L_H), month = t.editText(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("日：", L_W_T, L_H), day = t.editText(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("时：", L_W_T, L_H), hour = t.editText(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("分：", L_W_T, L_H), minute = t.editText(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("秒：", L_W_T, L_H), second = t.editText(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("年：", L_W_T, L_H), year = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("月：", L_W_T, L_H), month = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("日：", L_W_T, L_H), day = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("时：", L_W_T, L_H), hour = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("分：", L_W_T, L_H), minute = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("秒：", L_W_T, L_H), second = t.input(L_W_C, L_H)),
                 t.line(L_W, L_H, t.textView("状态：", L_W_T, L_H), statusSel = t.selector(L_W_C, L_H))
         );
         jobSel.mapper(JobHolder::getName).init().refreshData(JobHolder.jobs());

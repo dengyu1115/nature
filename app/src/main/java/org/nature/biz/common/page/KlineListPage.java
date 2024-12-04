@@ -9,7 +9,7 @@ import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
-import org.nature.common.view.TableView;
+import org.nature.common.view.Table;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,20 +28,20 @@ public class KlineListPage extends ListPage<Kline> {
 
     private Button chart;
 
-    private final List<TableView.D<Kline>> ds = Arrays.asList(
-            TableView.row("CODE", d -> TextUtil.text(d.getCode()), C, S, Kline::getCode),
-            TableView.row("日期", d -> TextUtil.text(d.getDate()), C, S, Kline::getDate),
-            TableView.row("交易量", d -> TextUtil.amount(d.getShare()), C, E, Kline::getShare),
-            TableView.row("交易额", d -> TextUtil.amount(d.getAmount()), C, E, Kline::getAmount),
-            TableView.row("最新", d -> TextUtil.price(d.getLatest()), C, E, Kline::getLatest),
-            TableView.row("今开", d -> TextUtil.price(d.getOpen()), C, E, Kline::getOpen),
-            TableView.row("最高", d -> TextUtil.price(d.getHigh()), C, E, Kline::getHigh),
-            TableView.row("最低", d -> TextUtil.price(d.getLow()), C, E, Kline::getLow)
+    private final List<Table.Header<Kline>> headers = Arrays.asList(
+            Table.header("CODE", d -> TextUtil.text(d.getCode()), C, S, Kline::getCode),
+            Table.header("日期", d -> TextUtil.text(d.getDate()), C, S, Kline::getDate),
+            Table.header("交易量", d -> TextUtil.amount(d.getShare()), C, E, Kline::getShare),
+            Table.header("交易额", d -> TextUtil.amount(d.getAmount()), C, E, Kline::getAmount),
+            Table.header("最新", d -> TextUtil.price(d.getLatest()), C, E, Kline::getLatest),
+            Table.header("今开", d -> TextUtil.price(d.getOpen()), C, E, Kline::getOpen),
+            Table.header("最高", d -> TextUtil.price(d.getHigh()), C, E, Kline::getHigh),
+            Table.header("最低", d -> TextUtil.price(d.getLow()), C, E, Kline::getLow)
     );
 
     @Override
-    protected List<TableView.D<Kline>> define() {
-        return ds;
+    protected List<Table.Header<Kline>> define() {
+        return headers;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class KlineListPage extends ListPage<Kline> {
 
     @Override
     protected int getTotalColumns() {
-        return ds.size();
+        return headers.size();
     }
 
 }

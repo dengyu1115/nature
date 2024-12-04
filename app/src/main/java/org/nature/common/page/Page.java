@@ -3,6 +3,7 @@ package org.nature.common.page;
 import android.content.Context;
 import android.view.View;
 import android.widget.LinearLayout;
+import org.nature.common.view.ViewTemplate;
 
 /**
  * 页面基类
@@ -14,6 +15,8 @@ public abstract class Page {
 
     protected static final int MATCH_PARENT = LinearLayout.LayoutParams.MATCH_PARENT;
     protected static final int C = 0, S = 1, E = 2;
+    protected Context context;
+    protected ViewTemplate template;
     private LinearLayout page;
     private BasicPage basic;
     private Object param;
@@ -24,7 +27,8 @@ public abstract class Page {
      */
     public void doCreate(BasicPage basic) {
         this.basic = basic;
-        Context context = basic.getContext();
+        this.context = basic.getContext();
+        this.template = ViewTemplate.build(context);
         this.page = new LinearLayout(context);
         this.makeStructure(this.page, context);
     }

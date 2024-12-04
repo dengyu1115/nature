@@ -19,7 +19,7 @@ import org.nature.common.util.PopUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
-import org.nature.common.view.TableView;
+import org.nature.common.view.Table;
 import org.nature.common.view.ViewTemplate;
 
 import java.util.Arrays;
@@ -65,19 +65,19 @@ public class ItemListPage extends ListPage<Item> {
     /**
      * 表头
      */
-    private final List<TableView.D<Item>> ds = Arrays.asList(
-            TableView.row("名称", d -> TextUtil.text(d.getName()), C, S, Item::getName),
-            TableView.row("编号", d -> TextUtil.text(d.getCode()), C, C, Item::getCode),
-            TableView.row("类型", d -> TextUtil.text(d.getType()), C, C, Item::getType),
-            TableView.row("编辑", d -> "+", C, C, this::edit),
-            TableView.row("删除", d -> "-", C, C, this::delete),
-            TableView.row("K线查看", d -> "查看", C, C, this::showKline),
-            TableView.row("规则查看", d -> "查看", C, C, this::showRule)
+    private final List<Table.Header<Item>> headers = Arrays.asList(
+            Table.header("名称", d -> TextUtil.text(d.getName()), C, S, Item::getName),
+            Table.header("编号", d -> TextUtil.text(d.getCode()), C, C, Item::getCode),
+            Table.header("类型", d -> TextUtil.text(d.getType()), C, C, Item::getType),
+            Table.header("编辑", d -> "+", C, C, this::edit),
+            Table.header("删除", d -> "-", C, C, this::delete),
+            Table.header("K线查看", d -> "查看", C, C, this::showKline),
+            Table.header("规则查看", d -> "查看", C, C, this::showRule)
     );
 
     @Override
-    protected List<TableView.D<Item>> define() {
-        return ds;
+    protected List<Table.Header<Item>> define() {
+        return headers;
     }
 
     @Override
@@ -93,7 +93,7 @@ public class ItemListPage extends ListPage<Item> {
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
         searchBar.addConditionView(add = template.button("+", 30, 30));
-        searchBar.addConditionView(keyword = template.editText(100, 30));
+        searchBar.addConditionView(keyword = template.input(100, 30));
         searchBar.addConditionView(calcRule = template.button("规则计算", 80, 30));
     }
 
@@ -105,7 +105,7 @@ public class ItemListPage extends ListPage<Item> {
 
     @Override
     protected int getTotalColumns() {
-        return ds.size();
+        return headers.size();
     }
 
     @Override
@@ -198,9 +198,9 @@ public class ItemListPage extends ListPage<Item> {
      */
     private void makeWindowStructure() {
         ViewTemplate t = template;
-        editPop = t.linearPage(Gravity.CENTER,
-                t.line(L_W, L_H, t.textView("编号：", L_W_T, L_H), code = t.editText(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("名称：", L_W_T, L_H), name = t.editText(L_W_C, L_H)),
+        editPop = t.block(Gravity.CENTER,
+                t.line(L_W, L_H, t.textView("编号：", L_W_T, L_H), code = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.textView("名称：", L_W_T, L_H), name = t.input(L_W_C, L_H)),
                 t.line(L_W, L_H, t.textView("类型：", L_W_T, L_H), type = t.selector(L_W_C, L_H)),
                 t.line(L_W, L_H)
         );

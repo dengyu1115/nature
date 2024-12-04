@@ -18,7 +18,7 @@ import org.nature.common.util.PopUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
-import org.nature.common.view.TableView;
+import org.nature.common.view.Table;
 import org.nature.common.view.ViewTemplate;
 import org.nature.func.workday.manager.WorkdayManager;
 import org.nature.func.workday.mapper.WorkdayMapper;
@@ -65,18 +65,18 @@ public class WorkdayPage extends ListPage<Month> {
     private EditText date;
 
     @Override
-    protected List<TableView.D<Month>> define() {
-        List<TableView.D<Month>> ds = new ArrayList<>();
-        ds.add(TableView.row("月份", i -> TextUtil.text(i.getMonth()), C, C, Month::getMonth));
+    protected List<Table.Header<Month>> define() {
+        List<Table.Header<Month>> headers = new ArrayList<>();
+        headers.add(Table.header("月份", i -> TextUtil.text(i.getMonth()), C, C, Month::getMonth));
         for (int i = 1; i < 32; i++) {
             String day = String.format("%02d", i);
             Consumer<Month> monthConsumer = d -> {
                 String date = d.getMonth() + day;
                 this.edit(d.getDateType(date), date);
             };
-            ds.add(TableView.row(day, d -> TextUtil.text(d.getDateType(d.getMonth() + day)), C, C, monthConsumer));
+            headers.add(Table.header(day, d -> TextUtil.text(d.getDateType(d.getMonth() + day)), C, C, monthConsumer));
         }
-        return ds;
+        return headers;
     }
 
     @Override
@@ -160,8 +160,8 @@ public class WorkdayPage extends ListPage<Month> {
      */
     private void makeWindowStructure() {
         ViewTemplate t = template;
-        page = t.linearPage(Gravity.CENTER,
-                t.line(L_W, L_H, t.textView("日期：", L_W_T, L_H), date = t.editText(L_W_C, L_H)),
+        page = t.block(Gravity.CENTER,
+                t.line(L_W, L_H, t.textView("日期：", L_W_T, L_H), date = t.input(L_W_C, L_H)),
                 t.line(L_W, L_H, t.textView("类型：", L_W_T, L_H), type = t.selector(L_W_C, L_H))
         );
         date.setFocusable(false);

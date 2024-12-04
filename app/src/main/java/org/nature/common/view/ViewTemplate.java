@@ -15,6 +15,7 @@ import org.nature.R;
 import org.nature.common.constant.Const;
 import org.nature.common.util.DateUtil;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -105,8 +106,8 @@ public class ViewTemplate {
      * @param h 高
      * @return EditText
      */
-    public EditText numeric(int w, int h) {
-        EditText editText = this.editText(w, h);
+    public EditText decimal(int w, int h) {
+        EditText editText = this.input(w, h);
         editText.setInputType(TYPE_CLASS_NUMBER | TYPE_NUMBER_FLAG_DECIMAL | TYPE_NUMBER_FLAG_SIGNED);
         return editText;
     }
@@ -117,8 +118,8 @@ public class ViewTemplate {
      * @param h 高
      * @return EditText
      */
-    public EditText integer(int w, int h) {
-        EditText editText = this.editText(w, h);
+    public EditText number(int w, int h) {
+        EditText editText = this.input(w, h);
         editText.setInputType(TYPE_CLASS_NUMBER | TYPE_NUMBER_FLAG_SIGNED);
         return editText;
     }
@@ -129,7 +130,7 @@ public class ViewTemplate {
      * @param h 高
      * @return EditText
      */
-    public EditText editText(int w, int h) {
+    public EditText input(int w, int h) {
         EditText editText = new EditText(context);
         float density = context.getResources().getDisplayMetrics().density;
         int width = (int) (w * density + 0.5f);
@@ -189,10 +190,22 @@ public class ViewTemplate {
         int height = (int) (h * density + 0.5f);
         LayoutParams param = new LayoutParams(width, height);
         line.setLayoutParams(param);
-        for (View view : views) {
-            line.addView(view);
-        }
+        Arrays.stream(views).forEach(line::addView);
         return line;
+    }
+
+    /**
+     * 线性布局
+     * @param gravity 排布方式
+     * @param views   子级view集合
+     * @return LinearLayout
+     */
+    public LinearLayout block(int gravity, View... views) {
+        LinearLayout block = new LinearLayout(context);
+        block.setOrientation(LinearLayout.VERTICAL);
+        block.setGravity(gravity);
+        Arrays.stream(views).forEach(block::addView);
+        return block;
     }
 
     /**
@@ -211,22 +224,6 @@ public class ViewTemplate {
         line.setLayoutParams(param);
         line.setOrientation(LinearLayout.VERTICAL);
         return line;
-    }
-
-    /**
-     * 线性布局
-     * @param gravity 排布方式
-     * @param views   子级view集合
-     * @return LinearLayout
-     */
-    public LinearLayout linearPage(int gravity, View... views) {
-        LinearLayout page = new LinearLayout(context);
-        page.setOrientation(LinearLayout.VERTICAL);
-        page.setGravity(gravity);
-        for (View view : views) {
-            page.addView(view);
-        }
-        return page;
     }
 
     /**

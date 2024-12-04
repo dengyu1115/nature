@@ -9,7 +9,7 @@ import org.nature.common.page.ListPage;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
-import org.nature.common.view.TableView;
+import org.nature.common.view.Table;
 
 import java.util.Arrays;
 import java.util.List;
@@ -34,17 +34,17 @@ public class ResultListPage extends ListPage<Result> {
     /**
      * 表头
      */
-    private final List<TableView.D<Result>> ds = Arrays.asList(
-            TableView.row("规则", d -> TextUtil.text(d.getRule()), C, S, Result::getRule),
-            TableView.row("名称", d -> TextUtil.text(d.getName()), C, S, Result::getName),
-            TableView.row("编号", d -> TextUtil.text(d.getCode()), C, C, Result::getCode),
-            TableView.row("类型", d -> TextUtil.text(d.getType()), C, C, Result::getType),
-            TableView.row("涨幅", d -> TextUtil.hundred(d.getRatio()), C, E, Result::getRatio)
+    private final List<Table.Header<Result>> headers = Arrays.asList(
+            Table.header("规则", d -> TextUtil.text(d.getRule()), C, S, Result::getRule),
+            Table.header("名称", d -> TextUtil.text(d.getName()), C, S, Result::getName),
+            Table.header("编号", d -> TextUtil.text(d.getCode()), C, C, Result::getCode),
+            Table.header("类型", d -> TextUtil.text(d.getType()), C, C, Result::getType),
+            Table.header("涨幅", d -> TextUtil.hundred(d.getRatio()), C, E, Result::getRatio)
     );
 
     @Override
-    protected List<TableView.D<Result>> define() {
-        return ds;
+    protected List<Table.Header<Result>> define() {
+        return headers;
     }
 
     @Override
@@ -65,12 +65,12 @@ public class ResultListPage extends ListPage<Result> {
 
     @Override
     protected int getTotalColumns() {
-        return ds.size();
+        return headers.size();
     }
 
     @Override
     protected int getFixedColumns() {
-        return ds.size();
+        return headers.size();
     }
 
 }

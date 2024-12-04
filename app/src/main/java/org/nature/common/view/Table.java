@@ -30,7 +30,7 @@ import static org.nature.common.constant.Const.PAGE_WIDTH;
  * @since 2024/1/5
  */
 @SuppressLint({"DefaultLocale", "ClickableViewAccessibility"})
-public class TableView<T> extends BasicView {
+public class Table<T> extends BasicView {
 
     public static final int HEIGHT = 33, PADDING = 8, SCROLL_BAR_SIZE = 3;
     private final int columns, fixed;
@@ -63,7 +63,7 @@ public class TableView<T> extends BasicView {
     /**
      * 表格定义
      */
-    private List<D<T>> ds;
+    private List<Header<T>> headers;
     /**
      * 表格需要展示的数据集合
      */
@@ -84,15 +84,15 @@ public class TableView<T> extends BasicView {
 
     private Consumer<T> longClick;
 
-    public TableView(Context context) {
+    public Table(Context context) {
         this(context, 3, 1);
     }
 
-    public TableView(Context context, int columns, int fixed) {
+    public Table(Context context, int columns, int fixed) {
         this(context, columns, fixed, 1);
     }
 
-    public TableView(Context context, int columns, int fixed, float widthRate) {
+    public Table(Context context, int columns, int fixed, float widthRate) {
         super(context);
         this.fixed = fixed;
         this.widthRate = widthRate;
@@ -102,10 +102,10 @@ public class TableView<T> extends BasicView {
 
     /**
      * 定义
-     * @param ds 列定义集合
+     * @param headers 列定义集合
      */
-    public void define(List<D<T>> ds) {
-        this.ds = ds;
+    public void define(List<Header<T>> headers) {
+        this.headers = headers;
         this.init();
     }
 
@@ -166,11 +166,11 @@ public class TableView<T> extends BasicView {
         scrollView.addView(innerLine);
         horizontalScrollViews.add(scrollView);
         this.scrollFix(scrollView);
-        for (D<T> d : ds) {
-            List<D<T>> ds = d.ds;
+        for (Header<T> header : headers) {
+            List<Header<T>> headers = header.headers;
             // 单层表头处理
-            if (ds == null || ds.isEmpty()) {
-                TextView content = this.titleView(d);
+            if (headers == null || headers.isEmpty()) {
+                TextView content = this.titleView(header);
                 if (titleGroup < fixed - 1) {
                     line.addView(content);
                     line.addView(this.vDivider());
@@ -178,7 +178,7 @@ public class TableView<T> extends BasicView {
                     line.addView(content);
                     line.addView(this.vDivider());
                     line.addView(scrollView);
-                } else if (titleGroup == this.ds.size() - 1) {
+                } else if (titleGroup == this.headers.size() - 1) {
                     innerLine.addView(content);
                 } else {
                     innerLine.addView(content);
@@ -186,8 +186,8 @@ public class TableView<T> extends BasicView {
                 }
             } else {
                 // 多级表头处理
-                if (StringUtils.isNotBlank(d.title)) {
-                    LinearLayout rect = this.rectView(d.title, d.titleAlign, d.ds);
+                if (StringUtils.isNotBlank(header.title)) {
+                    LinearLayout rect = this.rectView(header.title, header.titleAlign, header.headers);
                     if (titleGroup < fixed - 1) {
                         line.addView(rect);
                         line.addView(this.vDivider());
@@ -195,23 +195,23 @@ public class TableView<T> extends BasicView {
                         line.addView(rect);
                         line.addView(this.vDivider());
                         line.addView(scrollView);
-                    } else if (titleGroup == this.ds.size() - 1) {
+                    } else if (titleGroup == this.headers.size() - 1) {
                         innerLine.addView(rect);
                     } else {
                         innerLine.addView(rect);
                         innerLine.addView(this.vDivider());
                     }
                 } else if (titleGroup < fixed - 1) {
-                    for (D<T> td : ds) {
+                    for (Header<T> td : headers) {
                         TextView content = this.titleView(td);
                         line.addView(content);
                         line.addView(this.vDivider());
                     }
                 } else if (titleGroup == fixed - 1) {
                     int j = 0;
-                    for (D<T> td : ds) {
+                    for (Header<T> td : headers) {
                         TextView content = this.titleView(td);
-                        if (j == ds.size() - 1) {
+                        if (j == headers.size() - 1) {
                             line.addView(content);
                             line.addView(this.vDivider());
                             line.addView(scrollView);
@@ -221,11 +221,11 @@ public class TableView<T> extends BasicView {
                         }
                         j++;
                     }
-                } else if (titleGroup == this.ds.size() - 1) {
+                } else if (titleGroup == this.headers.size() - 1) {
                     int j = 0;
-                    for (D<T> td : ds) {
+                    for (Header<T> td : headers) {
                         TextView content = this.titleView(td);
-                        if (j == ds.size() - 1) {
+                        if (j == headers.size() - 1) {
                             innerLine.addView(content);
                             innerLine.addView(this.vDivider());
                         } else {
@@ -234,7 +234,7 @@ public class TableView<T> extends BasicView {
                         j++;
                     }
                 } else {
-                    for (D<T> td : ds) {
+                    for (Header<T> td : headers) {
                         TextView content = this.titleView(td);
                         innerLine.addView(content);
                         innerLine.addView(this.vDivider());
@@ -261,11 +261,11 @@ public class TableView<T> extends BasicView {
         scrollView.addView(innerLine);
         horizontalScrollViews.add(scrollView);
         this.scrollFix(scrollView);
-        int size = ds.size();
+        int size = headers.size();
         for (int i = 0; i < size; i++) {
-            D<T> d = ds.get(i);
-            List<D<T>> ds = d.ds;
-            if (ds == null || ds.isEmpty()) {
+            Header<T> header = this.headers.get(i);
+            List<Header<T>> headers = header.headers;
+            if (headers == null || headers.isEmpty()) {
                 // 单层表头的处理
                 TextView content = this.textView();
                 textViews.add(content);
@@ -285,17 +285,17 @@ public class TableView<T> extends BasicView {
             } else {
                 // 多层表头的处理
                 if (i < this.fixed - 1) {
-                    for (int j = 0; j < ds.size(); j++) {
+                    for (int j = 0; j < headers.size(); j++) {
                         TextView content = this.textView();
                         textViews.add(content);
                         line.addView(content);
                         line.addView(this.vDivider());
                     }
                 } else if (i == this.fixed - 1) {
-                    for (int j = 0; j < ds.size(); j++) {
+                    for (int j = 0; j < headers.size(); j++) {
                         TextView content = this.textView();
                         textViews.add(content);
-                        if (j == ds.size() - 1) {
+                        if (j == headers.size() - 1) {
                             line.addView(content);
                             line.addView(this.vDivider());
                             line.addView(scrollView);
@@ -305,10 +305,10 @@ public class TableView<T> extends BasicView {
                         }
                     }
                 } else if (i == size - 1) {
-                    for (int j = 0; j < ds.size(); j++) {
+                    for (int j = 0; j < headers.size(); j++) {
                         TextView content = this.textView();
                         textViews.add(content);
-                        if (j == ds.size() - 1) {
+                        if (j == headers.size() - 1) {
                             innerLine.addView(content);
                         } else {
                             innerLine.addView(content);
@@ -316,7 +316,7 @@ public class TableView<T> extends BasicView {
                         }
                     }
                 } else {
-                    for (int j = 0; j < ds.size(); j++) {
+                    for (int j = 0; j < headers.size(); j++) {
                         TextView content = this.textView();
                         textViews.add(content);
                         innerLine.addView(content);
@@ -333,7 +333,7 @@ public class TableView<T> extends BasicView {
      * @param td 定义信息
      * @return TextView
      */
-    private TextView titleView(D<T> td) {
+    private TextView titleView(Header<T> td) {
         TextView textView = this.textView();
         textView.setText(td.title);
         textView.setGravity(this.textAlign(td.titleAlign));
@@ -399,7 +399,7 @@ public class TableView<T> extends BasicView {
                 // 手指点下时候事件处理
                 clickX = event.getX();
                 clickY = event.getY();
-                synchronized (TableView.this) {
+                synchronized (Table.this) {
                     canceled.set(true);
                     if (touchView != null) {
                         touchView.fling(0);
@@ -415,7 +415,7 @@ public class TableView<T> extends BasicView {
                 this.sortClicked = false;
             } else if (action != MotionEvent.ACTION_MOVE) {
                 // 其他非移动情况处理
-                synchronized (TableView.this) {
+                synchronized (Table.this) {
                     canceled.set(false);
                     if (running.get()) return false;
                     Timer timer = new Timer();
@@ -440,19 +440,19 @@ public class TableView<T> extends BasicView {
         return new TimerTask() {
             @Override
             public void run() {
-                synchronized (TableView.this) {
+                synchronized (Table.this) {
                     if (canceled.get()) {
                         timer.cancel();
                         running.set(false);
                         return;
                     }
                     int x = scrollView.getScrollX();
-                    int scrollX = TableView.this.calculateFixScroll(x);
+                    int scrollX = Table.this.calculateFixScroll(x);
                     if (oldScrollX != x) {
                         oldScrollX = x;
                     } else {
                         scrollView.setOnScrollChangeListener(null);
-                        TableView.this.scrollAll(scrollX);
+                        Table.this.scrollAll(scrollX);
                     }
                     if (scrollX == x) {
                         timer.cancel();
@@ -490,15 +490,15 @@ public class TableView<T> extends BasicView {
      * 列
      * @param text  文案
      * @param align 对其方式
-     * @param ds    定义信息
+     * @param headers    定义信息
      * @return LinearLayout
      */
-    private LinearLayout rectView(String text, int align, List<D<T>> ds) {
+    private LinearLayout rectView(String text, int align, List<Header<T>> headers) {
         LinearLayout line = new LinearLayout(context);
         line.setLayoutParams(new LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
         line.setOrientation(VERTICAL);
         TextView textView = this.textView();
-        textView.setWidth(ds.size() * this.dpToPx(colWidth));
+        textView.setWidth(headers.size() * this.dpToPx(colWidth));
         textView.setHeight(this.dpToPx(HEIGHT / 2f) - 1);
         textView.setText(text);
         textView.setGravity(this.textAlign(align));
@@ -508,8 +508,8 @@ public class TableView<T> extends BasicView {
         bottom.setLayoutParams(new LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
         line.addView(bottom);
         int i = 0;
-        for (D<T> d : ds) {
-            TextView content = this.titleView(d);
+        for (Header<T> header : headers) {
+            TextView content = this.titleView(header);
             if (i != 0) {
                 bottom.addView(this.vDivider());
             }
@@ -632,48 +632,48 @@ public class TableView<T> extends BasicView {
         return false;
     }
 
-    public static <T> D<T> row(String title, Function<T, String> content) {
-        return new D<>(title, content, 0, 0, null, null, null);
+    public static <T> Header<T> header(String title, Function<T, String> content) {
+        return new Header<>(title, content, 0, 0, null, null, null);
     }
 
-    public static <T> D<T> row(String title, Function<T, String> content, int titleAlign) {
-        return new D<>(title, content, titleAlign, 0, null, null, null);
+    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign) {
+        return new Header<>(title, content, titleAlign, 0, null, null, null);
     }
 
-    public static <T> D<T> row(String title, int titleAlign, List<D<T>> ds) {
-        return new D<>(title, null, titleAlign, 0, null, null, ds);
+    public static <T> Header<T> header(String title, int titleAlign, List<Header<T>> headers) {
+        return new Header<>(title, null, titleAlign, 0, null, null, headers);
     }
 
-    public static <T> D<T> row(String title, Function<T, String> content, int titleAlign, int contentAlign) {
-        return new D<>(title, content, titleAlign, contentAlign, null, null, null);
+    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign, int contentAlign) {
+        return new Header<>(title, content, titleAlign, contentAlign, null, null, null);
     }
 
-    public static <T, U extends Comparable<? super U>> D<T> row(String title, Function<T, String> content, int titleAlign,
-                                                                int contentAlign, Function<T, U> sort) {
-        return new D<>(title, content, titleAlign, contentAlign, Sorter.nullsLast(sort), null, null);
+    public static <T, U extends Comparable<? super U>> Header<T> header(String title, Function<T, String> content, int titleAlign,
+                                                                        int contentAlign, Function<T, U> sort) {
+        return new Header<>(title, content, titleAlign, contentAlign, Sorter.nullsLast(sort), null, null);
     }
 
-    public static <T> D<T> row(String title, Function<T, String> content, int titleAlign, int contentAlign,
-                               Comparator<T> sort) {
-        return new D<>(title, content, titleAlign, contentAlign, sort, null, null);
+    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign, int contentAlign,
+                                       Comparator<T> sort) {
+        return new Header<>(title, content, titleAlign, contentAlign, sort, null, null);
     }
 
-    public static <T> D<T> row(String title, Function<T, String> content, int titleAlign, int contentAlign,
-                               Consumer<T> click) {
-        return new D<>(title, content, titleAlign, contentAlign, null, click, null);
+    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign, int contentAlign,
+                                       Consumer<T> click) {
+        return new Header<>(title, content, titleAlign, contentAlign, null, click, null);
     }
 
-    public static <T> D<T> row(String title, Function<T, String> content, int titleAlign, int contentAlign,
-                               Comparator<T> sort, Consumer<T> click) {
-        return new D<>(title, content, titleAlign, contentAlign, sort, click, null);
+    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign, int contentAlign,
+                                       Comparator<T> sort, Consumer<T> click) {
+        return new Header<>(title, content, titleAlign, contentAlign, sort, click, null);
     }
 
-    public static <T> D<T> row(String title, Function<T, String> content, int titleAlign, int contentAlign,
-                               Comparator<T> sort, Consumer<T> click, List<D<T>> ds) {
-        return new D<>(title, content, titleAlign, contentAlign, sort, click, ds);
+    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign, int contentAlign,
+                                       Comparator<T> sort, Consumer<T> click, List<Header<T>> headers) {
+        return new Header<>(title, content, titleAlign, contentAlign, sort, click, headers);
     }
 
-    public static class D<T> {
+    public static class Header<T> {
 
         private final String title;
         private final Function<T, String> content;
@@ -681,17 +681,17 @@ public class TableView<T> extends BasicView {
         private final int contentAlign;
         private final Comparator<T> sort;
         private final Consumer<T> click;
-        private final List<D<T>> ds;
+        private final List<Header<T>> headers;
 
-        public D(String title, Function<T, String> content, int titleAlign, int contentAlign, Comparator<T> sort
-                , Consumer<T> click, List<D<T>> ds) {
+        public Header(String title, Function<T, String> content, int titleAlign, int contentAlign, Comparator<T> sort
+                , Consumer<T> click, List<Header<T>> headers) {
             this.title = title;
             this.content = content;
             this.titleAlign = titleAlign;
             this.contentAlign = contentAlign;
             this.sort = sort;
             this.click = click;
-            this.ds = ds;
+            this.headers = headers;
         }
     }
 
@@ -716,18 +716,18 @@ public class TableView<T> extends BasicView {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = TableView.this.contentView();
+                convertView = Table.this.contentView();
             }
             List<TextView> textViews = (List<TextView>) convertView.getTag();
             T item = this.getItem(position);
             int num = 0;
-            for (D<T> d : ds) {
-                List<D<T>> ds = d.ds;
-                if (ds == null || ds.isEmpty()) {
-                    this.addAction(textViews, item, num, d);
+            for (Header<T> header : headers) {
+                List<Header<T>> headers = header.headers;
+                if (headers == null || headers.isEmpty()) {
+                    this.addAction(textViews, item, num, header);
                     num++;
                 } else {
-                    for (D<T> di : ds) {
+                    for (Header<T> di : headers) {
                         this.addAction(textViews, item, num, di);
                         num++;
                     }
@@ -747,17 +747,17 @@ public class TableView<T> extends BasicView {
          * @param views view集合
          * @param item  数据
          * @param num   第几个
-         * @param d     定义信息
+         * @param header     定义信息
          */
-        private void addAction(List<TextView> views, T item, int num, D<T> d) {
+        private void addAction(List<TextView> views, T item, int num, Header<T> header) {
             TextView textView = views.get(num);
-            textView.setText(d.content.apply(item));
-            textView.setGravity(textAlign(d.contentAlign));
-            if (d.click == null) {
+            textView.setText(header.content.apply(item));
+            textView.setGravity(textAlign(header.contentAlign));
+            if (header.click == null) {
                 return;
             }
             // 设置点击事件
-            ClickUtil.onClick(textView, () -> d.click.accept(item));
+            ClickUtil.onClick(textView, () -> header.click.accept(item));
         }
 
     }

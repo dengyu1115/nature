@@ -8,7 +8,7 @@ import org.nature.common.page.ListPage;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
-import org.nature.common.view.TableView;
+import org.nature.common.view.Table;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -34,30 +34,30 @@ public abstract class BaseBsPage extends ListPage<Hold> {
 
     protected abstract List<Hold> data();
 
-    private final List<TableView.D<Hold>> ds = Arrays.asList(
-            TableView.row("项目", d -> TextUtil.text(this.getItem(d)), C, S, this::getItem),
-            TableView.row("规则", d -> TextUtil.text(d.getRule()), C, S, Hold::getRule),
-            TableView.row("操作", d -> TextUtil.text(this.getHandle(d)), C, C, this::getHandle),
-            TableView.row("日期", C, Arrays.asList(
-                    TableView.row("买入", d -> TextUtil.text(d.getDateBuy()), C, S, Hold::getDateBuy),
-                    TableView.row("卖出", d -> TextUtil.text(d.getDateSell()), C, E, Hold::getDateSell))
+    private final List<Table.Header<Hold>> headers = Arrays.asList(
+            Table.header("项目", d -> TextUtil.text(this.getItem(d)), C, S, this::getItem),
+            Table.header("规则", d -> TextUtil.text(d.getRule()), C, S, Hold::getRule),
+            Table.header("操作", d -> TextUtil.text(this.getHandle(d)), C, C, this::getHandle),
+            Table.header("日期", C, Arrays.asList(
+                    Table.header("买入", d -> TextUtil.text(d.getDateBuy()), C, S, Hold::getDateBuy),
+                    Table.header("卖出", d -> TextUtil.text(d.getDateSell()), C, E, Hold::getDateSell))
             ),
-            TableView.row("价格", C, Arrays.asList(
-                    TableView.row("标记", d -> TextUtil.price(d.getMark()), C, E, Hold::getMark),
-                    TableView.row("买入", d -> TextUtil.price(d.getPriceBuy()), C, E, Hold::getPriceBuy),
-                    TableView.row("卖出", d -> TextUtil.price(d.getPriceSell()), C, E, Hold::getPriceSell))
+            Table.header("价格", C, Arrays.asList(
+                    Table.header("标记", d -> TextUtil.price(d.getMark()), C, E, Hold::getMark),
+                    Table.header("买入", d -> TextUtil.price(d.getPriceBuy()), C, E, Hold::getPriceBuy),
+                    Table.header("卖出", d -> TextUtil.price(d.getPriceSell()), C, E, Hold::getPriceSell))
             ),
-            TableView.row("份额", d -> TextUtil.text(d.getShareBuy()), C, E, Hold::getShareBuy),
-            TableView.row("金额", C, Arrays.asList(
-                    TableView.row("买入", d -> TextUtil.amount(this.getAmountBuy(d)), C, E, this::getAmountBuy),
-                    TableView.row("卖出", d -> TextUtil.amount(this.getAmountSell(d)), C, E, this::getAmountSell),
-                    TableView.row("盈利", d -> TextUtil.amount(d.getProfit()), C, E, Hold::getProfit))
+            Table.header("份额", d -> TextUtil.text(d.getShareBuy()), C, E, Hold::getShareBuy),
+            Table.header("金额", C, Arrays.asList(
+                    Table.header("买入", d -> TextUtil.amount(this.getAmountBuy(d)), C, E, this::getAmountBuy),
+                    Table.header("卖出", d -> TextUtil.amount(this.getAmountSell(d)), C, E, this::getAmountSell),
+                    Table.header("盈利", d -> TextUtil.amount(d.getProfit()), C, E, Hold::getProfit))
             )
     );
 
     @Override
-    protected List<TableView.D<Hold>> define() {
-        return ds;
+    protected List<Table.Header<Hold>> define() {
+        return headers;
     }
 
     @Override

@@ -10,7 +10,7 @@ import org.nature.common.util.ClickUtil;
 import org.nature.common.util.PopUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
-import org.nature.common.view.TableView;
+import org.nature.common.view.Table;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,19 +33,19 @@ public class KInfoListPage extends ListPage<KInfo> {
     /**
      * 表头
      */
-    private final List<TableView.D<KInfo>> ds = Arrays.asList(
-            TableView.row("名称", d -> TextUtil.text(d.getName()), C, S, KInfo::getName),
-            TableView.row("编号", d -> TextUtil.text(d.getCode()), C, C, KInfo::getCode),
-            TableView.row("类型", d -> TextUtil.text(d.getType()), C, C, KInfo::getType),
-            TableView.row("明细", d -> "+", C, C, this::detail),
-            TableView.row("加载", d -> "+", C, C, this::load),
-            TableView.row("重载", d -> "+", C, C, this::reload)
+    private final List<Table.Header<KInfo>> headers = Arrays.asList(
+            Table.header("名称", d -> TextUtil.text(d.getName()), C, S, KInfo::getName),
+            Table.header("编号", d -> TextUtil.text(d.getCode()), C, C, KInfo::getCode),
+            Table.header("类型", d -> TextUtil.text(d.getType()), C, C, KInfo::getType),
+            Table.header("明细", d -> "+", C, C, this::detail),
+            Table.header("加载", d -> "+", C, C, this::load),
+            Table.header("重载", d -> "+", C, C, this::reload)
 
     );
 
     @Override
-    protected List<TableView.D<KInfo>> define() {
-        return ds;
+    protected List<Table.Header<KInfo>> define() {
+        return headers;
     }
 
     @Override
@@ -67,12 +67,12 @@ public class KInfoListPage extends ListPage<KInfo> {
 
     @Override
     protected int getTotalColumns() {
-        return ds.size();
+        return headers.size();
     }
 
     @Override
     protected int getFixedColumns() {
-        return ds.size();
+        return headers.size();
     }
 
 

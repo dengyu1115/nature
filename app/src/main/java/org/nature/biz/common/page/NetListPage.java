@@ -9,7 +9,7 @@ import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.SearchBar;
-import org.nature.common.view.TableView;
+import org.nature.common.view.Table;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,17 +28,17 @@ public class NetListPage extends ListPage<Net> {
 
     private Button chart;
 
-    private final List<TableView.D<Net>> ds = Arrays.asList(
-            TableView.row("CODE", d -> TextUtil.text(d.getCode()), C, S, Net::getCode),
-            TableView.row("日期", d -> TextUtil.text(d.getDate()), C, S, Net::getDate),
-            TableView.row("单位净值", d -> TextUtil.amount(d.getDw()), C, E, Net::getDw),
-            TableView.row("累计净值", d -> TextUtil.amount(d.getLj()), C, E, Net::getLj),
-            TableView.row("复权净值", d -> TextUtil.price(d.getNet()), C, E, Net::getNet)
+    private final List<Table.Header<Net>> headers = Arrays.asList(
+            Table.header("CODE", d -> TextUtil.text(d.getCode()), C, S, Net::getCode),
+            Table.header("日期", d -> TextUtil.text(d.getDate()), C, S, Net::getDate),
+            Table.header("单位净值", d -> TextUtil.amount(d.getDw()), C, E, Net::getDw),
+            Table.header("累计净值", d -> TextUtil.amount(d.getLj()), C, E, Net::getLj),
+            Table.header("复权净值", d -> TextUtil.price(d.getNet()), C, E, Net::getNet)
     );
 
     @Override
-    protected List<TableView.D<Net>> define() {
-        return ds;
+    protected List<Table.Header<Net>> define() {
+        return headers;
     }
 
     @Override
@@ -59,7 +59,7 @@ public class NetListPage extends ListPage<Net> {
 
     @Override
     protected int getTotalColumns() {
-        return ds.size();
+        return headers.size();
     }
 
 }
