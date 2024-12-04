@@ -106,8 +106,9 @@ public class ProfitListPage extends ListPage<Profit> {
     @Override
     protected void initHeaderBehaviours() {
         total.setOnClickListener(v -> this.show(ProfitViewPage.class, this.getParam()));
-        dateRule.init().mapper(dateRuleMap::get).refreshData(dateRuleList);
+        dateRule.mapper(dateRuleMap::get);
         dateRule.onChangeRun(this::toggleDateBtn);
+        dateRule.refreshData(dateRuleList);
         this.toggleDateBtn();
         this.nameMap = itemMapper.listAll().stream()
                 .collect(Collectors.toMap(i -> String.join(Const.DELIMITER, i.getCode(), i.getType()), Item::getName));

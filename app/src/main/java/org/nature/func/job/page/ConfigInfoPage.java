@@ -111,8 +111,10 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
                 t.line(L_W, L_H, t.textView("秒：", L_W_T, L_H), second = t.input(L_W_C, L_H)),
                 t.line(L_W, L_H, t.textView("状态：", L_W_T, L_H), statusSel = t.selector(L_W_C, L_H))
         );
-        jobSel.mapper(JobHolder::getName).init().refreshData(JobHolder.jobs());
-        statusSel.mapper(Status::name).init().refreshData(Status.codes());
+        jobSel.mapper(JobHolder::getName);
+        jobSel.refreshData(JobHolder.jobs());
+        statusSel.mapper(Status::name);
+        statusSel.refreshData(Status.codes());
     }
 
     /**

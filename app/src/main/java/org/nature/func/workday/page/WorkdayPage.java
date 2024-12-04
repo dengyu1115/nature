@@ -98,7 +98,8 @@ public class WorkdayPage extends ListPage<Month> {
 
     @Override
     protected void initHeaderBehaviours() {
-        year.mapper(i -> i).init().refreshData(this.initYears());
+        year.mapper(i -> i);
+        year.refreshData(this.initYears());
         year.setValue(DateFormatUtils.format(new Date(), Const.FORMAT_YEAR));
         ClickUtil.onPopConfirm(reload, "重新加载数据", "确定重新加载吗？", () -> {
             String year = this.year.getValue();
@@ -165,7 +166,8 @@ public class WorkdayPage extends ListPage<Month> {
                 t.line(L_W, L_H, t.textView("类型：", L_W_T, L_H), type = t.selector(L_W_C, L_H))
         );
         date.setFocusable(false);
-        type.init().mapper(i -> i).refreshData(Arrays.asList("H", "W"));
+        type.mapper(i -> i);
+        type.refreshData(Arrays.asList("H", "W"));
     }
 
 }

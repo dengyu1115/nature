@@ -203,8 +203,10 @@ public class RuleListPage extends ListPage<Rule> {
                 t.line(L_W, L_H, t.textView("状态：", L_W_T, L_H), statusSel = t.selector(L_W_C, L_H)),
                 t.line(L_W, L_H, t.textView("规则类型：", L_W_T, L_H), typeSel = t.selector(L_W_C, L_H))
         );
-        statusSel.init().mapper(this::statusName).refreshData(Arrays.asList("1", "0"));
-        typeSel.init().mapper(this::typeName).refreshData(Arrays.asList("0", "1", "2"));
+        statusSel.mapper(this::statusName);
+        statusSel.refreshData(Arrays.asList("1", "0"));
+        typeSel.mapper(this::typeName);
+        typeSel.refreshData(Arrays.asList("0", "1", "2"));
     }
 
     /**

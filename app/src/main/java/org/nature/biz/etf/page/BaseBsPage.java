@@ -87,7 +87,8 @@ public abstract class BaseBsPage extends ListPage<Hold> {
                 return "卖";
             }
             return "请选择";
-        }).init().refreshData(Arrays.asList("0", "1", "2"));
+        });
+        handleSel.refreshData(Arrays.asList("0", "1", "2"));
     }
 
     @Override

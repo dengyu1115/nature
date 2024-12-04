@@ -77,8 +77,10 @@ public class RateListPage extends ListPage<Rate> {
         List<Rule> rules = ruleMapper.listAll();
         Map<String, String> map = rules.stream().collect(Collectors.toMap(Rule::getCode, Rule::getName));
         List<String> ruleCodes = rules.stream().map(Rule::getCode).collect(Collectors.toList());
-        rule.mapper(map::get).init().refreshData(ruleCodes);
-        type.mapper(i -> "0".equals(i) ? "涨幅" : "对比").init().refreshData(List.of("0", "1"));
+        rule.mapper(map::get);
+        rule.refreshData(ruleCodes);
+        type.mapper(i -> "0".equals(i) ? "涨幅" : "对比");
+        type.refreshData(List.of("0", "1"));
     }
 
     @Override

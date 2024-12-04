@@ -35,7 +35,8 @@ public class PredictBsPage extends BaseBsPage {
         super.initHeaderViews(searchBar);
         searchBar.addConditionView(countSel = template.selector(60, 30));
         List<Integer> list = IntStream.range(1, 11).boxed().collect(Collectors.toList());
-        countSel.mapper(Object::toString).init().refreshData(list);
+        countSel.mapper(Object::toString);
+        countSel.refreshData(list);
         // 默认展示3条
         countSel.setValue(4);
     }

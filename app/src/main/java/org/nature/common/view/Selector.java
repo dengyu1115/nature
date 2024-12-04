@@ -23,12 +23,15 @@ import java.util.function.Function;
  * @version 1.0.0
  * @since 2024/1/14
  */
-@SuppressLint("ViewConstructor")
+@SuppressWarnings("unchecked")
+@SuppressLint({"ResourceAsColor", "UseCompatLoadingForDrawables", "ViewConstructor"})
 public class Selector<T> extends BasicView {
 
     private final Context context;
     private final LayoutParams params, tps;
+    private final Drawable drawable;
     private final int height;
+    private final Adapter adapter;
     private PopupWindow popup;
     private ListView listView;
     private TextView valueView;
@@ -44,6 +47,8 @@ public class Selector<T> extends BasicView {
         this.height = this.dpToPx(h * 5);
         this.params = new LayoutParams(this.dpToPx(w), this.dpToPx(h));
         this.tps = new LayoutParams(this.dpToPx(w), this.dpToPx(h) - 3);
+        this.drawable = context.getDrawable(R.drawable.common_background);
+        this.adapter = new Adapter();
         this.makeStructure();
     }
 
@@ -57,21 +62,19 @@ public class Selector<T> extends BasicView {
         return this;
     }
 
-    public Selector<T> init() {
-        Adapter adapter = new Adapter();
-        listView.setAdapter(adapter);
-        return this;
+    public void refreshData(List<T> data) {
+        this.data = data;
+        this.adapter.notifyDataSetChanged();
+        if (!data.isEmpty() && (valueView.getText() == null || valueView.getText().length() == 0)) {
+            this.doSelect(0, valueView);
+            value = (T) valueView.getTag();
+            if (changeRun != null) {
+                changeRun.run();
+            }
+        }
     }
 
-    public void setHeight(float height) {
-        this.params.height = this.dpToPx(height);
-    }
 
-    public void setWidth(float width) {
-        this.params.width = this.dpToPx(width);
-    }
-
-    @SuppressWarnings("unchecked")
     public T getValue() {
         return (T) valueView.getTag();
     }
@@ -81,24 +84,20 @@ public class Selector<T> extends BasicView {
         valueView.setText(mapper.apply(t));
     }
 
-    @SuppressWarnings("unchecked")
-    @SuppressLint({"ResourceAsColor", "UseCompatLoadingForDrawables"})
     private void makeStructure() {
-        Drawable drawable = context.getDrawable(R.drawable.common_background);
-        popup = new PopupWindow(context);
-        valueView = this.textView();
         this.setOrientation(VERTICAL);
+        this.setLayoutParams(params);
+        this.setBackground(drawable);
+        valueView = this.textView();
         this.addView(valueView);
-        this.addView(this.divider(MATCH_PARENT, 3));
+        this.addView(this.divider());
+        popup = new PopupWindow(context);
         listView = new ListView(context);
-        LayoutParams param = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
-        listView.setLayoutParams(param);
+        listView.setAdapter(adapter);
         popup.setContentView(listView);
         popup.setHeight(this.height);
         popup.setFocusable(true);
         popup.setBackgroundDrawable(drawable);
-        this.setLayoutParams(params);
-        this.setBackground(drawable);
         this.setOnClickListener(v -> {
             popup.setWidth(this.getWidth());
             popup.showAsDropDown(this, 0, 1);
@@ -124,18 +123,6 @@ public class Selector<T> extends BasicView {
         valueView.setText(mapper.apply(t));
     }
 
-    @SuppressWarnings("unchecked")
-    public void refreshData(List<T> data) {
-        this.data = data;
-        if (!data.isEmpty() && (valueView.getText() == null || valueView.getText().length() == 0)) {
-            this.doSelect(0, valueView);
-            value = (T) valueView.getTag();
-            if (changeRun != null) {
-                changeRun.run();
-            }
-        }
-    }
-
     private TextView textView() {
         TextView textView = new TextView(context);
         textView.setLayoutParams(this.tps);
@@ -144,10 +131,9 @@ public class Selector<T> extends BasicView {
         return textView;
     }
 
-    private View divider(int w, int h) {
+    private View divider() {
         View view = new View(context);
-        LayoutParams param = new LayoutParams(w, h);
-        view.setLayoutParams(param);
+        view.setLayoutParams(new LayoutParams(MATCH_PARENT, 3));
         view.setBackgroundColor(BG_COLOR);
         return view;
     }
