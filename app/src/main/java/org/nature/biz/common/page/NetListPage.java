@@ -49,7 +49,7 @@ public class NetListPage extends ListPage<Net> {
 
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(chart = template.button("图", 30, 30));
+        searchBar.addConditionView(chart = template.button("图", 3, 7));
     }
 
     @Override

@@ -91,12 +91,12 @@ public class MainPage extends Page {
      * @param pages 页面信息集合
      */
     private void listMenu(List<PageInfo> pages) {
-        LinearLayout line = template.line(200, MATCH_PARENT);
+        LinearLayout line = template.line(20, MATCH_PARENT);
         line.setOrientation(LinearLayout.VERTICAL);
         this.body.addView(line);
         for (PageInfo page : pages) {
             line.addView(this.menuBtn(page.getName(), page.getCls()));
-            line.addView(template.textView("", 200, 5));
+            line.addView(template.text("", 10, 2));
         }
     }
 
@@ -106,7 +106,7 @@ public class MainPage extends Page {
      * @return Button
      */
     private Button tabBtn(String name) {
-        Button btn = template.button(name, 80, 30);
+        Button btn = template.button(name, 10, 7);
         btn.setOnClickListener(v -> this.showMain(PageHolder.get(name)));
         return btn;
     }
@@ -118,7 +118,7 @@ public class MainPage extends Page {
      * @return Button
      */
     private Button menuBtn(String name, Class<? extends Page> clz) {
-        Button btn = template.button(name, 100, 35);
+        Button btn = template.button(name, 10, 7);
         btn.setOnClickListener(v -> this.show(clz));
         return btn;
     }

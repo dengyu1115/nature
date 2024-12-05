@@ -33,7 +33,7 @@ public class PredictBsPage extends BaseBsPage {
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
         super.initHeaderViews(searchBar);
-        searchBar.addConditionView(countSel = template.selector(60, 30));
+        searchBar.addConditionView(countSel = template.selector(8, 7));
         List<Integer> list = IntStream.range(1, 11).boxed().collect(Collectors.toList());
         countSel.mapper(Object::toString);
         countSel.refreshData(list);

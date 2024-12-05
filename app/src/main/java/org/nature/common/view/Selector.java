@@ -2,14 +2,11 @@ package org.nature.common.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
-import android.widget.PopupWindow;
-import android.widget.TextView;
+import android.widget.*;
 import org.nature.R;
 
 import java.util.ArrayList;
@@ -25,41 +22,40 @@ import java.util.function.Function;
  */
 @SuppressWarnings("unchecked")
 @SuppressLint({"ResourceAsColor", "UseCompatLoadingForDrawables", "ViewConstructor"})
-public class Selector<T> extends BasicView {
+public class Selector<T> extends LinearLayout {
+    /**
+     * 背景颜色
+     */
+    protected static final int BG_COLOR = Color.parseColor("#ff99cc00");
 
     private final Context context;
     private final LayoutParams params, tps;
-    private final Drawable drawable;
     private final int height;
     private final Adapter adapter;
     private PopupWindow popup;
-    private ListView listView;
     private TextView valueView;
     private Function<T, String> mapper;
     private Runnable changeRun;
     private List<T> data;
     private T value;
 
-    public Selector(Context context, int w, int h) {
+    public Selector(Context context, int width, int height) {
         super(context);
         this.context = context;
         this.data = new ArrayList<>();
-        this.height = this.dpToPx(h * 5);
-        this.params = new LayoutParams(this.dpToPx(w), this.dpToPx(h));
-        this.tps = new LayoutParams(this.dpToPx(w), this.dpToPx(h) - 3);
-        this.drawable = context.getDrawable(R.drawable.common_background);
+        this.height = height * 5;
+        this.params = new LayoutParams(width, height);
+        this.tps = new LayoutParams(width, height - 3);
         this.adapter = new Adapter();
         this.makeStructure();
     }
 
-    public Selector<T> mapper(Function<T, String> mapper) {
+    public void mapper(Function<T, String> mapper) {
         this.mapper = mapper;
-        return this;
     }
 
-    public Selector<T> onChangeRun(Runnable run) {
+    public void onChangeRun(Runnable run) {
         this.changeRun = run;
-        return this;
     }
 
     public void refreshData(List<T> data) {
@@ -85,23 +81,27 @@ public class Selector<T> extends BasicView {
     }
 
     private void makeStructure() {
-        this.setOrientation(VERTICAL);
         this.setLayoutParams(params);
-        this.setBackground(drawable);
-        valueView = this.textView();
-        this.addView(valueView);
-        this.addView(this.divider());
+        this.setBackground(context.getDrawable(R.drawable.common_background));
+        this.addView(valueView = this.textView());
+        this.buildPopup();
+    }
+
+    private void buildPopup() {
         popup = new PopupWindow(context);
-        listView = new ListView(context);
-        listView.setAdapter(adapter);
-        popup.setContentView(listView);
+        popup.setContentView(this.buildListView());
         popup.setHeight(this.height);
         popup.setFocusable(true);
-        popup.setBackgroundDrawable(drawable);
+        popup.setBackgroundDrawable(context.getDrawable(R.drawable.common_background));
         this.setOnClickListener(v -> {
             popup.setWidth(this.getWidth());
             popup.showAsDropDown(this, 0, 1);
         });
+    }
+
+    private ListView buildListView() {
+        ListView listView = new ListView(context);
+        listView.setAdapter(adapter);
         listView.setOnItemClickListener((parent, view, position, id) -> {
             popup.dismiss();
             TextView textView = (TextView) view;
@@ -115,6 +115,7 @@ public class Selector<T> extends BasicView {
                 }
             }
         });
+        return listView;
     }
 
     private void doSelect(int i, TextView valueView) {
@@ -127,15 +128,8 @@ public class Selector<T> extends BasicView {
         TextView textView = new TextView(context);
         textView.setLayoutParams(this.tps);
         textView.setGravity(Gravity.START | Gravity.CENTER);
-        textView.setPadding(this.dpToPx(10), 1, 1, 1);
+        textView.setPadding(30, 1, 1, 1);
         return textView;
-    }
-
-    private View divider() {
-        View view = new View(context);
-        view.setLayoutParams(new LayoutParams(MATCH_PARENT, 3));
-        view.setBackgroundColor(BG_COLOR);
-        return view;
     }
 
     class Adapter extends BaseAdapter {

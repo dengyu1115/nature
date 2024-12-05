@@ -9,8 +9,8 @@ import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.DateUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.Table;
 import org.nature.common.view.SearchBar;
+import org.nature.common.view.Table;
 
 import java.util.Arrays;
 import java.util.List;
@@ -59,7 +59,7 @@ public class ProfitViewPage extends ListPage<ProfitView> {
 
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(dateBtn = template.datePiker(80, 30));
+        searchBar.addConditionView(dateBtn = template.datePiker(10, 7));
     }
 
     @Override

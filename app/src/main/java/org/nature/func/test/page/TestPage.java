@@ -30,14 +30,14 @@ public class TestPage extends Page {
     @Override
     protected void makeStructure(LinearLayout page, Context context) {
         template = ViewTemplate.build(context);
-        page.addView(ttsBtn = template.button("tts", 80, 30));
+        page.addView(ttsBtn = template.button("tts", 10, 7));
     }
 
     @Override
     protected void onShow() {
         ClickUtil.onClick(ttsBtn, () -> {
-            EditText ttsText = template.areaText(360, 160);
-            LinearLayout line = template.line(500, 230, template.textView("内容", 60, 30), ttsText);
+            EditText ttsText = template.areaText(40, 40);
+            LinearLayout line = template.line(50, 50, template.text("内容", 5, 7), ttsText);
             PopupUtil.confirm(ttsBtn.getContext(), "请输入要转语音的文本", line, () -> {
                 String text = ttsText.getText().toString();
                 NotifyUtil.speak(text);

@@ -95,12 +95,12 @@ public class ProfitListPage extends ListPage<Profit> {
 
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(total = template.button("总述", 40, 30));
-        searchBar.addConditionView(dateRule = template.selector(80, 30));
-        searchBar.addConditionView(dateStart = template.datePiker(80, 30));
-        searchBar.addConditionView(dateEnd = template.datePiker(80, 30));
-        searchBar.addConditionView(item = template.radio("项目", 40, 30));
-        searchBar.addConditionView(rule = template.radio("规则", 40, 30));
+        searchBar.addConditionView(total = template.button("总述", 4, 7));
+        searchBar.addConditionView(dateRule = template.selector(10, 7));
+        searchBar.addConditionView(dateStart = template.datePiker(10, 7));
+        searchBar.addConditionView(dateEnd = template.datePiker(10, 7));
+        searchBar.addConditionView(item = template.radio("项目", 4, 7));
+        searchBar.addConditionView(rule = template.radio("规则", 4, 7));
     }
 
     @Override

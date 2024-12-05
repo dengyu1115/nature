@@ -78,7 +78,7 @@ public abstract class BaseBsPage extends ListPage<Hold> {
 
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(handleSel = template.selector(60, 30));
+        searchBar.addConditionView(handleSel = template.selector(8, 7));
         handleSel.mapper(i -> {
             if ("1".equals(i)) {
                 return "买";

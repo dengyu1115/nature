@@ -14,9 +14,6 @@ import org.nature.common.view.Table;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.nature.common.constant.Const.L_H;
-import static org.nature.common.constant.Const.L_W_T;
-
 /**
  * 计算结果
  * @author Nature
@@ -55,7 +52,7 @@ public class ResultListPage extends ListPage<Result> {
 
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(strategy = template.selector(L_W_T, L_H));
+        searchBar.addConditionView(strategy = template.selector(8, 7));
     }
 
     @Override

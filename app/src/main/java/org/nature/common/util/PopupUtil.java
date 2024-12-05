@@ -72,8 +72,8 @@ public class PopupUtil {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("请选择你要的操作");
         ViewTemplate template = ViewTemplate.build(context);
-        Button delBtn = template.button("删除", 80, 30);
-        Button updBtn = template.button("修改", 80, 30);
+        Button delBtn = template.button("删除", 10, 7);
+        Button updBtn = template.button("修改", 10, 7);
         LinearLayout line = template.line(200, 30, delBtn, updBtn);
         builder.setView(line);
         builder.setNegativeButton("取消", (di, i) -> di.dismiss());

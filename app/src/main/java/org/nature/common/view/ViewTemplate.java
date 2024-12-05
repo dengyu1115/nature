@@ -5,10 +5,8 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.*;
 import android.widget.LinearLayout.LayoutParams;
 import org.nature.R;
@@ -38,9 +36,15 @@ public class ViewTemplate {
      * context
      */
     private final Context context;
+    /**
+     * 宽度、高度
+     */
+    private final float wd, hd;
 
     private ViewTemplate(Context context) {
         this.context = context;
+        this.wd = Const.PAGE_WIDTH / 100f;
+        this.hd = Const.PAGE_HEIGHT / 100f;
     }
 
     public static ViewTemplate build(Context context) {
@@ -55,15 +59,10 @@ public class ViewTemplate {
      */
     public Button button(int w, int h) {
         Button button = new Button(context);
-        float density = context.getResources().getDisplayMetrics().density;
-        int width = (int) (w * density + 0.5f);
-        int height = (int) (h * density + 0.5f);
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(width, height);
-        button.setLayoutParams(params);
+        button.setLayoutParams(new LayoutParams(this.getWidth(w), this.getHeight(h)));
         button.setGravity(Gravity.CENTER);
         button.setPadding(PAD, PAD, PAD, PAD);
-        Drawable drawable = context.getDrawable(R.drawable.common_background);
-        button.setBackground(drawable);
+        button.setBackground(context.getDrawable(R.drawable.common_background));
         return button;
     }
 
@@ -87,14 +86,10 @@ public class ViewTemplate {
      * @param h    高
      * @return TextView
      */
-    public TextView textView(String name, int w, int h) {
+    public TextView text(String name, int w, int h) {
         TextView text = new TextView(context);
         text.setText(name);
-        float density = context.getResources().getDisplayMetrics().density;
-        int width = (int) (w * density + 0.5f);
-        int height = (int) (h * density + 0.5f);
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(width, height);
-        text.setLayoutParams(params);
+        text.setLayoutParams(new LayoutParams(this.getWidth(w), this.getHeight(h)));
         text.setPadding(PAD, PAD, PAD, PAD);
         text.setGravity(Gravity.CENTER_VERTICAL | Gravity.END);
         return text;
@@ -131,18 +126,13 @@ public class ViewTemplate {
      * @return EditText
      */
     public EditText input(int w, int h) {
-        EditText editText = new EditText(context);
-        float density = context.getResources().getDisplayMetrics().density;
-        int width = (int) (w * density + 0.5f);
-        int height = (int) (h * density + 0.5f);
-        ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(width, height);
-        editText.setTextSize(12);
-        editText.setLayoutParams(params);
-        editText.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
-        editText.setPadding(PAD, PAD, PAD, PAD);
-        Drawable drawable = context.getDrawable(R.drawable.common_background);
-        editText.setBackground(drawable);
-        return editText;
+        EditText text = new EditText(context);
+        text.setTextSize(12);
+        text.setLayoutParams(new LayoutParams(this.getWidth(w), this.getHeight(h)));
+        text.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
+        text.setPadding(PAD, PAD, PAD, PAD);
+        text.setBackground(context.getDrawable(R.drawable.common_background));
+        return text;
     }
 
     /**
@@ -152,16 +142,8 @@ public class ViewTemplate {
      * @return EditText
      */
     public EditText areaText(int w, int h) {
-        EditText text = new EditText(context);
-        float density = context.getResources().getDisplayMetrics().density;
-        int width = (int) (w * density + 0.5f);
-        int height = (int) (h * density + 0.5f);
-        LayoutParams param = new LayoutParams(width, height);
-        text.setPadding(PAD, PAD, PAD, PAD);
-        text.setLayoutParams(param);
+        EditText text = this.input(w, h);
         text.setGravity(Gravity.TOP | Gravity.START);
-        Drawable drawable = context.getDrawable(R.drawable.common_background);
-        text.setBackground(drawable);
         return text;
     }
 
@@ -171,8 +153,8 @@ public class ViewTemplate {
      * @param h 高
      * @return Selector
      */
-    public <T> Selector<T> selector(int w, int h) {
-        return new Selector<>(context, w, h);
+    public <T> Selector<T> selector(float w, float h) {
+        return new Selector<>(context, this.getWidth(w), this.getHeight(h));
     }
 
     /**
@@ -185,11 +167,7 @@ public class ViewTemplate {
     public LinearLayout line(int w, int h, View... views) {
         LinearLayout line = new LinearLayout(context);
         line.setGravity(Gravity.CENTER);
-        float density = context.getResources().getDisplayMetrics().density;
-        int width = (int) (w * density + 0.5f);
-        int height = (int) (h * density + 0.5f);
-        LayoutParams param = new LayoutParams(width, height);
-        line.setLayoutParams(param);
+        line.setLayoutParams(new LayoutParams(this.getWidth(w), this.getHeight(h)));
         Arrays.stream(views).forEach(line::addView);
         return line;
     }
@@ -206,24 +184,6 @@ public class ViewTemplate {
         block.setGravity(gravity);
         Arrays.stream(views).forEach(block::addView);
         return block;
-    }
-
-    /**
-     * 块
-     * @param w 宽
-     * @param h 高
-     * @return LinearLayout
-     */
-    public LinearLayout block(int w, int h) {
-        LinearLayout line = new LinearLayout(context);
-        line.setGravity(Gravity.CENTER);
-        float density = context.getResources().getDisplayMetrics().density;
-        int width = (int) (w * density + 0.5f);
-        int height = (int) (h * density + 0.5f);
-        LayoutParams param = new LayoutParams(width, height);
-        line.setLayoutParams(param);
-        line.setOrientation(LinearLayout.VERTICAL);
-        return line;
     }
 
     /**
@@ -311,6 +271,15 @@ public class ViewTemplate {
      */
     private String getTime(TimePicker view) {
         return String.format("%02d:%02d:00", view.getHour(), view.getMinute());
+    }
+
+
+    private int getWidth(float w) {
+        return (int) (w * wd + 05f);
+    }
+
+    private int getHeight(float h) {
+        return (int) (h * hd + 0.5f);
     }
 
 }

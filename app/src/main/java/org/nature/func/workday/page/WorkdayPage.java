@@ -31,7 +31,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static org.nature.common.constant.Const.*;
+import static org.nature.common.constant.Const.L_H;
+import static org.nature.common.constant.Const.L_W;
 
 /**
  * 工作日
@@ -91,9 +92,9 @@ public class WorkdayPage extends ListPage<Month> {
 
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(reload = template.button("重新加载", 60, 30));
-        searchBar.addConditionView(loadLatest = template.button("加载最新", 60, 30));
-        searchBar.addConditionView(year = template.selector(100, 30));
+        searchBar.addConditionView(reload = template.button("重新加载", 8, 7));
+        searchBar.addConditionView(loadLatest = template.button("加载最新", 8, 7));
+        searchBar.addConditionView(year = template.selector(10, 7));
     }
 
     @Override
@@ -162,8 +163,8 @@ public class WorkdayPage extends ListPage<Month> {
     private void makeWindowStructure() {
         ViewTemplate t = template;
         page = t.block(Gravity.CENTER,
-                t.line(L_W, L_H, t.textView("日期：", L_W_T, L_H), date = t.input(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("类型：", L_W_T, L_H), type = t.selector(L_W_C, L_H))
+                t.line(21, 7 , t.text("日期：", 8, 7), date = t.input(12, 7 )),
+                t.line(21, 7 , t.text("类型：", 8, 7), type = t.selector(12, 7 ))
         );
         date.setFocusable(false);
         type.mapper(i -> i);

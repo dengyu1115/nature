@@ -25,7 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static org.nature.common.constant.Const.*;
+import static org.nature.common.constant.Const.L_H;
+import static org.nature.common.constant.Const.L_W;
 
 /**
  * 规则页面
@@ -74,7 +75,7 @@ public class RuleListPage extends ListPage<Rule> {
 
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(add = template.button("+", 30, 30));
+        searchBar.addConditionView(add = template.button("+", 3, 7));
     }
 
     @Override
@@ -195,13 +196,13 @@ public class RuleListPage extends ListPage<Rule> {
     private void makeWindowStructure() {
         ViewTemplate t = template;
         page = t.block(Gravity.CENTER,
-                t.line(L_W, L_H, t.textView("名称：", L_W_T, L_H), name = t.input(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("开始日期：", L_W_T, L_H), date = t.input(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("金额基数：", L_W_T, L_H), base = t.decimal(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("波动比率：", L_W_T, L_H), ratio = t.decimal(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("扩大幅度：", L_W_T, L_H), expansion = t.decimal(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("状态：", L_W_T, L_H), statusSel = t.selector(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("规则类型：", L_W_T, L_H), typeSel = t.selector(L_W_C, L_H))
+                t.line(21, 7 , t.text("名称：", 8, 7), name = t.input(12, 7 )),
+                t.line(21, 7 , t.text("开始日期：", 8, 7), date = t.input(12, 7 )),
+                t.line(21, 7 , t.text("金额基数：", 8, 7), base = t.decimal(12, 7 )),
+                t.line(21, 7 , t.text("波动比率：", 8, 7), ratio = t.decimal(12, 7 )),
+                t.line(21, 7 , t.text("扩大幅度：", 8, 7), expansion = t.decimal(12, 7 )),
+                t.line(21, 7 , t.text("状态：", 8, 7), statusSel = t.selector(12, 7 )),
+                t.line(21, 7 , t.text("规则类型：", 8, 7), typeSel = t.selector(12, 7 ))
         );
         statusSel.mapper(this::statusName);
         statusSel.refreshData(Arrays.asList("1", "0"));

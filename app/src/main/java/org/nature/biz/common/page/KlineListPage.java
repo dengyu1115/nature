@@ -52,7 +52,7 @@ public class KlineListPage extends ListPage<Kline> {
 
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(chart = template.button("图", 30, 30));
+        searchBar.addConditionView(chart = template.button("图", 3, 7));
     }
 
     @Override

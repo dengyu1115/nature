@@ -67,9 +67,9 @@ public class RateListPage extends ListPage<Rate> {
 
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(type = template.selector(80, 30));
-        searchBar.addConditionView(rule = template.selector(80, 30));
-        searchBar.addConditionView(date = template.datePiker(80, 30));
+        searchBar.addConditionView(type = template.selector(10, 7));
+        searchBar.addConditionView(rule = template.selector(10, 7));
+        searchBar.addConditionView(date = template.datePiker(10, 7));
     }
 
     @Override

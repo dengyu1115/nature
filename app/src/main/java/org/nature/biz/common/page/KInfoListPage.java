@@ -55,8 +55,8 @@ public class KInfoListPage extends ListPage<KInfo> {
 
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(load = template.button("加载", 80, 30));
-        searchBar.addConditionView(reload = template.button("重载", 80, 30));
+        searchBar.addConditionView(load = template.button("加载", 10, 7));
+        searchBar.addConditionView(reload = template.button("重载", 10, 7));
     }
 
     @Override

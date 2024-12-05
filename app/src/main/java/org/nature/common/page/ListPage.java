@@ -82,7 +82,7 @@ public abstract class ListPage<T> extends Page {
         header.setLayoutParams(new LayoutParams(MATCH_PARENT, (int) (40 * density)));
         SearchBar searchBar = new SearchBar(context);
         header.addView(searchBar);
-        button = template.button("查询", 50, 30);
+        button = template.button("查询", 5, 7);
         searchBar.addHandleView(button);
         this.initHeaderViews(searchBar);
     }

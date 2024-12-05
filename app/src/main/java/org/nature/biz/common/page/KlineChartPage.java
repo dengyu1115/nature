@@ -9,8 +9,8 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import org.nature.biz.common.mapper.KlineMapper;
 import org.nature.biz.common.model.KInfo;
-import org.nature.biz.common.model.Kline;
 import org.nature.biz.common.model.KView;
+import org.nature.biz.common.model.Kline;
 import org.nature.biz.common.util.KlineUtil;
 import org.nature.common.chart.*;
 import org.nature.common.ioc.annotation.Injection;
@@ -159,7 +159,7 @@ public class KlineChartPage extends Page {
      * @return Button
      */
     private Button klineView(String title, Function<List<Kline>, List<Kline>> func) {
-        Button button = template.button(title, 60, 30);
+        Button button = template.button(title, 8, 7);
         ClickUtil.onClick(button, () -> chart.data(KlineUtil.convert(func.apply(list), name)));
         return button;
     }

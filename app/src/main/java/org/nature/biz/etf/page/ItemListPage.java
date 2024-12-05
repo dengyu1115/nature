@@ -27,7 +27,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static org.nature.common.constant.Const.*;
+import static org.nature.common.constant.Const.L_H;
+import static org.nature.common.constant.Const.L_W;
 
 /**
  * 项目维护
@@ -92,9 +93,9 @@ public class ItemListPage extends ListPage<Item> {
 
     @Override
     protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(add = template.button("+", 30, 30));
-        searchBar.addConditionView(keyword = template.input(100, 30));
-        searchBar.addConditionView(calcRule = template.button("规则计算", 80, 30));
+        searchBar.addConditionView(add = template.button("+", 3, 7));
+        searchBar.addConditionView(keyword = template.input(10, 7));
+        searchBar.addConditionView(calcRule = template.button("规则计算", 10, 7));
     }
 
     @Override
@@ -199,10 +200,10 @@ public class ItemListPage extends ListPage<Item> {
     private void makeWindowStructure() {
         ViewTemplate t = template;
         editPop = t.block(Gravity.CENTER,
-                t.line(L_W, L_H, t.textView("编号：", L_W_T, L_H), code = t.input(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("名称：", L_W_T, L_H), name = t.input(L_W_C, L_H)),
-                t.line(L_W, L_H, t.textView("类型：", L_W_T, L_H), type = t.selector(L_W_C, L_H)),
-                t.line(L_W, L_H)
+                t.line(21, 7 , t.text("编号：", 8, 7), code = t.input(12, 7 )),
+                t.line(21, 7 , t.text("名称：", 8, 7), name = t.input(12, 7 )),
+                t.line(21, 7 , t.text("类型：", 8, 7), type = t.selector(12, 7 )),
+                t.line(21, 7 )
         );
         type.mapper(i -> i);
         type.refreshData(Arrays.asList("0", "1"));
