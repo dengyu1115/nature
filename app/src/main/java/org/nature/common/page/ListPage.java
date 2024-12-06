@@ -1,18 +1,14 @@
 package org.nature.common.page;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import org.apache.commons.lang3.StringUtils;
 import org.nature.common.util.PopupUtil;
-import org.nature.common.view.SearchBar;
 import org.nature.common.view.Table;
 
 import java.util.List;
@@ -26,7 +22,6 @@ import java.util.function.Consumer;
  */
 public abstract class ListPage<T> extends Page {
 
-    private LinearLayout page;
     private Table<T> excel;
     private Button button;
     private TextView total;
@@ -34,14 +29,13 @@ public abstract class ListPage<T> extends Page {
         this.total.setText(String.valueOf(this.excel.getListSize()));
         return false;
     });
-    private int height;
-    private float density;
 
     @Override
-    protected void makeStructure(LinearLayout page, Context context) {
-        this.page = page;
-        this.context = context;
-        this.makeStructure();
+    protected void makeStructure() {
+        page.setOrientation(LinearLayout.VERTICAL);
+        this.header();
+        this.body();
+        this.footer();
     }
 
     @Override
@@ -51,25 +45,12 @@ public abstract class ListPage<T> extends Page {
     }
 
     /**
-     * 布局页面
-     */
-    private void makeStructure() {
-        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        page.setOrientation(LinearLayout.VERTICAL);
-        height = metrics.heightPixels;
-        density = metrics.density;
-        this.header();
-        this.body();
-        this.footer();
-    }
-
-    /**
      * 初始化按钮行为
      */
     private void initBehaviours() {
         this.button.setOnClickListener(v -> this.refreshData());
         this.excel.setLongClick(this.longClick());
-        this.excel.define(this.define());
+        this.excel.setHeaders(this.define(), this.getFixedColumns());
         this.initHeaderBehaviours();
     }
 
@@ -77,38 +58,33 @@ public abstract class ListPage<T> extends Page {
      * 头部布局
      */
     private void header() {
-        LinearLayout header = new LinearLayout(context);
+        LinearLayout condition = template.line(90, 7);
+        condition.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+        LinearLayout handle = template.line(10, 7);
+        LinearLayout header = template.line(100, 7, condition, handle);
         page.addView(header);
-        header.setLayoutParams(new LayoutParams(MATCH_PARENT, (int) (40 * density)));
-        SearchBar searchBar = new SearchBar(context);
-        header.addView(searchBar);
         button = template.button("查询", 5, 7);
-        searchBar.addHandleView(button);
-        this.initHeaderViews(searchBar);
+        handle.addView(button);
+        this.initHeaderViews(condition);
     }
 
     /**
      * 主体布局
      */
     private void body() {
-        LinearLayout body = new LinearLayout(context);
-        page.addView(body);
-        body.setLayoutParams(new LayoutParams(MATCH_PARENT, height - (int) (60 * density)));
-        this.excel = new Table<>(context, this.getTotalColumns(), this.getFixedColumns());
-        body.addView(this.excel);
+        this.excel = template.table(100, 86, 10, this.getTotalColumns());
+        page.addView(this.excel);
     }
 
     /**
      * 底部布局
      */
     private void footer() {
-        LinearLayout footer = new LinearLayout(context);
+        LinearLayout footer = template.line(100, 7);
         page.addView(footer);
-        footer.setLayoutParams(new LayoutParams(MATCH_PARENT, (int) (20 * density)));
         footer.setGravity(Gravity.CENTER);
-        total = new TextView(context);
+        total = template.text("0", 10, 7);
         footer.addView(total);
-        total.setGravity(Gravity.CENTER);
     }
 
     /**
@@ -177,9 +153,9 @@ public abstract class ListPage<T> extends Page {
 
     /**
      * 初始化头部视图
-     * @param searchBar 搜索组件
+     * @param condition 搜索组件
      */
-    protected abstract void initHeaderViews(SearchBar searchBar);
+    protected abstract void initHeaderViews(LinearLayout condition);
 
     /**
      * 初始化头部按钮行为

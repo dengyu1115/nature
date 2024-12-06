@@ -1,12 +1,12 @@
 package org.nature.biz.etf.page;
 
+import android.widget.LinearLayout;
 import org.nature.biz.etf.mapper.ItemMapper;
 import org.nature.biz.etf.model.Hold;
 import org.nature.biz.etf.model.Item;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
 
@@ -77,8 +77,8 @@ public abstract class BaseBsPage extends ListPage<Hold> {
     }
 
     @Override
-    protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(handleSel = template.selector(8, 7));
+    protected void initHeaderViews(LinearLayout condition) {
+        condition.addView(handleSel = template.selector(8, 7));
         handleSel.mapper(i -> {
             if ("1".equals(i)) {
                 return "买";

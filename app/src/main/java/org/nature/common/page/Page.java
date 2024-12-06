@@ -17,7 +17,7 @@ public abstract class Page {
     protected static final int C = 0, S = 1, E = 2;
     protected Context context;
     protected ViewTemplate template;
-    private LinearLayout page;
+    protected LinearLayout page;
     private BasicPage basic;
     private Object param;
 
@@ -30,7 +30,7 @@ public abstract class Page {
         this.context = basic.getContext();
         this.template = ViewTemplate.build(context);
         this.page = new LinearLayout(context);
-        this.makeStructure(this.page, context);
+        this.makeStructure();
     }
 
     /**
@@ -85,10 +85,8 @@ public abstract class Page {
 
     /**
      * 页面布局创建
-     * @param page    页面
-     * @param context 上下文
      */
-    protected abstract void makeStructure(LinearLayout page, Context context);
+    protected abstract void makeStructure();
 
     /**
      * 展示前处理

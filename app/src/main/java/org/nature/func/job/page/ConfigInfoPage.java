@@ -12,7 +12,6 @@ import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.ioc.holder.JobHolder;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.*;
-import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
 import org.nature.common.view.ViewTemplate;
@@ -26,9 +25,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
-import static org.nature.common.constant.Const.L_H;
-import static org.nature.common.constant.Const.L_W;
 
 /**
  * 任务配置
@@ -73,10 +69,10 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
 
 
     @Override
-    protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(start = template.button("启动", 5, 7));
-        searchBar.addConditionView(stop = template.button("停止", 5, 7));
-        searchBar.addConditionView(add = template.button("+", 3, 7));
+    protected void initHeaderViews(LinearLayout condition) {
+        condition.addView(start = template.button("启动", 5, 7));
+        condition.addView(stop = template.button("停止", 5, 7));
+        condition.addView(add = template.button("+", 3, 7));
     }
 
     @Override

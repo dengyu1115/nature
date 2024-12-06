@@ -13,7 +13,6 @@ import org.nature.common.page.ListPage;
 import org.nature.common.util.ClickUtil;
 import org.nature.common.util.PopupUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
 import org.nature.common.view.Table.Header;
@@ -83,8 +82,8 @@ public class ItemListPage extends ListPage<Item> {
     }
 
     @Override
-    protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(add = template.button("+", 3, 7));
+    protected void initHeaderViews(LinearLayout condition) {
+        condition.addView(add = template.button("+", 3, 7));
     }
 
     @Override
@@ -169,13 +168,13 @@ public class ItemListPage extends ListPage<Item> {
     private void makeWindowStructure() {
         ViewTemplate t = template;
         editPop = t.block(Gravity.CENTER,
-                t.line(21, 7 , t.text("选择复制:", 8, 7), item = t.selector(12, 7 )),
-                t.line(21, 7 , t.text("名称：", 8, 7), name = t.input(12, 7 )),
-                t.line(21, 7 , t.text("编号：", 8, 7), code = t.input(12, 7 )),
-                t.line(21, 7 , t.text("类型：", 8, 7), type = t.selector(12, 7 )),
-                t.line(21, 7 , t.text("基金编号：", 8, 7), fund = t.input(12, 7 )),
-                t.line(21, 7 , t.text("比例系数：", 8, 7), ratio = t.decimal(12, 7 )),
-                t.line(21, 7 )
+                t.line(21, 7, t.text("选择复制:", 8, 7), item = t.selector(12, 7)),
+                t.line(21, 7, t.text("名称：", 8, 7), name = t.input(12, 7)),
+                t.line(21, 7, t.text("编号：", 8, 7), code = t.input(12, 7)),
+                t.line(21, 7, t.text("类型：", 8, 7), type = t.selector(12, 7)),
+                t.line(21, 7, t.text("基金编号：", 8, 7), fund = t.input(12, 7)),
+                t.line(21, 7, t.text("比例系数：", 8, 7), ratio = t.decimal(12, 7)),
+                t.line(21, 7)
         );
         type.mapper(i -> i);
         type.refreshData(Arrays.asList("0", "1"));

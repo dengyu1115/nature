@@ -1,6 +1,7 @@
 package org.nature.biz.bound.page;
 
 import android.widget.Button;
+import android.widget.LinearLayout;
 import org.nature.biz.bound.manager.RateManager;
 import org.nature.biz.bound.mapper.RuleMapper;
 import org.nature.biz.bound.model.Rate;
@@ -9,7 +10,6 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
 
@@ -66,10 +66,10 @@ public class RateListPage extends ListPage<Rate> {
     }
 
     @Override
-    protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(type = template.selector(10, 7));
-        searchBar.addConditionView(rule = template.selector(10, 7));
-        searchBar.addConditionView(date = template.datePiker(10, 7));
+    protected void initHeaderViews(LinearLayout condition) {
+        condition.addView(type = template.selector(10, 7));
+        condition.addView(rule = template.selector(10, 7));
+        condition.addView(date = template.datePiker(10, 7));
     }
 
     @Override

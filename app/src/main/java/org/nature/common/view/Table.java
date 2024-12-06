@@ -10,18 +10,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-import org.apache.commons.lang3.StringUtils;
 import org.nature.common.util.ClickUtil;
 import org.nature.common.util.Sorter;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static android.graphics.drawable.GradientDrawable.Orientation.RIGHT_LEFT;
-import static org.nature.common.constant.Const.PAGE_WIDTH;
 
 /**
  * 表格
@@ -29,29 +26,20 @@ import static org.nature.common.constant.Const.PAGE_WIDTH;
  * @version 1.0.0
  * @since 2024/1/5
  */
-@SuppressLint({"DefaultLocale", "ClickableViewAccessibility"})
+@SuppressLint({"DefaultLocale", "ClickableViewAccessibility", "ViewConstructor"})
 public class Table<T> extends BasicView {
 
-    public static final int HEIGHT = 33, PADDING = 8, SCROLL_BAR_SIZE = 3;
-    private final int columns, fixed;
-    private final float widthRate;
-    private final LayoutParams param = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
+    public static final int PADDING = 10, SCROLL_BAR_SIZE = 3;
+    private final int rowHeight, colWidth;
     /**
      * 水平滚动的view集合
      */
     private final Set<HorizontalScrollView> horizontalScrollViews = new HashSet<>();
+    private final OnScrollChangeListener scrollChangeListener = (v, x, y, ox, oy) -> this.scrollAll(this.scrollX = x);
     /**
      * 排序点击计数
      */
-    private final AtomicInteger sc = new AtomicInteger(-1);
-    /**
-     * 移动取消标记
-     */
-    private final AtomicBoolean canceled = new AtomicBoolean();
-    /**
-     * 移动状态标记
-     */
-    private final AtomicBoolean running = new AtomicBoolean();
+    private final AtomicReference<Header<T>> sc = new AtomicReference<>();
     /**
      * listview适配器
      */
@@ -61,60 +49,67 @@ public class Table<T> extends BasicView {
      */
     private final Handler handler = new Handler(this::handleMessage);
     /**
+     * 表格需要展示的数据集合
+     */
+    private List<T> data = new ArrayList<>();
+
+    private HorizontalScrollView touchView;
+    private int scrollX, oldScrollX;
+    private Comparator<T> comparator;
+
+    private Consumer<T> longClick;
+    private Header<T> sortCol;
+    /**
      * 表格定义
      */
     private List<Header<T>> headers;
     /**
-     * 表格需要展示的数据集合
+     * 平铺后最底层的表格定义数据
      */
-    private List<T> list = new ArrayList<>();
+    private List<Header<T>> flatHeaders;
     /**
-     * 临时集合
+     * 是否需要水平滚动
      */
-    private List<T> tempList;
-    private float colWidth;
-    private HorizontalScrollView touchView;
-    private int scrollX, oldScrollX;
-    private final OnScrollChangeListener scrollChangeListener = (v, x, y, ox, oy) -> this.scrollAll(this.scrollX = x);
-    private Comparator<T> comparator;
-    private int sortCol;
-    private boolean sortClicked;
-    private float clickX, clickY;
-    private int titleGroup, titleCol;
+    private boolean needHScroll;
+    /**
+     * 固定表头量
+     */
+    private int fixedMainHeaders, fixedSubHeaders;
 
-    private Consumer<T> longClick;
+    private Timer timer;
 
-    public Table(Context context) {
-        this(context, 3, 1);
-    }
-
-    public Table(Context context, int columns, int fixed) {
-        this(context, columns, fixed, 1);
-    }
-
-    public Table(Context context, int columns, int fixed, float widthRate) {
+    public Table(Context context, int width, int height, int rows, int columns) {
         super(context);
-        this.fixed = fixed;
-        this.widthRate = widthRate;
         this.context = context;
-        this.columns = columns;
+        this.rowHeight = (int) (height / (float) (rows + 1) + 0.5f);
+        this.colWidth = (int) (width / (float) columns + 0.5f);
+        // 设置行间线
+        this.setBaselineAligned(true);
+        // 设置布局参数
+        this.setLayoutParams(new LayoutParams(colWidth * columns - 1, rowHeight * (rows + 1)));
+        // 设置布局方向
+        this.setOrientation(VERTICAL);
     }
 
     /**
-     * 定义
+     * 设置表头，规定固定表头量
      * @param headers 列定义集合
      */
-    public void define(List<Header<T>> headers) {
+    public void setHeaders(List<Header<T>> headers, int fixedHeaders) {
         this.headers = headers;
+        this.needHScroll = headers.size() > fixedHeaders;
+        this.flatHeaders = this.flatHeaders(headers);
+        this.fixedMainHeaders = fixedHeaders;
+        this.fixedSubHeaders = this.calcFixedSubHeaders(headers, fixedHeaders);
         this.init();
     }
 
     /**
      * 设置数据
-     * @param list 数据
+     * @param data 数据
      */
-    public void data(List<T> list) {
-        this.tempList = list;
+    public void data(List<T> data) {
+        this.data = data;
         handler.sendMessage(new Message());
     }
 
@@ -130,245 +125,144 @@ public class Table<T> extends BasicView {
      * 初始化
      */
     private void init() {
-        // 计算列宽
-        this.calculateColumnWidth();
-        // 设置行间线
-        this.setBaselineAligned(true);
-        // 设置布局参数
-        this.setLayoutParams(param);
-        // 设置布局方向
-        this.setOrientation(VERTICAL);
         // 设置表头
-        this.addView(this.headerView());
+        this.addView(this.buildHeadersView());
         // 设置分割线
-        this.addView(this.hDivider());
+        this.addView(this.divider(MATCH_PARENT, 1));
         // 设置数据行
-        this.addView(this.dataView());
-    }
-
-    /**
-     * 计算列宽度
-     */
-    private void calculateColumnWidth() {
-        // context.getResources().getDisplayMetrics().widthPixels;
-        this.colWidth = (PAGE_WIDTH - columns + 1) * widthRate / DENSITY / columns + 0.4f; //  - 2
+        this.addView(this.buildDataView());
     }
 
     /**
      * 表头view部分
      * @return LinearLayout
      */
-    private LinearLayout headerView() {
-        LinearLayout line = this.lineView();
+    private LinearLayout buildHeadersView() {
+        LinearLayout line = this.buildRowView();
+        boolean needScroll = headers.size() > fixedMainHeaders;
+        int size = needScroll ? fixedMainHeaders : headers.size();
+        // 遍历不可滚动的部分处理
+        for (int i = 0; i < size; i++) {
+            this.doAddHeaderView(line, headers.get(i), i, size);
+        }
+        // 没有滚动部分，构建完成返回
+        if (!needScroll) {
+            return line;
+        }
+        // 有滚动部分添加滚动view
+        line.addView(this.divider(1, MATCH_PARENT));
         HorizontalScrollView scrollView = this.horizontalScrollView();
         scrollView.setOnScrollChangeListener(scrollChangeListener);
-        LinearLayout innerLine = this.lineView();
+        LinearLayout innerLine = this.buildRowView();
         scrollView.addView(innerLine);
         horizontalScrollViews.add(scrollView);
         this.scrollFix(scrollView);
-        for (Header<T> header : headers) {
-            List<Header<T>> headers = header.headers;
-            // 单层表头处理
-            if (headers == null || headers.isEmpty()) {
-                TextView content = this.titleView(header);
-                if (titleGroup < fixed - 1) {
-                    line.addView(content);
-                    line.addView(this.vDivider());
-                } else if (titleGroup == fixed - 1) {
-                    line.addView(content);
-                    line.addView(this.vDivider());
-                    line.addView(scrollView);
-                } else if (titleGroup == this.headers.size() - 1) {
-                    innerLine.addView(content);
-                } else {
-                    innerLine.addView(content);
-                    innerLine.addView(this.vDivider());
-                }
-            } else {
-                // 多级表头处理
-                if (StringUtils.isNotBlank(header.title)) {
-                    LinearLayout rect = this.rectView(header.title, header.titleAlign, header.headers);
-                    if (titleGroup < fixed - 1) {
-                        line.addView(rect);
-                        line.addView(this.vDivider());
-                    } else if (titleGroup == fixed - 1) {
-                        line.addView(rect);
-                        line.addView(this.vDivider());
-                        line.addView(scrollView);
-                    } else if (titleGroup == this.headers.size() - 1) {
-                        innerLine.addView(rect);
-                    } else {
-                        innerLine.addView(rect);
-                        innerLine.addView(this.vDivider());
-                    }
-                } else if (titleGroup < fixed - 1) {
-                    for (Header<T> td : headers) {
-                        TextView content = this.titleView(td);
-                        line.addView(content);
-                        line.addView(this.vDivider());
-                    }
-                } else if (titleGroup == fixed - 1) {
-                    int j = 0;
-                    for (Header<T> td : headers) {
-                        TextView content = this.titleView(td);
-                        if (j == headers.size() - 1) {
-                            line.addView(content);
-                            line.addView(this.vDivider());
-                            line.addView(scrollView);
-                        } else {
-                            line.addView(content);
-                            line.addView(this.vDivider());
-                        }
-                        j++;
-                    }
-                } else if (titleGroup == this.headers.size() - 1) {
-                    int j = 0;
-                    for (Header<T> td : headers) {
-                        TextView content = this.titleView(td);
-                        if (j == headers.size() - 1) {
-                            innerLine.addView(content);
-                            innerLine.addView(this.vDivider());
-                        } else {
-                            innerLine.addView(content);
-                        }
-                        j++;
-                    }
-                } else {
-                    for (Header<T> td : headers) {
-                        TextView content = this.titleView(td);
-                        innerLine.addView(content);
-                        innerLine.addView(this.vDivider());
-                    }
-                }
-
-            }
-            titleGroup++;
+        line.addView(scrollView);
+        size = headers.size();
+        // 遍历可滚动的部分处理
+        for (int i = fixedMainHeaders; i < size; i++) {
+            this.doAddHeaderView(innerLine, headers.get(i), i, size);
         }
         return line;
+    }
+
+    /**
+     * 数据view
+     * @return ListView
+     */
+    private ListView buildDataView() {
+        ListView listView = new ListView(context);
+        listView.setScrollBarSize(SCROLL_BAR_SIZE);
+        listView.setAdapter(adapter);
+        listView.setDivider(new GradientDrawable(RIGHT_LEFT, new int[]{BG_COLOR, BG_COLOR, BG_COLOR}));
+        listView.setDividerHeight(1);
+        listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        // 数据刷新完成滚动所有view到同一位置
+        listView.getViewTreeObserver().addOnGlobalLayoutListener(() -> this.scrollAll(this.scrollX));
+        return listView;
     }
 
     /**
      * 内容view
      * @return LinearLayout
      */
-    private LinearLayout contentView() {
+    private LinearLayout buildDatumView() {
+        LinearLayout line = this.buildRowView();
         List<View> textViews = new ArrayList<>();
-        LinearLayout line = this.lineView();
         line.setTag(textViews);
+        boolean needScroll = flatHeaders.size() > fixedSubHeaders;
+        int size = needScroll ? fixedSubHeaders : flatHeaders.size();
+        // 遍历不可滚动的部分处理
+        for (int i = 0; i < size; i++) {
+            this.doAddDatumView(line, textViews, i, size);
+        }
+        // 没有滚动部分，构建完成返回
+        if (!needScroll) {
+            return line;
+        }
+        // 有滚动部分添加滚动view
+        line.addView(this.divider(1, MATCH_PARENT));
         HorizontalScrollView scrollView = this.horizontalScrollView();
         scrollView.setOnScrollChangeListener(scrollChangeListener);
-        LinearLayout innerLine = this.lineView();
+        LinearLayout innerLine = this.buildRowView();
         scrollView.addView(innerLine);
         horizontalScrollViews.add(scrollView);
         this.scrollFix(scrollView);
-        int size = headers.size();
-        for (int i = 0; i < size; i++) {
-            Header<T> header = this.headers.get(i);
-            List<Header<T>> headers = header.headers;
-            if (headers == null || headers.isEmpty()) {
-                // 单层表头的处理
-                TextView content = this.textView();
-                textViews.add(content);
-                if (i < this.fixed - 1) {
-                    line.addView(content);
-                    line.addView(this.vDivider());
-                } else if (i == this.fixed - 1) {
-                    line.addView(content);
-                    line.addView(this.vDivider());
-                    line.addView(scrollView);
-                } else if (i == size - 1) {
-                    innerLine.addView(content);
-                } else {
-                    innerLine.addView(content);
-                    innerLine.addView(this.vDivider());
-                }
-            } else {
-                // 多层表头的处理
-                if (i < this.fixed - 1) {
-                    for (int j = 0; j < headers.size(); j++) {
-                        TextView content = this.textView();
-                        textViews.add(content);
-                        line.addView(content);
-                        line.addView(this.vDivider());
-                    }
-                } else if (i == this.fixed - 1) {
-                    for (int j = 0; j < headers.size(); j++) {
-                        TextView content = this.textView();
-                        textViews.add(content);
-                        if (j == headers.size() - 1) {
-                            line.addView(content);
-                            line.addView(this.vDivider());
-                            line.addView(scrollView);
-                        } else {
-                            line.addView(content);
-                            line.addView(this.vDivider());
-                        }
-                    }
-                } else if (i == size - 1) {
-                    for (int j = 0; j < headers.size(); j++) {
-                        TextView content = this.textView();
-                        textViews.add(content);
-                        if (j == headers.size() - 1) {
-                            innerLine.addView(content);
-                        } else {
-                            innerLine.addView(content);
-                            innerLine.addView(this.vDivider());
-                        }
-                    }
-                } else {
-                    for (int j = 0; j < headers.size(); j++) {
-                        TextView content = this.textView();
-                        textViews.add(content);
-                        innerLine.addView(content);
-                        innerLine.addView(this.vDivider());
-                    }
-                }
-            }
+        line.addView(scrollView);
+        size = flatHeaders.size();
+        // 遍历可滚动的部分处理
+        for (int i = fixedSubHeaders; i < size; i++) {
+            this.doAddDatumView(innerLine, textViews, i, size);
         }
         return line;
     }
 
     /**
-     * 标题view
-     * @param td 定义信息
-     * @return TextView
+     * 添加表头
+     * @param line   容器view
+     * @param header 表头
+     * @param i      位置
+     * @param size   总量
      */
-    private TextView titleView(Header<T> td) {
-        TextView textView = this.textView();
-        textView.setText(td.title);
-        textView.setGravity(this.textAlign(td.titleAlign));
-        this.addSortClickEvent(textView, td.sort);
-        return textView;
+    private void doAddHeaderView(LinearLayout line, Header<T> header, int i, int size) {
+        LinearLayout headerView = this.buildHeaderView(header, this.rowHeight);
+        line.addView(headerView);
+        // 不是最后一个需要添加分隔线
+        if (i < size - 1) {
+            line.addView(this.divider(1, MATCH_PARENT));
+        }
     }
 
+    /**
+     * 添加表头
+     * @param line  容器view
+     * @param views view集合
+     * @param i     位置
+     * @param size  总量
+     */
+    private void doAddDatumView(LinearLayout line, List<View> views, int i, int size) {
+        TextView textView = this.buildDatumColView();
+        line.addView(textView);
+        views.add(textView);
+        // 不是最后一个需要添加分隔线
+        if (i < size - 1) {
+            line.addView(this.divider(1, MATCH_PARENT));
+        }
+    }
 
     /**
      * 添加点击排序事件
-     * @param view       view
-     * @param comparator 排序逻辑
+     * @param view view
      */
-    private void addSortClickEvent(TextView view, Comparator<T> comparator) {
-        if (comparator == null) {
+    private void addSortClickEvent(TextView view, Header<T> header) {
+        if (header.sort == null) {
             return;
         }
-        int col = titleCol++;
-        if (this.titleGroup < this.fixed) {
-            view.setOnClickListener(v -> {
-                this.comparator = comparator;
-                this.sortCol = col;
-                this.sortClick(v);
-            });
-        } else {
-            view.setOnTouchListener((v, event) -> {
-                int action = event.getAction();
-                if (action == MotionEvent.ACTION_DOWN) {
-                    this.comparator = comparator;
-                    this.sortCol = col;
-                    this.sortClicked = true;
-                }
-                return false;
-            });
-        }
+        view.setOnClickListener(v -> {
+            this.comparator = header.sort;
+            this.sortCol = header;
+            this.sortClick(v);
+        });
     }
 
     /**
@@ -377,12 +271,12 @@ public class Table<T> extends BasicView {
      */
     private void sortClick(View view) {
         ClickUtil.click(view, () -> {
-            if (sc.get() == this.sortCol) {
-                sc.set(-1);
-                this.list.sort(this.comparator.reversed());
+            if (sc.get() != null && sc.get() == this.sortCol) {
+                sc.set(null);
+                this.data.sort(this.comparator.reversed());
             } else {
                 sc.set(this.sortCol);
-                this.list.sort(this.comparator);
+                this.data.sort(this.comparator);
             }
             adapter.notifyDataSetChanged();
         });
@@ -397,34 +291,14 @@ public class Table<T> extends BasicView {
             int action = event.getAction();
             if (action == MotionEvent.ACTION_DOWN) {
                 // 手指点下时候事件处理
-                clickX = event.getX();
-                clickY = event.getY();
-                synchronized (Table.this) {
-                    canceled.set(true);
-                    if (touchView != null) {
-                        touchView.fling(0);
-                        touchView.setOnScrollChangeListener(null);
-                    }
-                    this.scrollAll(scrollView.getScrollX());
-                    (touchView = scrollView).setOnScrollChangeListener(scrollChangeListener);
-                }
-            } else if (action == MotionEvent.ACTION_UP && sortClicked
-                    && event.getX() == clickX && event.getY() == clickY) {
-                // 手指放开事件处理
-                this.sortClick(view);
-                this.sortClicked = false;
-            } else if (action != MotionEvent.ACTION_MOVE) {
-                // 其他非移动情况处理
-                synchronized (Table.this) {
-                    canceled.set(false);
-                    if (running.get()) return false;
-                    Timer timer = new Timer();
-                    running.set(true);
-                    timer.schedule(this.moveFixTask(scrollView, timer), 500, 100);
-                }
-                this.sortClicked = false;
-            } else {
                 (touchView = scrollView).setOnScrollChangeListener(scrollChangeListener);
+                touchView.fling(0);
+            } else if (action == MotionEvent.ACTION_MOVE) {
+                // 手指放开事件处理
+                if (timer == null) {
+                    timer = new Timer();
+                    timer.schedule(this.moveFixTask(scrollView), 500, 100);
+                }
             }
             return false;
         });
@@ -433,30 +307,26 @@ public class Table<T> extends BasicView {
     /**
      * 移动至指定位置任务
      * @param scrollView 滚动view
-     * @param timer      定时器
      * @return TimerTask
      */
-    private TimerTask moveFixTask(HorizontalScrollView scrollView, Timer timer) {
+    private TimerTask moveFixTask(HorizontalScrollView scrollView) {
         return new TimerTask() {
             @Override
             public void run() {
                 synchronized (Table.this) {
-                    if (canceled.get()) {
-                        timer.cancel();
-                        running.set(false);
-                        return;
-                    }
                     int x = scrollView.getScrollX();
-                    int scrollX = Table.this.calculateFixScroll(x);
+                    // 根据滚动位置计算需要停止的位置
+                    int stopPos = Table.this.calcScrollStopPos(x);
                     if (oldScrollX != x) {
+                        // 未停止，记录上一个位置
                         oldScrollX = x;
                     } else {
+                        // 已停止滚动，取消滚动变更监听，滚动所有行到固定位置
                         scrollView.setOnScrollChangeListener(null);
-                        Table.this.scrollAll(scrollX);
-                    }
-                    if (scrollX == x) {
+                        Table.this.scrollAll(stopPos);
+                        // 滚动位置固定后关闭定时器
                         timer.cancel();
-                        running.set(false);
+                        timer = null;
                     }
                 }
             }
@@ -468,55 +338,20 @@ public class Table<T> extends BasicView {
      * @param x 位置
      * @return int
      */
-    private int calculateFixScroll(int x) {
-        float dp = this.pxToDp(x);
+    private int calcScrollStopPos(int x) {
         // 计算滚动至第几个
-        int num = (int) (dp / (colWidth + 1));
+        int num = x / colWidth;
         // 计算位置：
-        return this.dpToPx((colWidth + 1) * (dp - colWidth * num < colWidth / 2 ? num : num + 1));
+        return colWidth * ((x - colWidth * num < colWidth / 2) ? num : num + 1);
     }
 
     /**
      * 行
      * @return LinearLayout
      */
-    private LinearLayout lineView() {
+    private LinearLayout buildRowView() {
         LinearLayout line = new LinearLayout(context);
         line.setLayoutParams(new LayoutParams(MATCH_PARENT, WRAP_CONTENT));
-        return line;
-    }
-
-    /**
-     * 列
-     * @param text  文案
-     * @param align 对其方式
-     * @param headers    定义信息
-     * @return LinearLayout
-     */
-    private LinearLayout rectView(String text, int align, List<Header<T>> headers) {
-        LinearLayout line = new LinearLayout(context);
-        line.setLayoutParams(new LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
-        line.setOrientation(VERTICAL);
-        TextView textView = this.textView();
-        textView.setWidth(headers.size() * this.dpToPx(colWidth));
-        textView.setHeight(this.dpToPx(HEIGHT / 2f) - 1);
-        textView.setText(text);
-        textView.setGravity(this.textAlign(align));
-        line.addView(textView);
-        line.addView(this.hDivider());
-        LinearLayout bottom = new LinearLayout(context);
-        bottom.setLayoutParams(new LayoutParams(WRAP_CONTENT, WRAP_CONTENT));
-        line.addView(bottom);
-        int i = 0;
-        for (Header<T> header : headers) {
-            TextView content = this.titleView(header);
-            if (i != 0) {
-                bottom.addView(this.vDivider());
-            }
-            content.setHeight(this.dpToPx(HEIGHT / 2f) - 1);
-            bottom.addView(content);
-            i++;
-        }
         return line;
     }
 
@@ -526,27 +361,9 @@ public class Table<T> extends BasicView {
      */
     private HorizontalScrollView horizontalScrollView() {
         HorizontalScrollView hsv = new HorizontalScrollView(context);
-        hsv.setLayoutParams(param);
         hsv.setScrollBarSize(0);
         hsv.setOverScrollMode(View.OVER_SCROLL_NEVER);
         return hsv;
-    }
-
-    /**
-     * 数据view
-     * @return ListView
-     */
-    private ListView dataView() {
-        ListView listView = new ListView(context);
-        listView.setLayoutParams(param);
-        listView.setScrollBarSize(SCROLL_BAR_SIZE);
-        listView.setAdapter(adapter);
-        listView.setDivider(new GradientDrawable(RIGHT_LEFT, new int[]{BG_COLOR, BG_COLOR, BG_COLOR}));
-        listView.setDividerHeight(1);
-        listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
-        // 数据刷新完成滚动所有view到同一位置
-        listView.getViewTreeObserver().addOnGlobalLayoutListener(() -> this.scrollAll(this.scrollX));
-        return listView;
     }
 
     /**
@@ -554,7 +371,7 @@ public class Table<T> extends BasicView {
      * @return int
      */
     public int getListSize() {
-        return list.size();
+        return data.size();
     }
 
     /**
@@ -570,34 +387,6 @@ public class Table<T> extends BasicView {
             return Gravity.END | Gravity.CENTER;
         }
         return Gravity.CENTER;
-    }
-
-    /**
-     * 文本view
-     * @return TextView
-     */
-    private TextView textView() {
-        TextView view = new TextView(context);
-        view.setWidth(this.dpToPx(colWidth));
-        view.setHeight(this.dpToPx(HEIGHT));
-        view.setPadding(this.dpToPx(PADDING), 0, this.dpToPx(PADDING), 0);
-        return view;
-    }
-
-    /**
-     * 水平分隔线
-     * @return View
-     */
-    private View hDivider() {
-        return this.divider(MATCH_PARENT, 1);
-    }
-
-    /**
-     * 纵向分隔线
-     * @return View
-     */
-    private View vDivider() {
-        return this.divider(1, MATCH_PARENT);
     }
 
     /**
@@ -627,9 +416,130 @@ public class Table<T> extends BasicView {
      * @return boolean
      */
     private boolean handleMessage(Message msg) {
-        this.list = this.tempList;
         this.adapter.notifyDataSetChanged();
         return false;
+    }
+
+    /**
+     * 展开表头，收集最底层表头
+     * @param headers 表头数据集合
+     * @return list
+     */
+    private List<Header<T>> flatHeaders(List<Header<T>> headers) {
+        List<Header<T>> list = new ArrayList<>();
+        for (Header<T> i : headers) {
+            List<Header<T>> hs = i.headers;
+            if (hs == null || hs.isEmpty()) {
+                // 没有下级说明是最底层的表头
+                list.add(i);
+            } else {
+                // 有下级继续处理下级
+                list.addAll(this.flatHeaders(hs));
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 计算固定表头量
+     * @param headers      表头数据集合
+     * @param fixedHeaders 固定列数
+     * @return int
+     */
+    private int calcFixedSubHeaders(List<Header<T>> headers, int fixedHeaders) {
+        // 所有列固定
+        if (!this.needHScroll) {
+            return this.flatHeaders.size();
+        }
+        // 计算需要固定的底层表头量
+        return this.flatHeaders(headers.subList(0, fixedHeaders)).size();
+    }
+
+    /**
+     * 构建表头view
+     * @param header    表头
+     * @param rowHeight 行高
+     * @return LinearLayout
+     */
+    private LinearLayout buildHeaderView(Header<T> header, int rowHeight) {
+        // 计算表头需要占用的列宽
+        int subHeaders = this.calcSubHeaders(header);
+        // 计算表头共有几层
+        int headerLevel = this.calcHeaderLevel(header);
+        LinearLayout line = new LinearLayout(context);
+        int width = subHeaders * colWidth - 1;
+        int height = (int) (rowHeight / (float) headerLevel + 0.5) - (headerLevel > 1 ? 1 : 0);
+        line.setLayoutParams(new LayoutParams(width, rowHeight));
+        line.setOrientation(VERTICAL);
+        TextView textView = new TextView(context);
+        textView.setPadding(PADDING, 0, PADDING, 0);
+        textView.setWidth(width);
+        textView.setHeight(height);
+        textView.setText(header.title);
+        textView.setGravity(this.textAlign(header.titleAlign));
+        this.addSortClickEvent(textView, header);
+        line.addView(textView);
+        // 单层表头返回
+        if (headerLevel == 1) {
+            return line;
+        }
+        // 增加分隔线
+        line.addView(this.divider(MATCH_PARENT, 1));
+        LinearLayout bottom = new LinearLayout(context);
+        // 剩余行高
+        rowHeight = rowHeight - height;
+        bottom.setLayoutParams(new LayoutParams(MATCH_PARENT, rowHeight));
+        line.addView(bottom);
+        // 多级表头继续遍历下级处理
+        int size = header.headers.size();
+        for (int i = 0; i < size; i++) {
+            Header<T> h = header.headers.get(i);
+            bottom.addView(this.buildHeaderView(h, rowHeight));
+            // 不是最后一个添加分隔线
+            if (i < size - 1) {
+                bottom.addView(this.divider(1, MATCH_PARENT));
+            }
+        }
+        return line;
+    }
+
+
+    private TextView buildDatumColView() {
+        TextView view = new TextView(context);
+        view.setWidth(colWidth - 1);
+        view.setHeight(rowHeight);
+        view.setPadding(PADDING, 0, PADDING, 0);
+        return view;
+    }
+
+    /**
+     * 计算子级表头数量
+     * @param header 表头
+     * @return int
+     */
+    private int calcSubHeaders(Header<T> header) {
+        List<Header<T>> list = header.headers;
+        // 没有下级返回1
+        if (list == null || list.isEmpty()) {
+            return 1;
+        }
+        // 有下级则累加下级
+        return list.stream().mapToInt(this::calcSubHeaders).sum();
+    }
+
+    /**
+     * 计算子级表头数量
+     * @param header 表头
+     * @return int
+     */
+    private int calcHeaderLevel(Header<T> header) {
+        List<Header<T>> list = header.headers;
+        // 没有下级返回1
+        if (list == null || list.isEmpty()) {
+            return 1;
+        }
+        // 有下级则累加下级
+        return 1 + list.stream().mapToInt(this::calcHeaderLevel).max().orElse(0);
     }
 
     public static <T> Header<T> header(String title, Function<T, String> content) {
@@ -699,12 +609,12 @@ public class Table<T> extends BasicView {
 
         @Override
         public int getCount() {
-            return list.size();
+            return data.size();
         }
 
         @Override
         public T getItem(int position) {
-            return list.get(position);
+            return data.get(position);
         }
 
         @Override
@@ -714,40 +624,30 @@ public class Table<T> extends BasicView {
 
         @SuppressWarnings("unchecked")
         @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = Table.this.contentView();
+        public View getView(int position, View view, ViewGroup parent) {
+            if (view == null) {
+                view = Table.this.buildDatumView();
             }
-            List<TextView> textViews = (List<TextView>) convertView.getTag();
+            List<TextView> textViews = (List<TextView>) view.getTag();
             T item = this.getItem(position);
-            int num = 0;
-            for (Header<T> header : headers) {
-                List<Header<T>> headers = header.headers;
-                if (headers == null || headers.isEmpty()) {
-                    this.addAction(textViews, item, num, header);
-                    num++;
-                } else {
-                    for (Header<T> di : headers) {
-                        this.addAction(textViews, item, num, di);
-                        num++;
-                    }
-                }
+            for (int i = 0; i < flatHeaders.size(); i++) {
+                this.addAction(textViews, item, i, flatHeaders.get(i));
             }
             if (longClick != null) {
-                convertView.setOnLongClickListener(v -> {
+                view.setOnLongClickListener(v -> {
                     longClick.accept(item);
                     return false;
                 });
             }
-            return convertView;
+            return view;
         }
 
         /**
          * 添加点击处理事件
-         * @param views view集合
-         * @param item  数据
-         * @param num   第几个
-         * @param header     定义信息
+         * @param views  view集合
+         * @param item   数据
+         * @param num    第几个
+         * @param header 定义信息
          */
         private void addAction(List<TextView> views, T item, int num, Header<T> header) {
             TextView textView = views.get(num);

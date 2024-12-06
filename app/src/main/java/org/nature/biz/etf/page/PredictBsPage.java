@@ -1,10 +1,10 @@
 package org.nature.biz.etf.page;
 
+import android.widget.LinearLayout;
 import org.nature.biz.etf.manager.RuleManager;
 import org.nature.biz.etf.model.Hold;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
-import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
 
 import java.util.List;
@@ -31,9 +31,9 @@ public class PredictBsPage extends BaseBsPage {
     }
 
     @Override
-    protected void initHeaderViews(SearchBar searchBar) {
-        super.initHeaderViews(searchBar);
-        searchBar.addConditionView(countSel = template.selector(8, 7));
+    protected void initHeaderViews(LinearLayout condition) {
+        super.initHeaderViews(condition);
+        condition.addView(countSel = template.selector(8, 7));
         List<Integer> list = IntStream.range(1, 11).boxed().collect(Collectors.toList());
         countSel.mapper(Object::toString);
         countSel.refreshData(list);

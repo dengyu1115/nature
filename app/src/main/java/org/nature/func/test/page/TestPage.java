@@ -1,6 +1,5 @@
 package org.nature.func.test.page;
 
-import android.content.Context;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -28,7 +27,7 @@ public class TestPage extends Page {
     private Button ttsBtn;
 
     @Override
-    protected void makeStructure(LinearLayout page, Context context) {
+    protected void makeStructure() {
         template = ViewTemplate.build(context);
         page.addView(ttsBtn = template.button("tts", 10, 7));
     }
@@ -36,7 +35,7 @@ public class TestPage extends Page {
     @Override
     protected void onShow() {
         ClickUtil.onClick(ttsBtn, () -> {
-            EditText ttsText = template.areaText(40, 40);
+            EditText ttsText = template.textArea(40, 40);
             LinearLayout line = template.line(50, 50, template.text("内容", 5, 7), ttsText);
             PopupUtil.confirm(ttsBtn.getContext(), "请输入要转语音的文本", line, () -> {
                 String text = ttsText.getText().toString();

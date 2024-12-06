@@ -17,7 +17,6 @@ import org.nature.common.page.ListPage;
 import org.nature.common.util.ClickUtil;
 import org.nature.common.util.PopupUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
 import org.nature.common.view.ViewTemplate;
@@ -26,9 +25,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
-import static org.nature.common.constant.Const.L_H;
-import static org.nature.common.constant.Const.L_W;
 
 /**
  * 项目维护
@@ -92,10 +88,10 @@ public class ItemListPage extends ListPage<Item> {
     }
 
     @Override
-    protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(add = template.button("+", 3, 7));
-        searchBar.addConditionView(keyword = template.input(10, 7));
-        searchBar.addConditionView(calcRule = template.button("规则计算", 10, 7));
+    protected void initHeaderViews(LinearLayout condition) {
+        condition.addView(add = template.button("+", 3, 7));
+        condition.addView(keyword = template.input(10, 7));
+        condition.addView(calcRule = template.button("规则计算", 10, 7));
     }
 
     @Override

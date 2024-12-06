@@ -37,7 +37,7 @@ public class SearchBar extends BasicView {
         this.addView(handles);
     }
 
-    public void addConditionView(View view) {
+    public void addView(View view) {
         this.conditions.addView(view);
     }
 

@@ -99,6 +99,22 @@ public class ViewTemplate {
     }
 
     /**
+     * 编辑框
+     * @param w 宽
+     * @param h 高
+     * @return EditText
+     */
+    public EditText input(int w, int h) {
+        EditText text = new EditText(context);
+        text.setTextSize(12);
+        text.setLayoutParams(new LayoutParams(this.getWidth(w), this.getHeight(h)));
+        text.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
+        text.setPadding(PAD, PAD, PAD, PAD);
+        text.setBackground(context.getDrawable(R.drawable.common_background));
+        return text;
+    }
+
+    /**
      * 数字框
      * @param w 宽
      * @param h 高
@@ -123,28 +139,12 @@ public class ViewTemplate {
     }
 
     /**
-     * 编辑框
-     * @param w 宽
-     * @param h 高
-     * @return EditText
-     */
-    public EditText input(int w, int h) {
-        EditText text = new EditText(context);
-        text.setTextSize(12);
-        text.setLayoutParams(new LayoutParams(this.getWidth(w), this.getHeight(h)));
-        text.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
-        text.setPadding(PAD, PAD, PAD, PAD);
-        text.setBackground(context.getDrawable(R.drawable.common_background));
-        return text;
-    }
-
-    /**
      * 文本域
      * @param w 宽
      * @param h 高
      * @return EditText
      */
-    public EditText areaText(int w, int h) {
+    public EditText textArea(int w, int h) {
         EditText text = this.input(w, h);
         text.setGravity(Gravity.TOP | Gravity.START);
         return text;
@@ -158,6 +158,11 @@ public class ViewTemplate {
      */
     public <T> Selector<T> selector(float w, float h) {
         return new Selector<>(context, this.getWidth(w), this.getHeight(h));
+    }
+
+
+    public <T> Table<T> table(float w, float h, int rows, int columns) {
+        return new Table<>(context, this.getWidth(w), this.getHeight(h), rows, columns);
     }
 
     /**

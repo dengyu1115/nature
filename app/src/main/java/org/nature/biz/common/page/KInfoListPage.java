@@ -1,6 +1,7 @@
 package org.nature.biz.common.page;
 
 import android.widget.Button;
+import android.widget.LinearLayout;
 import org.nature.biz.common.manager.KlineManager;
 import org.nature.biz.common.model.KInfo;
 import org.nature.common.ioc.annotation.Injection;
@@ -9,7 +10,6 @@ import org.nature.common.page.ListPage;
 import org.nature.common.util.ClickUtil;
 import org.nature.common.util.PopupUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.SearchBar;
 import org.nature.common.view.Table;
 
 import java.util.Arrays;
@@ -54,9 +54,9 @@ public class KInfoListPage extends ListPage<KInfo> {
     }
 
     @Override
-    protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(load = template.button("加载", 10, 7));
-        searchBar.addConditionView(reload = template.button("重载", 10, 7));
+    protected void initHeaderViews(LinearLayout condition) {
+        condition.addView(load = template.button("加载", 10, 7));
+        condition.addView(reload = template.button("重载", 10, 7));
     }
 
     @Override

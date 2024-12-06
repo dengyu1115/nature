@@ -1,5 +1,6 @@
 package org.nature.biz.bound.page;
 
+import android.widget.LinearLayout;
 import org.nature.biz.bound.manager.CalcManager;
 import org.nature.biz.bound.model.Result;
 import org.nature.biz.bound.model.Rule;
@@ -7,7 +8,6 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
 
@@ -51,8 +51,8 @@ public class ResultListPage extends ListPage<Result> {
     }
 
     @Override
-    protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(strategy = template.selector(8, 7));
+    protected void initHeaderViews(LinearLayout condition) {
+        condition.addView(strategy = template.selector(8, 7));
     }
 
     @Override

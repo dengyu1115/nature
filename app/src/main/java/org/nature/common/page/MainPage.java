@@ -1,13 +1,11 @@
 package org.nature.common.page;
 
-import android.content.Context;
-import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.holder.PageHolder;
 import org.nature.common.model.PageInfo;
-import org.nature.common.view.ViewTemplate;
 
 import java.util.List;
 
@@ -20,17 +18,13 @@ import java.util.List;
 @Component
 public class MainPage extends Page {
 
-    private Context context;
-    private LinearLayout page, body;
-    private ViewTemplate template;
-    private int height;
-    private float density;
+    private LinearLayout body;
 
     @Override
-    protected void makeStructure(LinearLayout page, Context context) {
-        this.context = context;
-        this.page = page;
-        this.makeStructure();
+    protected void makeStructure() {
+        page.setOrientation(LinearLayout.VERTICAL);
+        this.header();
+        this.body();
     }
 
     @Override
@@ -39,25 +33,12 @@ public class MainPage extends Page {
     }
 
     /**
-     * 布局
-     */
-    private void makeStructure() {
-        template = ViewTemplate.build(context);
-        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        page.setOrientation(LinearLayout.VERTICAL);
-        height = metrics.heightPixels;
-        density = metrics.density;
-        this.header();
-        this.body();
-    }
-
-    /**
      * 头部布局
      */
     private void header() {
-        LinearLayout header = new LinearLayout(context);
+        LinearLayout header = template.line(100, 7);
+        header.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
         page.addView(header);
-        header.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, (int) (40 * density)));
         for (String i : Const.GROUPS) {
             header.addView(this.tabBtn(i));
         }
@@ -67,9 +48,9 @@ public class MainPage extends Page {
      * 主体布局
      */
     private void body() {
-        this.body = new LinearLayout(context);
+        this.body = template.line(100, 93);
+        this.body.setGravity(Gravity.START);
         page.addView(body);
-        body.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, height - (int) (40 * density)));
     }
 
     /**
@@ -91,12 +72,13 @@ public class MainPage extends Page {
      * @param pages 页面信息集合
      */
     private void listMenu(List<PageInfo> pages) {
-        LinearLayout line = template.line(20, MATCH_PARENT);
+        LinearLayout line = template.line(20, 93);
         line.setOrientation(LinearLayout.VERTICAL);
+        line.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL);
         this.body.addView(line);
         for (PageInfo page : pages) {
-            line.addView(this.menuBtn(page.getName(), page.getCls()));
             line.addView(template.text("", 10, 2));
+            line.addView(this.menuBtn(page.getName(), page.getCls()));
         }
     }
 

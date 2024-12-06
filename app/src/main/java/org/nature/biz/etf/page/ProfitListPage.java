@@ -2,6 +2,7 @@ package org.nature.biz.etf.page;
 
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.nature.biz.etf.manager.ProfitManager;
@@ -16,7 +17,6 @@ import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.DateUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.SearchBar;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
 
@@ -94,13 +94,13 @@ public class ProfitListPage extends ListPage<Profit> {
     }
 
     @Override
-    protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(total = template.button("总述", 4, 7));
-        searchBar.addConditionView(dateRule = template.selector(10, 7));
-        searchBar.addConditionView(dateStart = template.datePiker(10, 7));
-        searchBar.addConditionView(dateEnd = template.datePiker(10, 7));
-        searchBar.addConditionView(item = template.radio("项目", 4, 7));
-        searchBar.addConditionView(rule = template.radio("规则", 4, 7));
+    protected void initHeaderViews(LinearLayout condition) {
+        condition.addView(total = template.button("总述", 4, 7));
+        condition.addView(dateRule = template.selector(10, 7));
+        condition.addView(dateStart = template.datePiker(10, 7));
+        condition.addView(dateEnd = template.datePiker(10, 7));
+        condition.addView(item = template.radio("项目", 4, 7));
+        condition.addView(rule = template.radio("规则", 4, 7));
     }
 
     @Override

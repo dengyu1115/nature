@@ -1,8 +1,6 @@
 package org.nature.biz.common.page;
 
-import android.content.Context;
 import android.graphics.Color;
-import android.widget.LinearLayout;
 import org.nature.biz.common.mapper.NetMapper;
 import org.nature.biz.common.model.NInfo;
 import org.nature.biz.common.model.NView;
@@ -69,7 +67,7 @@ public class NetChartPage extends Page {
     private LineChart<NView> chart;
 
     @Override
-    protected void makeStructure(LinearLayout page, Context context) {
+    protected void makeStructure() {
         page.addView(chart = new LineChart<>(context));
         chart.sizeDefault(30, 15, 1800);
         chart.init(QS, RS, NView::getDate);

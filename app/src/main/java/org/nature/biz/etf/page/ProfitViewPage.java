@@ -1,6 +1,7 @@
 package org.nature.biz.etf.page;
 
 import android.widget.Button;
+import android.widget.LinearLayout;
 import org.nature.biz.etf.manager.ProfitManager;
 import org.nature.biz.etf.model.ProfitView;
 import org.nature.biz.etf.model.Rule;
@@ -9,7 +10,6 @@ import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.DateUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.SearchBar;
 import org.nature.common.view.Table;
 
 import java.util.Arrays;
@@ -58,8 +58,8 @@ public class ProfitViewPage extends ListPage<ProfitView> {
     }
 
     @Override
-    protected void initHeaderViews(SearchBar searchBar) {
-        searchBar.addConditionView(dateBtn = template.datePiker(10, 7));
+    protected void initHeaderViews(LinearLayout condition) {
+        condition.addView(dateBtn = template.datePiker(10, 7));
     }
 
     @Override

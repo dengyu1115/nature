@@ -1,6 +1,5 @@
 package org.nature.biz.common.page;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
@@ -113,8 +112,7 @@ public class KlineChartPage extends Page {
     private LineChart<KView> chart;
 
     @Override
-    protected void makeStructure(LinearLayout page, Context context) {
-        template = ViewTemplate.build(context);
+    protected void makeStructure() {
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
         int width = metrics.widthPixels;
         float density = metrics.density;
