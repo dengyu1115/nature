@@ -40,7 +40,7 @@ public class ResultListPage extends ListPage<Result> {
     );
 
     @Override
-    protected List<Table.Header<Result>> define() {
+    protected List<Table.Header<Result>> headers() {
         return headers;
     }
 

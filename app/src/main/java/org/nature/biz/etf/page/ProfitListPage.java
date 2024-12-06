@@ -79,7 +79,7 @@ public class ProfitListPage extends ListPage<Profit> {
     private Map<String, String> nameMap;
 
     @Override
-    protected List<Table.Header<Profit>> define() {
+    protected List<Table.Header<Profit>> headers() {
         return headers;
     }
 

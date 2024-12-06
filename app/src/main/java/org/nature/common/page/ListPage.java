@@ -26,7 +26,7 @@ public abstract class ListPage<T> extends Page {
     private Button button;
     private TextView total;
     private final Handler handler = new Handler(msg -> {
-        this.total.setText(String.valueOf(this.excel.getListSize()));
+        this.total.setText(String.valueOf(this.excel.getDataSize()));
         return false;
     });
 
@@ -50,7 +50,7 @@ public abstract class ListPage<T> extends Page {
     private void initBehaviours() {
         this.button.setOnClickListener(v -> this.refreshData());
         this.excel.setLongClick(this.longClick());
-        this.excel.setHeaders(this.define(), this.getFixedColumns());
+        this.excel.setHeaders(this.headers(), this.getFixedColumns());
         this.initHeaderBehaviours();
     }
 
@@ -60,11 +60,11 @@ public abstract class ListPage<T> extends Page {
     private void header() {
         LinearLayout condition = template.line(90, 7);
         condition.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+        condition.setPadding(3, 0, 3, 0);
         LinearLayout handle = template.line(10, 7);
         LinearLayout header = template.line(100, 7, condition, handle);
         page.addView(header);
-        button = template.button("查询", 5, 7);
-        handle.addView(button);
+        handle.addView(button = template.button("查询", 5, 7));
         this.initHeaderViews(condition);
     }
 
@@ -72,7 +72,7 @@ public abstract class ListPage<T> extends Page {
      * 主体布局
      */
     private void body() {
-        this.excel = template.table(100, 86, 10, this.getTotalColumns());
+        this.excel = template.table(100, 86, this.getTotalRows(), this.getTotalColumns());
         page.addView(this.excel);
     }
 
@@ -97,7 +97,6 @@ public abstract class ListPage<T> extends Page {
                 this.excel.data(this.listData());
                 this.refreshTotal();
             } catch (Exception e) {
-                e.printStackTrace(System.err);
                 Looper.prepare();
                 String message = e.getMessage();
                 message = StringUtils.isBlank(message) ? "未知错误" : message;
@@ -113,6 +112,14 @@ public abstract class ListPage<T> extends Page {
      */
     private void refreshTotal() {
         handler.sendMessage(new Message());
+    }
+
+    /**
+     * 表格行数
+     * @return int
+     */
+    protected int getTotalRows() {
+        return 10;
     }
 
     /**
@@ -143,7 +150,7 @@ public abstract class ListPage<T> extends Page {
      * 表格定义
      * @return 表格定义信息
      */
-    protected abstract List<Table.Header<T>> define();
+    protected abstract List<Table.Header<T>> headers();
 
     /**
      * 查询数据

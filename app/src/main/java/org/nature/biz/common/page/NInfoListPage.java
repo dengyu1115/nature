@@ -43,7 +43,7 @@ public class NInfoListPage extends ListPage<NInfo> {
     );
 
     @Override
-    protected List<Table.Header<NInfo>> define() {
+    protected List<Table.Header<NInfo>> headers() {
         return headers;
     }
 

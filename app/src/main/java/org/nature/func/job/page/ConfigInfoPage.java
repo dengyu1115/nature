@@ -57,7 +57,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
     );
 
     @Override
-    protected List<Table.Header<ConfigInfo>> define() {
+    protected List<Table.Header<ConfigInfo>> headers() {
         return headers;
     }
 

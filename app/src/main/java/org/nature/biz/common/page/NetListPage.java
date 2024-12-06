@@ -37,7 +37,7 @@ public class NetListPage extends ListPage<Net> {
     );
 
     @Override
-    protected List<Table.Header<Net>> define() {
+    protected List<Table.Header<Net>> headers() {
         return headers;
     }
 

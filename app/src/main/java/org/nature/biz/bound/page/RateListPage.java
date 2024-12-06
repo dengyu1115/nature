@@ -50,7 +50,7 @@ public class RateListPage extends ListPage<Rate> {
     );
 
     @Override
-    protected List<Table.Header<Rate>> define() {
+    protected List<Table.Header<Rate>> headers() {
         return headers;
     }
 

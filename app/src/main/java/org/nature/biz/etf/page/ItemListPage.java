@@ -73,7 +73,7 @@ public class ItemListPage extends ListPage<Item> {
     );
 
     @Override
-    protected List<Table.Header<Item>> define() {
+    protected List<Table.Header<Item>> headers() {
         return headers;
     }
 

@@ -62,7 +62,7 @@ public class WorkdayPage extends ListPage<Month> {
     private EditText date;
 
     @Override
-    protected List<Table.Header<Month>> define() {
+    protected List<Table.Header<Month>> headers() {
         List<Table.Header<Month>> headers = new ArrayList<>();
         headers.add(Table.header("月份", i -> TextUtil.text(i.getMonth()), C, C, Month::getMonth));
         for (int i = 1; i < 32; i++) {

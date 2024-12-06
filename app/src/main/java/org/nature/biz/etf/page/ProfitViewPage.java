@@ -40,7 +40,7 @@ public class ProfitViewPage extends ListPage<ProfitView> {
     private Button dateBtn;
 
     @Override
-    protected List<Table.Header<ProfitView>> define() {
+    protected List<Table.Header<ProfitView>> headers() {
         return headers;
     }
 
@@ -65,6 +65,11 @@ public class ProfitViewPage extends ListPage<ProfitView> {
     @Override
     protected void initHeaderBehaviours() {
 
+    }
+
+    @Override
+    protected int getTotalRows() {
+        return 8;
     }
 
     @Override

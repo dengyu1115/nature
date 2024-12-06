@@ -56,7 +56,7 @@ public abstract class BaseBsPage extends ListPage<Hold> {
     );
 
     @Override
-    protected List<Table.Header<Hold>> define() {
+    protected List<Table.Header<Hold>> headers() {
         return headers;
     }
 

@@ -44,7 +44,7 @@ public class KInfoListPage extends ListPage<KInfo> {
     );
 
     @Override
-    protected List<Table.Header<KInfo>> define() {
+    protected List<Table.Header<KInfo>> headers() {
         return headers;
     }
 

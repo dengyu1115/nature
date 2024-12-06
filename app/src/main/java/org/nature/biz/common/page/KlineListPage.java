@@ -40,7 +40,7 @@ public class KlineListPage extends ListPage<Kline> {
     );
 
     @Override
-    protected List<Table.Header<Kline>> define() {
+    protected List<Table.Header<Kline>> headers() {
         return headers;
     }
 

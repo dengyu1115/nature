@@ -71,7 +71,7 @@ public class ItemListPage extends ListPage<Item> {
     );
 
     @Override
-    protected List<Header<Item>> define() {
+    protected List<Header<Item>> headers() {
         return headers;
     }
 

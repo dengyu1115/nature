@@ -30,12 +30,11 @@ import static android.graphics.drawable.GradientDrawable.Orientation.RIGHT_LEFT;
 public class Table<T> extends BasicView {
 
     public static final int PADDING = 10, SCROLL_BAR_SIZE = 3;
-    private final int rowHeight, colWidth;
     /**
      * 水平滚动的view集合
      */
-    private final Set<HorizontalScrollView> horizontalScrollViews = new HashSet<>();
-    private final OnScrollChangeListener scrollChangeListener = (v, x, y, ox, oy) -> this.scrollAll(this.scrollX = x);
+    private final Set<HorizontalScrollView> hsViews = new HashSet<>();
+    private final OnScrollChangeListener scrollListener = (v, x, y, ox, oy) -> hsViews.forEach(i -> i.scrollTo(this.scrollX = x, 0));
     /**
      * 排序点击计数
      */
@@ -48,25 +47,20 @@ public class Table<T> extends BasicView {
      * 异步处理类
      */
     private final Handler handler = new Handler(this::handleMessage);
+
+    private final int rowHeight, colWidth;
     /**
      * 表格需要展示的数据集合
      */
     private List<T> data = new ArrayList<>();
 
-    private HorizontalScrollView touchView;
-    private int scrollX, oldScrollX;
-    private Comparator<T> comparator;
-
     private Consumer<T> longClick;
+
     private Header<T> sortCol;
     /**
      * 表格定义
      */
-    private List<Header<T>> headers;
-    /**
-     * 平铺后最底层的表格定义数据
-     */
-    private List<Header<T>> flatHeaders;
+    private List<Header<T>> headers, flatHeaders;
     /**
      * 是否需要水平滚动
      */
@@ -74,7 +68,7 @@ public class Table<T> extends BasicView {
     /**
      * 固定表头量
      */
-    private int fixedMainHeaders, fixedSubHeaders;
+    private int scrollX, oldScrollX, fixedMainHeaders, fixedSubHeaders;
 
     private Timer timer;
 
@@ -101,7 +95,13 @@ public class Table<T> extends BasicView {
         this.flatHeaders = this.flatHeaders(headers);
         this.fixedMainHeaders = fixedHeaders;
         this.fixedSubHeaders = this.calcFixedSubHeaders(headers, fixedHeaders);
-        this.init();
+        this.removeAllViews();
+        // 设置表头
+        this.addView(this.buildHeadersView());
+        // 设置分割线
+        this.addView(this.divider(MATCH_PARENT, 1));
+        // 设置数据行
+        this.addView(this.buildDataView());
     }
 
     /**
@@ -110,7 +110,15 @@ public class Table<T> extends BasicView {
      */
     public void data(List<T> data) {
         this.data = data;
-        handler.sendMessage(new Message());
+        this.handler.sendMessage(new Message());
+    }
+
+    /**
+     * 获取数据size
+     * @return int
+     */
+    public int getDataSize() {
+        return data.size();
     }
 
     /**
@@ -119,18 +127,6 @@ public class Table<T> extends BasicView {
      */
     public void setLongClick(Consumer<T> click) {
         this.longClick = click;
-    }
-
-    /**
-     * 初始化
-     */
-    private void init() {
-        // 设置表头
-        this.addView(this.buildHeadersView());
-        // 设置分割线
-        this.addView(this.divider(MATCH_PARENT, 1));
-        // 设置数据行
-        this.addView(this.buildDataView());
     }
 
     /**
@@ -152,11 +148,11 @@ public class Table<T> extends BasicView {
         // 有滚动部分添加滚动view
         line.addView(this.divider(1, MATCH_PARENT));
         HorizontalScrollView scrollView = this.horizontalScrollView();
-        scrollView.setOnScrollChangeListener(scrollChangeListener);
+        scrollView.setOnScrollChangeListener(scrollListener);
         LinearLayout innerLine = this.buildRowView();
         scrollView.addView(innerLine);
-        horizontalScrollViews.add(scrollView);
-        this.scrollFix(scrollView);
+        hsViews.add(scrollView);
+        this.setOnTouchListener(scrollView);
         line.addView(scrollView);
         size = headers.size();
         // 遍历可滚动的部分处理
@@ -178,7 +174,7 @@ public class Table<T> extends BasicView {
         listView.setDividerHeight(1);
         listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         // 数据刷新完成滚动所有view到同一位置
-        listView.getViewTreeObserver().addOnGlobalLayoutListener(() -> this.scrollAll(this.scrollX));
+        listView.getViewTreeObserver().addOnGlobalLayoutListener(() -> hsViews.forEach(i -> i.scrollTo(this.scrollX, 0)));
         return listView;
     }
 
@@ -203,11 +199,11 @@ public class Table<T> extends BasicView {
         // 有滚动部分添加滚动view
         line.addView(this.divider(1, MATCH_PARENT));
         HorizontalScrollView scrollView = this.horizontalScrollView();
-        scrollView.setOnScrollChangeListener(scrollChangeListener);
+        scrollView.setOnScrollChangeListener(scrollListener);
         LinearLayout innerLine = this.buildRowView();
         scrollView.addView(innerLine);
-        horizontalScrollViews.add(scrollView);
-        this.scrollFix(scrollView);
+        hsViews.add(scrollView);
+        this.setOnTouchListener(scrollView);
         line.addView(scrollView);
         size = flatHeaders.size();
         // 遍历可滚动的部分处理
@@ -254,51 +250,56 @@ public class Table<T> extends BasicView {
      * 添加点击排序事件
      * @param view view
      */
-    private void addSortClickEvent(TextView view, Header<T> header) {
+    private void addHeaderEvent(TextView view, Header<T> header) {
         if (header.sort == null) {
             return;
         }
-        view.setOnClickListener(v -> {
-            this.comparator = header.sort;
+        ClickUtil.onClick(view, () -> {
             this.sortCol = header;
-            this.sortClick(v);
-        });
-    }
-
-    /**
-     * 排序点击
-     * @param view view
-     */
-    private void sortClick(View view) {
-        ClickUtil.click(view, () -> {
             if (sc.get() != null && sc.get() == this.sortCol) {
                 sc.set(null);
-                this.data.sort(this.comparator.reversed());
+                this.data.sort(header.sort.reversed());
             } else {
                 sc.set(this.sortCol);
-                this.data.sort(this.comparator);
+                this.data.sort(header.sort);
             }
             adapter.notifyDataSetChanged();
         });
     }
 
     /**
+     * 添加点击处理事件
+     * @param textView view
+     * @param header   表头对象
+     * @param datum    数据
+     */
+    private void addDatumEvent(TextView textView, Header<T> header, T datum) {
+        textView.setText(header.content.apply(datum));
+        textView.setGravity(textAlign(header.contentAlign));
+        if (header.click == null) {
+            return;
+        }
+        // 设置点击事件
+        ClickUtil.onClick(textView, () -> header.click.accept(datum));
+    }
+
+    /**
      * 滚动到固定位置
      * @param scrollView 水平滚动view
      */
-    private void scrollFix(HorizontalScrollView scrollView) {
+    private void setOnTouchListener(HorizontalScrollView scrollView) {
         scrollView.setOnTouchListener((view, event) -> {
             int action = event.getAction();
-            if (action == MotionEvent.ACTION_DOWN) {
-                // 手指点下时候事件处理
-                (touchView = scrollView).setOnScrollChangeListener(scrollChangeListener);
-                touchView.fling(0);
-            } else if (action == MotionEvent.ACTION_MOVE) {
-                // 手指放开事件处理
-                if (timer == null) {
-                    timer = new Timer();
-                    timer.schedule(this.moveFixTask(scrollView), 500, 100);
+            this.hsViews.forEach(i -> {
+                if (i == scrollView) {
+                    i.setOnScrollChangeListener(scrollListener);
+                } else {
+                    i.setOnScrollChangeListener(null);
                 }
+            });
+            if (action == MotionEvent.ACTION_UP && timer == null) {
+                timer = new Timer();
+                timer.schedule(this.moveFixTask(scrollView), 500, 100);
             }
             return false;
         });
@@ -323,7 +324,7 @@ public class Table<T> extends BasicView {
                     } else {
                         // 已停止滚动，取消滚动变更监听，滚动所有行到固定位置
                         scrollView.setOnScrollChangeListener(null);
-                        Table.this.scrollAll(stopPos);
+                        hsViews.forEach(i -> i.scrollTo(scrollX = stopPos, 0));
                         // 滚动位置固定后关闭定时器
                         timer.cancel();
                         timer = null;
@@ -367,14 +368,6 @@ public class Table<T> extends BasicView {
     }
 
     /**
-     * 获取数据size
-     * @return int
-     */
-    public int getListSize() {
-        return data.size();
-    }
-
-    /**
      * 文本排布
      * @param textAlign 排布方式
      * @return int
@@ -400,14 +393,6 @@ public class Table<T> extends BasicView {
         view.setLayoutParams(new LayoutParams(w, h));
         view.setBackgroundColor(BG_COLOR);
         return view;
-    }
-
-    /**
-     * 控制全部滚动至同一位置
-     * @param x 位置坐标
-     */
-    private void scrollAll(int x) {
-        horizontalScrollViews.forEach(i -> i.scrollTo(x, 0));
     }
 
     /**
@@ -441,21 +426,6 @@ public class Table<T> extends BasicView {
     }
 
     /**
-     * 计算固定表头量
-     * @param headers      表头数据集合
-     * @param fixedHeaders 固定列数
-     * @return int
-     */
-    private int calcFixedSubHeaders(List<Header<T>> headers, int fixedHeaders) {
-        // 所有列固定
-        if (!this.needHScroll) {
-            return this.flatHeaders.size();
-        }
-        // 计算需要固定的底层表头量
-        return this.flatHeaders(headers.subList(0, fixedHeaders)).size();
-    }
-
-    /**
      * 构建表头view
      * @param header    表头
      * @param rowHeight 行高
@@ -477,7 +447,7 @@ public class Table<T> extends BasicView {
         textView.setHeight(height);
         textView.setText(header.title);
         textView.setGravity(this.textAlign(header.titleAlign));
-        this.addSortClickEvent(textView, header);
+        this.addHeaderEvent(textView, header);
         line.addView(textView);
         // 单层表头返回
         if (headerLevel == 1) {
@@ -503,7 +473,10 @@ public class Table<T> extends BasicView {
         return line;
     }
 
-
+    /**
+     * 构建数据列view
+     * @return TextView
+     */
     private TextView buildDatumColView() {
         TextView view = new TextView(context);
         view.setWidth(colWidth - 1);
@@ -540,6 +513,21 @@ public class Table<T> extends BasicView {
         }
         // 有下级则累加下级
         return 1 + list.stream().mapToInt(this::calcHeaderLevel).max().orElse(0);
+    }
+
+    /**
+     * 计算固定表头量
+     * @param headers      表头数据集合
+     * @param fixedHeaders 固定列数
+     * @return int
+     */
+    private int calcFixedSubHeaders(List<Header<T>> headers, int fixedHeaders) {
+        // 所有列固定
+        if (!this.needHScroll) {
+            return this.flatHeaders.size();
+        }
+        // 计算需要固定的底层表头量
+        return this.flatHeaders(headers.subList(0, fixedHeaders)).size();
     }
 
     public static <T> Header<T> header(String title, Function<T, String> content) {
@@ -631,7 +619,7 @@ public class Table<T> extends BasicView {
             List<TextView> textViews = (List<TextView>) view.getTag();
             T item = this.getItem(position);
             for (int i = 0; i < flatHeaders.size(); i++) {
-                this.addAction(textViews, item, i, flatHeaders.get(i));
+                Table.this.addDatumEvent(textViews.get(i), flatHeaders.get(i), item);
             }
             if (longClick != null) {
                 view.setOnLongClickListener(v -> {
@@ -641,25 +629,6 @@ public class Table<T> extends BasicView {
             }
             return view;
         }
-
-        /**
-         * 添加点击处理事件
-         * @param views  view集合
-         * @param item   数据
-         * @param num    第几个
-         * @param header 定义信息
-         */
-        private void addAction(List<TextView> views, T item, int num, Header<T> header) {
-            TextView textView = views.get(num);
-            textView.setText(header.content.apply(item));
-            textView.setGravity(textAlign(header.contentAlign));
-            if (header.click == null) {
-                return;
-            }
-            // 设置点击事件
-            ClickUtil.onClick(textView, () -> header.click.accept(item));
-        }
-
     }
 
 }

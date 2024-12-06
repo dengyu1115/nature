@@ -57,7 +57,7 @@ public class RuleListPage extends ListPage<Rule> {
     );
 
     @Override
-    protected List<Table.Header<Rule>> define() {
+    protected List<Table.Header<Rule>> headers() {
         return headers;
     }
 
