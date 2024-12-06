@@ -2,6 +2,7 @@ package org.nature.common.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Message;
@@ -19,6 +20,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import static android.graphics.drawable.GradientDrawable.Orientation.RIGHT_LEFT;
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 /**
  * 表格
@@ -27,9 +30,13 @@ import static android.graphics.drawable.GradientDrawable.Orientation.RIGHT_LEFT;
  * @since 2024/1/5
  */
 @SuppressLint({"DefaultLocale", "ClickableViewAccessibility", "ViewConstructor"})
-public class Table<T> extends BasicView {
+public class Table<T> extends LinearLayout {
 
-    public static final int PADDING = 10, SCROLL_BAR_SIZE = 3;
+    /**
+     * 背景颜色
+     */
+    private static final int BG_COLOR = Color.parseColor("#ff99cc00");
+    private static final int PADDING = 10, SCROLL_BAR_SIZE = 3;
     /**
      * 水平滚动的view集合
      */
@@ -47,6 +54,8 @@ public class Table<T> extends BasicView {
      * 异步处理类
      */
     private final Handler handler = new Handler(this::handleMessage);
+
+    private final Context context;
 
     private final int rowHeight, colWidth;
     /**

@@ -2,7 +2,6 @@ package org.nature.common.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,10 +22,6 @@ import java.util.function.Function;
 @SuppressWarnings("unchecked")
 @SuppressLint({"ResourceAsColor", "UseCompatLoadingForDrawables", "ViewConstructor"})
 public class Selector<T> extends LinearLayout {
-    /**
-     * 背景颜色
-     */
-    protected static final int BG_COLOR = Color.parseColor("#ff99cc00");
 
     private final Context context;
     private final LayoutParams params, tps;

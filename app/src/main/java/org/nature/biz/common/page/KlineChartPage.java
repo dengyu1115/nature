@@ -17,7 +17,6 @@ import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.Page;
 import org.nature.common.util.ClickUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.ViewTemplate;
 
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
@@ -98,10 +97,6 @@ public class KlineChartPage extends Page {
      * K线数据原集合
      */
     private List<Kline> list;
-    /**
-     * view模板
-     */
-    private ViewTemplate template;
 
     @Injection
     private KlineMapper klineMapper;
