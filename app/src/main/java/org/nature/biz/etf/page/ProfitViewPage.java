@@ -29,13 +29,18 @@ public class ProfitViewPage extends ListPage<ProfitView> {
 
     private final List<Table.Header<ProfitView>> headers = Arrays.asList(
             Table.header("项目", d -> TextUtil.text(d.getTitle()), C, C),
-            Table.header("子项目1", d -> TextUtil.text(d.getTitle1()), C, C),
-            Table.header("值", d -> TextUtil.text(d.getValue1()), C, E),
-            Table.header("子项目2", d -> TextUtil.text(d.getTitle2()), C, C),
-            Table.header("值", d -> TextUtil.text(d.getValue2()), C, E),
-            Table.header("子项目3", d -> TextUtil.text(d.getTitle3()), C, C),
-            Table.header("值", d -> TextUtil.text(d.getValue3()), C, E)
-    );
+            Table.header("子项1", C, Arrays.asList(
+                    Table.header("项目", d -> TextUtil.text(d.getTitle1()), C, C),
+                    Table.header("值", d -> TextUtil.text(d.getValue1()), C, E)
+            )),
+            Table.header("子项2", C, Arrays.asList(
+                    Table.header("项目", d -> TextUtil.text(d.getTitle2()), C, C),
+                    Table.header("值", d -> TextUtil.text(d.getValue2()), C, E)
+            )),
+            Table.header("子项3", C, Arrays.asList(
+                    Table.header("项目", d -> TextUtil.text(d.getTitle3()), C, C),
+                    Table.header("值", d -> TextUtil.text(d.getValue3()), C, E)
+            )));
 
     private Button dateBtn;
 

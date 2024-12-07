@@ -6,7 +6,9 @@ import android.widget.LinearLayout;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.holder.PageHolder;
 import org.nature.common.model.PageInfo;
+import org.nature.common.util.ClickUtil;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,6 +19,8 @@ import java.util.List;
  */
 @Component
 public class MainPage extends Page {
+
+    private List<String> tabs = Arrays.asList("基础", "ETF", "债券");
 
     private LinearLayout body;
 
@@ -29,7 +33,7 @@ public class MainPage extends Page {
 
     @Override
     protected void onShow() {
-        this.showMain(PageHolder.get(Const.GROUPS.get(0)));
+        this.showMain(PageHolder.get(tabs.get(0)));
     }
 
     /**
@@ -39,7 +43,7 @@ public class MainPage extends Page {
         LinearLayout header = template.line(100, 7);
         header.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
         page.addView(header);
-        for (String i : Const.GROUPS) {
+        for (String i : tabs) {
             header.addView(this.tabBtn(i));
         }
     }
@@ -89,7 +93,7 @@ public class MainPage extends Page {
      */
     private Button tabBtn(String name) {
         Button btn = template.button(name, 10, 7);
-        btn.setOnClickListener(v -> this.showMain(PageHolder.get(name)));
+        ClickUtil.onClick(btn, () -> this.showMain(PageHolder.get(name)));
         return btn;
     }
 
@@ -101,7 +105,7 @@ public class MainPage extends Page {
      */
     private Button menuBtn(String name, Class<? extends Page> clz) {
         Button btn = template.button(name, 10, 7);
-        btn.setOnClickListener(v -> this.show(clz));
+        ClickUtil.onClick(btn, () -> this.show(clz));
         return btn;
     }
 }

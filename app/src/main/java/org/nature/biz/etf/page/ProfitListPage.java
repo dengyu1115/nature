@@ -95,7 +95,7 @@ public class ProfitListPage extends ListPage<Profit> {
 
     @Override
     protected void initHeaderViews(LinearLayout condition) {
-        condition.addView(total = template.button("总述", 4, 7));
+        condition.addView(total = template.button("总览", 4, 7));
         condition.addView(dateRule = template.selector(10, 7));
         condition.addView(dateStart = template.datePiker(10, 7));
         condition.addView(dateEnd = template.datePiker(10, 7));
