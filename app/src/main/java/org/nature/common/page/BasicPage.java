@@ -2,7 +2,6 @@ package org.nature.common.page;
 
 import android.content.Context;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import org.nature.common.ioc.holder.InstanceHolder;
 
@@ -31,8 +30,7 @@ public class BasicPage extends LinearLayout {
         this.pages = new Stack<>();
         this.map = new HashMap<>();
         // 页面宽高设置
-        ViewGroup.LayoutParams params = new LayoutParams(PAGE_WIDTH, PAGE_HEIGHT);
-        this.setLayoutParams(params);
+        this.setLayoutParams(new LayoutParams(PAGE_WIDTH, PAGE_HEIGHT));
     }
 
     /**
