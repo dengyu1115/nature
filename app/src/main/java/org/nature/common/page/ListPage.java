@@ -60,6 +60,8 @@ public abstract class ListPage<T> extends Page {
         condition.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
         condition.setPadding(3, 0, 3, 0);
         LinearLayout handle = template.line(10, 7);
+        handle.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
+        handle.setPadding(3, 0, 7, 0);
         LinearLayout header = template.line(100, 7, condition, handle);
         page.addView(header);
         handle.addView(button = template.button("查询", 5, 7));
