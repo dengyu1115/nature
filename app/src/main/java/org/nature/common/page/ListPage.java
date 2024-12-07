@@ -8,7 +8,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import org.apache.commons.lang3.StringUtils;
-import org.nature.common.util.PopupUtil;
 import org.nature.common.view.Table;
 
 import java.util.List;
@@ -25,7 +24,7 @@ public abstract class ListPage<T> extends Page {
     private Table<T> excel;
     private Button button;
     private TextView total;
-    private final Handler handler = new Handler(msg -> {
+    private final Handler handler = new Handler(Looper.myLooper(), msg -> {
         this.total.setText(String.valueOf(this.excel.getDataSize()));
         return false;
     });
@@ -50,7 +49,6 @@ public abstract class ListPage<T> extends Page {
     private void initBehaviours() {
         this.button.setOnClickListener(v -> this.refreshData());
         this.excel.setLongClick(this.longClick());
-        this.excel.setHeaders(this.headers(), this.getFixedColumns());
         this.initHeaderBehaviours();
     }
 
@@ -72,7 +70,8 @@ public abstract class ListPage<T> extends Page {
      * 主体布局
      */
     private void body() {
-        this.excel = template.table(100, 86, this.getTotalRows(), this.getTotalColumns());
+        this.excel = template.table(100, 87, this.getTotalRows(), this.getTotalColumns());
+        this.excel.setHeaders(this.headers(), this.getFixedColumns());
         page.addView(this.excel);
     }
 
@@ -80,10 +79,10 @@ public abstract class ListPage<T> extends Page {
      * 底部布局
      */
     private void footer() {
-        LinearLayout footer = template.line(100, 7);
+        LinearLayout footer = template.line(100, 6);
         page.addView(footer);
         footer.setGravity(Gravity.CENTER);
-        total = template.text("0", 10, 7);
+        total = template.text("0", 10, 6);
         footer.addView(total);
     }
 
@@ -100,7 +99,7 @@ public abstract class ListPage<T> extends Page {
                 Looper.prepare();
                 String message = e.getMessage();
                 message = StringUtils.isBlank(message) ? "未知错误" : message;
-                PopupUtil.alert(context, message);
+                this.popup.alert(message);
             } finally {
                 button.setClickable(true);
             }

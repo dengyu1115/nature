@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -53,7 +54,10 @@ public class Table<T> extends LinearLayout {
     /**
      * 异步处理类
      */
-    private final Handler handler = new Handler(this::handleMessage);
+    private final Handler handler = new Handler(Looper.myLooper(), msg -> {
+        this.adapter.notifyDataSetChanged();
+        return false;
+    });
 
     private final Context context;
 
@@ -402,16 +406,6 @@ public class Table<T> extends LinearLayout {
         view.setLayoutParams(new LayoutParams(w, h));
         view.setBackgroundColor(BG_COLOR);
         return view;
-    }
-
-    /**
-     * 处理数据更新
-     * @param msg 消息
-     * @return boolean
-     */
-    private boolean handleMessage(Message msg) {
-        this.adapter.notifyDataSetChanged();
-        return false;
     }
 
     /**

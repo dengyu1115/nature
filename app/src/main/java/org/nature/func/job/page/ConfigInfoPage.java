@@ -11,7 +11,10 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.ioc.holder.JobHolder;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.*;
+import org.nature.common.util.ClickUtil;
+import org.nature.common.util.Md5Util;
+import org.nature.common.util.Sorter;
+import org.nature.common.util.TextUtil;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
 import org.nature.common.view.ViewTemplate;
@@ -99,14 +102,14 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
     private void makeWindowStructure() {
         ViewTemplate t = template;
         editPop = t.block(Gravity.CENTER,
-                t.line(21, 7 , t.text("任务：", 8, 7), jobSel = t.selector(12, 7 )),
-                t.line(21, 7 , t.text("年：", 8, 7), year = t.input(12, 7 )),
-                t.line(21, 7 , t.text("月：", 8, 7), month = t.input(12, 7 )),
-                t.line(21, 7 , t.text("日：", 8, 7), day = t.input(12, 7 )),
-                t.line(21, 7 , t.text("时：", 8, 7), hour = t.input(12, 7 )),
-                t.line(21, 7 , t.text("分：", 8, 7), minute = t.input(12, 7 )),
-                t.line(21, 7 , t.text("秒：", 8, 7), second = t.input(12, 7 )),
-                t.line(21, 7 , t.text("状态：", 8, 7), statusSel = t.selector(12, 7 ))
+                t.line(21, 7, t.text("任务：", 8, 7), jobSel = t.selector(12, 7)),
+                t.line(21, 7, t.text("年：", 8, 7), year = t.input(12, 7)),
+                t.line(21, 7, t.text("月：", 8, 7), month = t.input(12, 7)),
+                t.line(21, 7, t.text("日：", 8, 7), day = t.input(12, 7)),
+                t.line(21, 7, t.text("时：", 8, 7), hour = t.input(12, 7)),
+                t.line(21, 7, t.text("分：", 8, 7), minute = t.input(12, 7)),
+                t.line(21, 7, t.text("秒：", 8, 7), second = t.input(12, 7)),
+                t.line(21, 7, t.text("状态：", 8, 7), statusSel = t.selector(12, 7))
         );
         jobSel.mapper(JobHolder::getName);
         jobSel.refreshData(JobHolder.jobs());
@@ -119,7 +122,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
      */
     private void add() {
         this.makeWindowStructure();
-        PopupUtil.confirm(context, "新增", editPop, () -> this.doEdit(this::save));
+        this.popup.confirm("新增", editPop, () -> this.doEdit(this::save));
     }
 
     /**
@@ -137,7 +140,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         this.second.setText(d.getSecond());
         this.statusSel.setValue(d.getStatus());
         String name = JobHolder.getName(d.getCode());
-        PopupUtil.confirm(context, "编辑-" + name, editPop, () -> this.doEdit(configInfoMapper::merge));
+        this.popup.confirm("编辑-" + name, editPop, () -> this.doEdit(configInfoMapper::merge));
     }
 
     /**
@@ -146,10 +149,10 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
      */
     private void delete(ConfigInfo d) {
         String name = JobHolder.getName(d.getCode());
-        PopupUtil.confirm(context, "删除-" + name, "确认删除吗？", () -> {
+        this.popup.confirm("删除-" + name, "确认删除吗？", () -> {
             configInfoMapper.deleteById(d);
             this.refreshData();
-            PopupUtil.alert(context, "删除成功！");
+            this.popup.alert("删除成功！");
         });
     }
 
@@ -174,7 +177,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         d.setSignature(Md5Util.md5(code, d.getYear(), d.getMonth(), d.getDay(), d.getHour(), d.getMinute(), d.getSecond()));
         consumer.accept(d);
         this.refreshData();
-        PopupUtil.alert(context, "编辑成功！");
+        this.popup.alert("编辑成功！");
     }
 
     /**
@@ -189,7 +192,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
 
     @Override
     protected Consumer<ConfigInfo> longClick() {
-        return i -> PopupUtil.handle(context, i, this::delete, this::edit);
+        return i -> this.popup.handle(i, this::delete, this::edit);
     }
 
 }

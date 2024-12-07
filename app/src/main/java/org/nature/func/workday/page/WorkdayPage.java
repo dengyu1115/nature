@@ -14,7 +14,6 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.ClickUtil;
-import org.nature.common.util.PopupUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
@@ -98,16 +97,16 @@ public class WorkdayPage extends ListPage<Month> {
         year.mapper(i -> i);
         year.refreshData(this.initYears());
         year.setValue(DateFormatUtils.format(new Date(), Const.FORMAT_YEAR));
-        ClickUtil.onPopConfirm(reload, "重新加载数据", "确定重新加载吗？", () -> {
-            String year = this.year.getValue();
-            Warn.check(() -> StringUtils.isBlank(year), "请选择年份");
-            return String.format("加载完成,共%s条", workDayManager.reload(year));
-        });
         ClickUtil.onAsyncClick(loadLatest, () -> {
             String year = this.year.getValue();
             Warn.check(() -> StringUtils.isBlank(year), "请选择年份");
             return String.format("加载完成,共%s条", workDayManager.load(year));
         });
+        ClickUtil.onClick(reload, () -> this.popup.confirmAsync("重新加载数据", "确定重新加载吗？", () -> {
+            String year = this.year.getValue();
+            Warn.check(() -> StringUtils.isBlank(year), "请选择年份");
+            return String.format("加载完成,共%s条", workDayManager.reload(year));
+        }));
     }
 
     @Override
@@ -133,7 +132,7 @@ public class WorkdayPage extends ListPage<Month> {
         this.makeWindowStructure();
         this.date.setText(day);
         this.type.setValue(type);
-        PopupUtil.confirm(context, "编辑-" + day, page, () -> this.doEdit(workdayMapper::merge));
+        this.popup.confirm("编辑-" + day, page, () -> this.doEdit(workdayMapper::merge));
     }
 
     /**
@@ -150,7 +149,7 @@ public class WorkdayPage extends ListPage<Month> {
         workday.setType(type);
         consumer.accept(workday);
         this.refreshData();
-        PopupUtil.alert(context, "编辑成功！");
+        this.popup.alert("编辑成功！");
     }
 
     /**
@@ -159,8 +158,8 @@ public class WorkdayPage extends ListPage<Month> {
     private void makeWindowStructure() {
         ViewTemplate t = template;
         page = t.block(Gravity.CENTER,
-                t.line(21, 7 , t.text("日期：", 8, 7), date = t.input(12, 7 )),
-                t.line(21, 7 , t.text("类型：", 8, 7), type = t.selector(12, 7 ))
+                t.line(21, 7, t.text("日期：", 8, 7), date = t.input(12, 7)),
+                t.line(21, 7, t.text("类型：", 8, 7), type = t.selector(12, 7))
         );
         date.setFocusable(false);
         type.mapper(i -> i);

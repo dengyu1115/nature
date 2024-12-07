@@ -7,8 +7,6 @@ import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.Page;
 import org.nature.common.util.ClickUtil;
 import org.nature.common.util.NotifyUtil;
-import org.nature.common.util.PopupUtil;
-import org.nature.common.view.ViewTemplate;
 
 /**
  * 测试功能
@@ -19,16 +17,10 @@ import org.nature.common.view.ViewTemplate;
 @PageView(name = "测试功能", group = "基础", col = 2, row = 2)
 public class TestPage extends Page {
 
-    /**
-     * view模板
-     */
-    private ViewTemplate template;
-
     private Button ttsBtn;
 
     @Override
     protected void makeStructure() {
-        template = ViewTemplate.build(context);
         page.addView(ttsBtn = template.button("tts", 10, 7));
     }
 
@@ -37,7 +29,7 @@ public class TestPage extends Page {
         ClickUtil.onClick(ttsBtn, () -> {
             EditText ttsText = template.textArea(40, 40);
             LinearLayout line = template.line(50, 50, template.text("内容", 5, 7), ttsText);
-            PopupUtil.confirm(ttsBtn.getContext(), "请输入要转语音的文本", line, () -> {
+            this.popup.confirm("请输入要转语音的文本", line, () -> {
                 String text = ttsText.getText().toString();
                 NotifyUtil.speak(text);
             });

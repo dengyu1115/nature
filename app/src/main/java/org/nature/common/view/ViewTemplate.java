@@ -13,7 +13,11 @@ import org.nature.R;
 import org.nature.common.constant.Const;
 import org.nature.common.util.DateUtil;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static android.text.InputType.*;
 
@@ -26,7 +30,7 @@ import static android.text.InputType.*;
 @SuppressLint({"UseCompatLoadingForDrawables", "ResourceType", "DefaultLocale"})
 public class ViewTemplate {
 
-    private static final Map<Context, ViewTemplate> MAP = new HashMap<>();
+    private static final Map<Context, ViewTemplate> MAP = new ConcurrentHashMap<>();
     /**
      * 默认内边距
      */
@@ -47,11 +51,7 @@ public class ViewTemplate {
     }
 
     public static ViewTemplate build(Context context) {
-        ViewTemplate instance = MAP.get(context);
-        if (instance == null) {
-            MAP.put(context, instance = new ViewTemplate(context));
-        }
-        return instance;
+        return MAP.computeIfAbsent(context, ViewTemplate::new);
     }
 
     /**

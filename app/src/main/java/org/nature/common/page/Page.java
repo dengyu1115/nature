@@ -3,6 +3,7 @@ package org.nature.common.page;
 import android.content.Context;
 import android.view.View;
 import android.widget.LinearLayout;
+import org.nature.common.view.Popup;
 import org.nature.common.view.ViewTemplate;
 
 /**
@@ -17,6 +18,7 @@ public abstract class Page {
     protected static final int C = 0, S = 1, E = 2;
     protected Context context;
     protected ViewTemplate template;
+    protected Popup popup;
     protected LinearLayout page;
     private BasicPage basic;
     private Object param;
@@ -29,6 +31,7 @@ public abstract class Page {
         this.basic = basic;
         this.context = basic.getContext();
         this.template = ViewTemplate.build(context);
+        this.popup = Popup.build(context);
         this.page = new LinearLayout(context);
         this.makeStructure();
     }
@@ -56,14 +59,6 @@ public abstract class Page {
      */
     public <P> void setParam(P param) {
         this.param = param;
-    }
-
-    /**
-     * 设置页面布局方向
-     * @param orientation 布局方向
-     */
-    protected void setOrientation(int orientation) {
-        this.page.setOrientation(orientation);
     }
 
     /**

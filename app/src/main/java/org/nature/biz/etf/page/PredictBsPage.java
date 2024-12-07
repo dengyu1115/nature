@@ -38,7 +38,7 @@ public class PredictBsPage extends BaseBsPage {
         countSel.mapper(Object::toString);
         countSel.refreshData(list);
         // 默认展示3条
-        countSel.setValue(4);
+        countSel.setValue(5);
     }
 
 }

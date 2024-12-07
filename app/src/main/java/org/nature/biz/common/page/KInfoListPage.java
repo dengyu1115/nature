@@ -8,7 +8,6 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.ClickUtil;
-import org.nature.common.util.PopupUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.Table;
 
@@ -62,7 +61,8 @@ public class KInfoListPage extends ListPage<KInfo> {
     @Override
     protected void initHeaderBehaviours() {
         ClickUtil.onAsyncClick(load, this::loadAll);
-        ClickUtil.onPopConfirm(reload, "K线重载", "确定重新加载全部K线数据？", this::reloadAll);
+        ClickUtil.onClick(reload, () ->
+                this.popup.confirmAsync("K线重载", "确定重新加载全部K线数据？", this::reloadAll));
     }
 
     @Override
@@ -97,12 +97,12 @@ public class KInfoListPage extends ListPage<KInfo> {
     }
 
     private void load(KInfo info) {
-        PopupUtil.alert(this.context, "加载完成，数据量：" + klineManager.load(info));
+        this.popup.alert("加载完成，数据量：" + klineManager.load(info));
     }
 
     private void reload(KInfo info) {
-        PopupUtil.confirm(this.context, "重载K线", "确定重载吗？",
-                () -> PopupUtil.alert(this.context, "重载完成，数据量：" + klineManager.reload(info)));
+        this.popup.confirm("重载K线", "确定重载吗？",
+                () -> this.popup.alert("重载完成，数据量：" + klineManager.reload(info)));
     }
 
 }

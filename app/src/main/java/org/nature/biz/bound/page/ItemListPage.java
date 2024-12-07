@@ -11,7 +11,7 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.ClickUtil;
-import org.nature.common.util.PopupUtil;
+import org.nature.common.view.Popup;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
@@ -106,7 +106,7 @@ public class ItemListPage extends ListPage<Item> {
      */
     private void add() {
         this.makeWindowStructure();
-        PopupUtil.confirm(context, "新增项目", editPop, () -> this.doEdit(this::save));
+        this.popup.confirm("新增项目", editPop, () -> this.doEdit(this::save));
     }
 
     /**
@@ -120,7 +120,7 @@ public class ItemListPage extends ListPage<Item> {
         this.type.setValue(d.getType());
         this.fund.setText(d.getFund());
         this.ratio.setText(d.getRatio().toPlainString());
-        PopupUtil.confirm(context, "编辑项目-" + d.getName(), editPop, () -> this.doEdit(itemMapper::merge));
+        this.popup.confirm("编辑项目-" + d.getName(), editPop, () -> this.doEdit(itemMapper::merge));
     }
 
     /**
@@ -147,7 +147,7 @@ public class ItemListPage extends ListPage<Item> {
         item.setRatio(new BigDecimal(ratio));
         consumer.accept(item);
         this.refreshData();
-        PopupUtil.alert(context, "编辑成功！");
+        this.popup.alert("编辑成功！");
     }
 
     /**
@@ -155,10 +155,10 @@ public class ItemListPage extends ListPage<Item> {
      * @param d 数据
      */
     private void delete(Item d) {
-        PopupUtil.confirm(context, "删除项目-" + d.getName(), "确认删除吗？", () -> {
+        this.popup.confirm("删除项目-" + d.getName(), "确认删除吗？", () -> {
             itemMapper.deleteById(d);
             this.refreshData();
-            PopupUtil.alert(context, "删除成功！");
+            this.popup.alert("删除成功！");
         });
     }
 

@@ -12,7 +12,7 @@ import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.PopupUtil;
+import org.nature.common.view.Popup;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
@@ -94,7 +94,7 @@ public class RuleListPage extends ListPage<Rule> {
      */
     private void add() {
         this.makeWindowStructure();
-        PopupUtil.confirm(context, "新增", page, () -> this.doEdit(this::save));
+        this.popup.confirm("新增", page, () -> this.doEdit(this::save));
     }
 
     /**
@@ -109,7 +109,7 @@ public class RuleListPage extends ListPage<Rule> {
         this.ratio.setText(d.getRatio().toPlainString());
         this.expansion.setText(d.getExpansion().toPlainString());
         this.statusSel.setValue(d.getStatus());
-        PopupUtil.confirm(context, "编辑-" + d.getName(), page, () -> this.doEdit(ruleMapper::merge));
+        this.popup.confirm("编辑-" + d.getName(), page, () -> this.doEdit(ruleMapper::merge));
     }
 
     /**
@@ -146,7 +146,7 @@ public class RuleListPage extends ListPage<Rule> {
         rule.setRuleType(type);
         consumer.accept(rule);
         this.refreshData();
-        PopupUtil.alert(context, "编辑成功！");
+        this.popup.alert("编辑成功！");
     }
 
     /**
@@ -154,10 +154,10 @@ public class RuleListPage extends ListPage<Rule> {
      * @param d 数据
      */
     private void delete(Rule d) {
-        PopupUtil.confirm(context, "删除项目-" + d.getName(), "确认删除吗？", () -> {
+        this.popup.confirm("删除项目-" + d.getName(), "确认删除吗？", () -> {
             ruleMapper.deleteById(d);
             this.refreshData();
-            PopupUtil.alert(context, "删除成功！");
+            this.popup.alert("删除成功！");
         });
     }
 
@@ -167,7 +167,7 @@ public class RuleListPage extends ListPage<Rule> {
      */
     private void calcProfit(Rule d) {
         int i = holdManager.calc(d);
-        PopupUtil.alert(context, "持仓收益计算完成，数据量：" + i);
+        this.popup.alert("持仓收益计算完成，数据量：" + i);
     }
 
     /**

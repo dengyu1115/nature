@@ -2,10 +2,12 @@ package org.nature.common.util;
 
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.view.View;
 import org.apache.commons.lang3.StringUtils;
 import org.nature.common.exception.Warn;
+import org.nature.common.view.Popup;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -66,17 +68,6 @@ public class ClickUtil {
     }
 
     /**
-     * 给view设置点击弹确认框事件
-     * @param view     view
-     * @param title    标题
-     * @param content  内容
-     * @param supplier 处理逻辑
-     */
-    public static void onPopConfirm(View view, String title, String content, Supplier<String> supplier) {
-        ClickUtil.onClick(view, () -> PopupUtil.confirmAsync(view.getContext(), title, content, supplier));
-    }
-
-    /**
      * 点击处理（主线程执行）
      * @param view     view
      * @param runnable 执行逻辑
@@ -104,11 +95,11 @@ public class ClickUtil {
             handled.run();
         } catch (Warn e) {
             // 弹出提示
-            PopupUtil.alert(view.getContext(), e.getMessage());
+            Popup.build(view.getContext()).alert(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             // 弹出提示
-            PopupUtil.alert(view.getContext(), "系统错误");
+            Popup.build(view.getContext()).alert("系统错误");
         } finally {
             // 恢复view可点击
             view.setClickable(true);
@@ -130,28 +121,15 @@ public class ClickUtil {
     /**
      * 点击处理（异步执行）
      * @param view     view
-     * @param runnable 执行逻辑
-     * @param handled  执行完毕后下一步执行
-     */
-    public static void asyncClick(View view, Runnable runnable, Runnable handled) {
-        ClickUtil.asyncClick(view, () -> {
-            runnable.run();
-            return null;
-        }, handled);
-    }
-
-    /**
-     * 点击处理（异步执行）
-     * @param view     view
      * @param supplier 执行逻辑
      * @param handled  执行完毕后下一步执行
      */
     private static void asyncClick(View view, Supplier<String> supplier, Runnable handled) {
         // 异步事件处理器
-        Handler handler = new Handler(msg -> {
+        Handler handler = new Handler(Looper.myLooper(), msg -> {
             String message = msg.getData().getString("data");
             if (message != null) {
-                PopupUtil.alert(view.getContext(), message);
+                Popup.build(view.getContext()).alert(message);
             } else {
                 handled.run();
             }
