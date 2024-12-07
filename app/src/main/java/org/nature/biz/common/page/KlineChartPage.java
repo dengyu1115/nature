@@ -25,6 +25,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
 
+import static org.nature.common.constant.Const.L_H;
+import static org.nature.common.constant.Const.L_W_T;
+
 /**
  * K线图
  * @author Nature
@@ -152,7 +155,7 @@ public class KlineChartPage extends Page {
      * @return Button
      */
     private Button klineView(String title, Function<List<Kline>, List<Kline>> func) {
-        Button button = template.button(title, 8, 7);
+        Button button = template.button(title, L_W_T, L_H);
         ClickUtil.onClick(button, () -> chart.data(KlineUtil.convert(func.apply(list), name)));
         return button;
     }

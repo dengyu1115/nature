@@ -12,7 +12,6 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.ClickUtil;
-import org.nature.common.view.Popup;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
@@ -22,6 +21,8 @@ import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static org.nature.common.constant.Const.*;
 
 /**
  * 规则页面
@@ -175,13 +176,13 @@ public class RuleListPage extends ListPage<Rule> {
     private void makeWindowStructure() {
         ViewTemplate t = template;
         page = t.block(Gravity.CENTER,
-                t.line(21, 7 , t.text("编号：", 8, 7), code = t.input(12, 7 )),
-                t.line(21, 7 , t.text("名称：", 8, 7), name = t.input(12, 7 )),
-                t.line(21, 7 , t.text("开始日期：", 8, 7), dateStart = t.input(12, 7 )),
-                t.line(21, 7 , t.text("结束日期：", 8, 7), dateEnd = t.input(12, 7 )),
-                t.line(21, 7 , t.text("数据天数：", 8, 7), days = t.number(12, 7 )),
-                t.line(21, 7 , t.text("触发差值：", 8, 7), diff = t.decimal(12, 7 )),
-                t.line(21, 7 , t.text("状态：", 8, 7), statusSel = t.selector(12, 7 ))
+                t.line(L_W, L_H, t.text("编号：", L_W_T, L_H), code = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("名称：", L_W_T, L_H), name = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("开始日期：", L_W_T, L_H), dateStart = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("结束日期：", L_W_T, L_H), dateEnd = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("数据天数：", L_W_T, L_H), days = t.number(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("触发差值：", L_W_T, L_H), diff = t.decimal(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("状态：", L_W_T, L_H), statusSel = t.selector(L_W_C, L_H))
         );
         statusSel.mapper(this::statusName);
         statusSel.refreshData(Arrays.asList("1", "0"));

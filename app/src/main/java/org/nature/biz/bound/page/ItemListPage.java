@@ -11,7 +11,6 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.ClickUtil;
-import org.nature.common.view.Popup;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
@@ -25,7 +24,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static org.nature.common.constant.Const.DELIMITER;
+import static org.nature.common.constant.Const.*;
 
 /**
  * 项目维护
@@ -168,13 +167,13 @@ public class ItemListPage extends ListPage<Item> {
     private void makeWindowStructure() {
         ViewTemplate t = template;
         editPop = t.block(Gravity.CENTER,
-                t.line(21, 7, t.text("选择复制:", 8, 7), item = t.selector(12, 7)),
-                t.line(21, 7, t.text("名称：", 8, 7), name = t.input(12, 7)),
-                t.line(21, 7, t.text("编号：", 8, 7), code = t.input(12, 7)),
-                t.line(21, 7, t.text("类型：", 8, 7), type = t.selector(12, 7)),
-                t.line(21, 7, t.text("基金编号：", 8, 7), fund = t.input(12, 7)),
-                t.line(21, 7, t.text("比例系数：", 8, 7), ratio = t.decimal(12, 7)),
-                t.line(21, 7)
+                t.line(L_W, L_H, t.text("选择复制:", L_W_T, L_H), item = t.selector(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("名称：", L_W_T, L_H), name = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("编号：", L_W_T, L_H), code = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("类型：", L_W_T, L_H), type = t.selector(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("基金编号：", L_W_T, L_H), fund = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("比例系数：", L_W_T, L_H), ratio = t.decimal(L_W_C, L_H)),
+                t.line(L_W, L_H)
         );
         type.mapper(i -> i);
         type.refreshData(Arrays.asList("0", "1"));

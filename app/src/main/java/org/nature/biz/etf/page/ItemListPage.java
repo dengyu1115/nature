@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static org.nature.common.constant.Const.*;
+
 /**
  * 项目维护
  * @author Nature
@@ -195,10 +197,10 @@ public class ItemListPage extends ListPage<Item> {
     private void makeWindowStructure() {
         ViewTemplate t = template;
         editPop = t.block(Gravity.CENTER,
-                t.line(21, 7, t.text("编号：", 8, 7), code = t.input(12, 7)),
-                t.line(21, 7, t.text("名称：", 8, 7), name = t.input(12, 7)),
-                t.line(21, 7, t.text("类型：", 8, 7), type = t.selector(12, 7)),
-                t.line(21, 7)
+                t.line(L_W, L_H, t.text("编号：", L_W_T, L_H), code = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("名称：", L_W_T, L_H), name = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("类型：", L_W_T, L_H), type = t.selector(L_W_C, L_H)),
+                t.line(L_W, L_H)
         );
         type.mapper(i -> i);
         type.refreshData(Arrays.asList("0", "1"));

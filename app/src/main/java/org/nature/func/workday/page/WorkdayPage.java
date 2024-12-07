@@ -29,6 +29,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
+import static org.nature.common.constant.Const.*;
+
 /**
  * 工作日
  * @author Nature
@@ -87,8 +89,8 @@ public class WorkdayPage extends ListPage<Month> {
 
     @Override
     protected void initHeaderViews(LinearLayout condition) {
-        condition.addView(reload = template.button("重新加载", 8, 7));
-        condition.addView(loadLatest = template.button("加载最新", 8, 7));
+        condition.addView(reload = template.button("重新加载", L_W_T, L_H));
+        condition.addView(loadLatest = template.button("加载最新", L_W_T, L_H));
         condition.addView(year = template.selector(10, 7));
     }
 
@@ -158,8 +160,8 @@ public class WorkdayPage extends ListPage<Month> {
     private void makeWindowStructure() {
         ViewTemplate t = template;
         page = t.block(Gravity.CENTER,
-                t.line(21, 7, t.text("日期：", 8, 7), date = t.input(12, 7)),
-                t.line(21, 7, t.text("类型：", 8, 7), type = t.selector(12, 7))
+                t.line(L_W, L_H, t.text("日期：", L_W_T, L_H), date = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("类型：", L_W_T, L_H), type = t.selector(L_W_C, L_H))
         );
         date.setFocusable(false);
         type.mapper(i -> i);

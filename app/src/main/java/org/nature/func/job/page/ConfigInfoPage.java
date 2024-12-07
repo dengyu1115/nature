@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import static org.nature.common.constant.Const.*;
+
 /**
  * 任务配置
  * @author Nature
@@ -102,14 +104,14 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
     private void makeWindowStructure() {
         ViewTemplate t = template;
         editPop = t.block(Gravity.CENTER,
-                t.line(21, 7, t.text("任务：", 8, 7), jobSel = t.selector(12, 7)),
-                t.line(21, 7, t.text("年：", 8, 7), year = t.input(12, 7)),
-                t.line(21, 7, t.text("月：", 8, 7), month = t.input(12, 7)),
-                t.line(21, 7, t.text("日：", 8, 7), day = t.input(12, 7)),
-                t.line(21, 7, t.text("时：", 8, 7), hour = t.input(12, 7)),
-                t.line(21, 7, t.text("分：", 8, 7), minute = t.input(12, 7)),
-                t.line(21, 7, t.text("秒：", 8, 7), second = t.input(12, 7)),
-                t.line(21, 7, t.text("状态：", 8, 7), statusSel = t.selector(12, 7))
+                t.line(L_W, L_H, t.text("任务：", L_W_T, L_H), jobSel = t.selector(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("年：", L_W_T, L_H), year = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("月：", L_W_T, L_H), month = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("日：", L_W_T, L_H), day = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("时：", L_W_T, L_H), hour = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("分：", L_W_T, L_H), minute = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("秒：", L_W_T, L_H), second = t.input(L_W_C, L_H)),
+                t.line(L_W, L_H, t.text("状态：", L_W_T, L_H), statusSel = t.selector(L_W_C, L_H))
         );
         jobSel.mapper(JobHolder::getName);
         jobSel.refreshData(JobHolder.jobs());
