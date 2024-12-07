@@ -35,7 +35,8 @@ public class ClickUtil {
      * @param runnable 执行逻辑
      */
     public static void onClick(View view, Runnable runnable) {
-        view.setOnClickListener(v -> ClickUtil.click(v, runnable));
+        view.setOnClickListener(v -> ClickUtil.click(v, runnable, () -> {
+        }));
     }
 
     /**
@@ -64,17 +65,8 @@ public class ClickUtil {
      * @param supplier 执行逻辑
      */
     public static void onAsyncClick(View view, Supplier<String> supplier) {
-        view.setOnClickListener(v -> ClickUtil.asyncClick(v, supplier));
-    }
-
-    /**
-     * 点击处理（主线程执行）
-     * @param view     view
-     * @param runnable 执行逻辑
-     */
-    public static void click(View view, Runnable runnable) {
-        ClickUtil.click(view, runnable, () -> {
-        });
+        view.setOnClickListener(v -> ClickUtil.asyncClick(v, supplier, () -> {
+        }));
     }
 
     /**
@@ -83,7 +75,7 @@ public class ClickUtil {
      * @param runnable 执行逻辑
      * @param handled  执行完毕后下一步执行
      */
-    public static void click(View view, Runnable runnable, Runnable handled) {
+    private static void click(View view, Runnable runnable, Runnable handled) {
         // 设置view不可点击
         try {
             view.setClickable(false);
@@ -106,16 +98,6 @@ public class ClickUtil {
             // 上次点击时间重置
             millis = System.currentTimeMillis();
         }
-    }
-
-    /**
-     * 点击处理（异步执行）
-     * @param view     view
-     * @param supplier 执行逻辑
-     */
-    public static void asyncClick(View view, Supplier<String> supplier) {
-        ClickUtil.asyncClick(view, supplier, () -> {
-        });
     }
 
     /**

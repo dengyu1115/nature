@@ -188,6 +188,7 @@ public class Table<T> extends LinearLayout {
         listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         // 数据刷新完成滚动所有view到同一位置
         listView.getViewTreeObserver().addOnGlobalLayoutListener(() -> hsViews.forEach(i -> i.scrollTo(this.scrollX, 0)));
+        listView.setOnScrollChangeListener((v, x, y, ox, oy) -> hsViews.forEach(i -> i.scrollTo(this.scrollX, 0)));
         return listView;
     }
 
