@@ -26,10 +26,6 @@ public class NInfoListPage extends ListPage<NInfo> {
     @Injection
     private NetManager netManager;
     /**
-     * 加载K线、重新加载K线
-     */
-    private Button load, reload;
-    /**
      * 表头
      */
     private final List<Table.Header<NInfo>> headers = Arrays.asList(
@@ -40,6 +36,10 @@ public class NInfoListPage extends ListPage<NInfo> {
             Table.header("重载", d -> "+", C, C, this::reload)
 
     );
+    /**
+     * 加载K线、重新加载K线
+     */
+    private Button load, reload;
 
     @Override
     protected List<Table.Header<NInfo>> headers() {
@@ -61,7 +61,7 @@ public class NInfoListPage extends ListPage<NInfo> {
     protected void initHeaderBehaviours() {
         ClickUtil.onAsyncClick(load, this::loadAll);
         ClickUtil.onClick(reload, () ->
-                this.popup.confirmAsync("K线重载", "确定重新加载全部K线数据？", this::reloadAll));
+                template.confirmAsync("K线重载", "确定重新加载全部K线数据？", this::reloadAll));
     }
 
     @Override
@@ -96,12 +96,12 @@ public class NInfoListPage extends ListPage<NInfo> {
     }
 
     private void load(NInfo info) {
-        this.popup.alert("加载完成，数据量：" + netManager.load(info.getCode()));
+        template.alert("加载完成，数据量：" + netManager.load(info.getCode()));
     }
 
     private void reload(NInfo info) {
-        this.popup.confirm("重载K线", "确定重载吗？",
-                () -> this.popup.alert("重载完成，数据量：" + netManager.reload(info.getCode())));
+        template.confirm("重载K线", "确定重载吗？",
+                () -> template.alert("重载完成，数据量：" + netManager.reload(info.getCode())));
     }
 
 }

@@ -5,9 +5,9 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.view.View;
+import android.widget.Toast;
 import org.apache.commons.lang3.StringUtils;
 import org.nature.common.exception.Warn;
-import org.nature.common.view.Popup;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -87,11 +87,11 @@ public class ClickUtil {
             handled.run();
         } catch (Warn e) {
             // 弹出提示
-            Popup.build(view.getContext()).alert(e.getMessage());
+            Toast.makeText(view.getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             e.printStackTrace();
             // 弹出提示
-            Popup.build(view.getContext()).alert("系统错误");
+            Toast.makeText(view.getContext(), "系统错误", Toast.LENGTH_LONG).show();
         } finally {
             // 恢复view可点击
             view.setClickable(true);
@@ -111,7 +111,7 @@ public class ClickUtil {
         Handler handler = new Handler(Looper.myLooper(), msg -> {
             String message = msg.getData().getString("data");
             if (message != null) {
-                Popup.build(view.getContext()).alert(message);
+                Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
             } else {
                 handled.run();
             }

@@ -24,11 +24,10 @@ import java.util.*;
 @JobExec(code = "bound_notice_job", name = "债券差价提醒")
 public class BoundNoticeJob implements Job {
 
-    private static final BigDecimal HUNDRED = new BigDecimal("100");
     public static final String RECORD_TYPE = "BOUND_NOTICE";
     public static final TypeReference<HashSet<String>> TYPE = new TypeReference<>() {
     };
-
+    private static final BigDecimal HUNDRED = new BigDecimal("100");
     private static boolean running;
 
     @Injection

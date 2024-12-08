@@ -23,11 +23,6 @@ import java.util.List;
 @PageView(name = "K线列表", group = "", col = 0, row = 0)
 public class KlineListPage extends ListPage<Kline> {
 
-    @Injection
-    private KlineMapper klineMapper;
-
-    private Button chart;
-
     private final List<Table.Header<Kline>> headers = Arrays.asList(
             Table.header("CODE", d -> TextUtil.text(d.getCode()), C, S, Kline::getCode),
             Table.header("日期", d -> TextUtil.text(d.getDate()), C, S, Kline::getDate),
@@ -38,6 +33,9 @@ public class KlineListPage extends ListPage<Kline> {
             Table.header("最高", d -> TextUtil.price(d.getHigh()), C, E, Kline::getHigh),
             Table.header("最低", d -> TextUtil.price(d.getLow()), C, E, Kline::getLow)
     );
+    @Injection
+    private KlineMapper klineMapper;
+    private Button chart;
 
     @Override
     protected List<Table.Header<Kline>> headers() {

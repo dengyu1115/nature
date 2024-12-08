@@ -1,7 +1,7 @@
 package org.nature.biz.common.util;
 
-import org.nature.biz.common.model.Kline;
 import org.nature.biz.common.model.KView;
+import org.nature.biz.common.model.Kline;
 import org.nature.common.constant.Const;
 
 import java.math.BigDecimal;

@@ -33,14 +33,6 @@ import java.util.stream.Collectors;
 @PageView(name = "收益列表", group = "ETF", col = 2, row = 2)
 public class ProfitListPage extends ListPage<Profit> {
 
-    @Injection
-    private ProfitManager profitManager;
-    @Injection
-    private ItemMapper itemMapper;
-
-    private Button dateStart, dateEnd, item, rule, total;
-    private Selector<String> dateRule;
-
     private final List<Table.Header<Profit>> headers = Arrays.asList(
             Table.header("项目", d -> TextUtil.text(d.getName()), C, S, Profit::getName),
             Table.header("规则", d -> TextUtil.text(d.getRule()), C, S, Profit::getRule),
@@ -66,7 +58,6 @@ public class ProfitListPage extends ListPage<Profit> {
                     Table.header("回收-总额", d -> TextUtil.amount(d.getReturned()), C, E, Profit::getReturned))
             )
     );
-
     private final List<String> dateRuleList = List.of("0", "", "1", "2", "3", "4");
     private final Map<String, String> dateRuleMap = Map.of(
             "", "自定义",
@@ -75,7 +66,12 @@ public class ProfitListPage extends ListPage<Profit> {
             "2", "近1年每周",
             "3", "近3年每月",
             "4", "近10年每年");
-
+    @Injection
+    private ProfitManager profitManager;
+    @Injection
+    private ItemMapper itemMapper;
+    private Button dateStart, dateEnd, item, rule, total;
+    private Selector<String> dateRule;
     private Map<String, String> nameMap;
 
     @Override

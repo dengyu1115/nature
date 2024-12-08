@@ -104,7 +104,7 @@ public class WorkdayPage extends ListPage<Month> {
             Warn.check(() -> StringUtils.isBlank(year), "请选择年份");
             return String.format("加载完成,共%s条", workDayManager.load(year));
         });
-        ClickUtil.onClick(reload, () -> this.popup.confirmAsync("重新加载数据", "确定重新加载吗？", () -> {
+        ClickUtil.onClick(reload, () -> template.confirmAsync("重新加载数据", "确定重新加载吗？", () -> {
             String year = this.year.getValue();
             Warn.check(() -> StringUtils.isBlank(year), "请选择年份");
             return String.format("加载完成,共%s条", workDayManager.reload(year));
@@ -134,7 +134,7 @@ public class WorkdayPage extends ListPage<Month> {
         this.makeWindowStructure();
         this.date.setText(day);
         this.type.setValue(type);
-        this.popup.confirm("编辑-" + day, page, () -> this.doEdit(workdayMapper::merge));
+        template.confirm("编辑-" + day, page, () -> this.doEdit(workdayMapper::merge));
     }
 
     /**
@@ -151,7 +151,7 @@ public class WorkdayPage extends ListPage<Month> {
         workday.setType(type);
         consumer.accept(workday);
         this.refreshData();
-        this.popup.alert("编辑成功！");
+        template.alert("编辑成功！");
     }
 
     /**

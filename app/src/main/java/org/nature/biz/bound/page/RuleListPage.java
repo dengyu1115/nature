@@ -38,11 +38,9 @@ public class RuleListPage extends ListPage<Rule> {
     @Injection
     private RuleManager ruleManager;
 
-    private LinearLayout page;
+    private LinearLayout popup;
     private EditText code, name, dateStart, dateEnd, days, diff;
     private Selector<String> statusSel;
-    private Button add;
-
     private final List<Table.Header<Rule>> headers = Arrays.asList(
             Table.header("编号", d -> TextUtil.text(d.getCode()), C, S, Rule::getCode),
             Table.header("名称", d -> TextUtil.text(d.getName()), C, S, Rule::getName),
@@ -56,6 +54,7 @@ public class RuleListPage extends ListPage<Rule> {
             Table.header("编辑", d -> "+", C, C, this::edit),
             Table.header("删除", d -> "-", C, C, this::delete)
     );
+    private Button add;
 
     @Override
     protected List<Table.Header<Rule>> headers() {
@@ -92,7 +91,7 @@ public class RuleListPage extends ListPage<Rule> {
      */
     private void add() {
         this.makeWindowStructure();
-        this.popup.confirm("新增", page, () -> this.doEdit(this::save));
+        template.confirm("新增", popup, () -> this.doEdit(this::save));
     }
 
     /**
@@ -108,7 +107,7 @@ public class RuleListPage extends ListPage<Rule> {
         this.days.setText(String.valueOf(d.getDays()));
         this.diff.setText(d.getDiff().toPlainString());
         this.statusSel.setValue(d.getStatus());
-        this.popup.confirm("编辑-" + d.getName(), page, () -> this.doEdit(ruleMapper::merge));
+        template.confirm("编辑-" + d.getName(), popup, () -> this.doEdit(ruleMapper::merge));
     }
 
     /**
@@ -139,7 +138,7 @@ public class RuleListPage extends ListPage<Rule> {
         rule.setStatus(status);
         consumer.accept(rule);
         this.refreshData();
-        this.popup.alert("编辑成功！");
+        template.alert("编辑成功！");
     }
 
     /**
@@ -155,10 +154,10 @@ public class RuleListPage extends ListPage<Rule> {
      * @param d 数据
      */
     private void delete(Rule d) {
-        this.popup.confirm("删除项目-" + d.getName(), "确认删除吗？", () -> {
+        template.confirm("删除项目-" + d.getName(), "确认删除吗？", () -> {
             ruleMapper.deleteById(d.getCode());
             this.refreshData();
-            this.popup.alert("删除成功！");
+            template.alert("删除成功！");
         });
     }
 
@@ -175,7 +174,7 @@ public class RuleListPage extends ListPage<Rule> {
      */
     private void makeWindowStructure() {
         ViewTemplate t = template;
-        page = t.block(Gravity.CENTER,
+        popup = t.block(Gravity.CENTER,
                 t.line(L_W, L_H, t.text("编号：", L_W_T, L_H), code = t.input(L_W_C, L_H)),
                 t.line(L_W, L_H, t.text("名称：", L_W_T, L_H), name = t.input(L_W_C, L_H)),
                 t.line(L_W, L_H, t.text("开始日期：", L_W_T, L_H), dateStart = t.input(L_W_C, L_H)),

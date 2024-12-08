@@ -26,10 +26,6 @@ public class KInfoListPage extends ListPage<KInfo> {
     @Injection
     private KlineManager klineManager;
     /**
-     * 加载K线、重新加载K线
-     */
-    private Button load, reload;
-    /**
      * 表头
      */
     private final List<Table.Header<KInfo>> headers = Arrays.asList(
@@ -41,6 +37,10 @@ public class KInfoListPage extends ListPage<KInfo> {
             Table.header("重载", d -> "+", C, C, this::reload)
 
     );
+    /**
+     * 加载K线、重新加载K线
+     */
+    private Button load, reload;
 
     @Override
     protected List<Table.Header<KInfo>> headers() {
@@ -62,7 +62,7 @@ public class KInfoListPage extends ListPage<KInfo> {
     protected void initHeaderBehaviours() {
         ClickUtil.onAsyncClick(load, this::loadAll);
         ClickUtil.onClick(reload, () ->
-                this.popup.confirmAsync("K线重载", "确定重新加载全部K线数据？", this::reloadAll));
+                template.confirmAsync("K线重载", "确定重新加载全部K线数据？", this::reloadAll));
     }
 
     @Override
@@ -97,12 +97,12 @@ public class KInfoListPage extends ListPage<KInfo> {
     }
 
     private void load(KInfo info) {
-        this.popup.alert("加载完成，数据量：" + klineManager.load(info));
+        template.alert("加载完成，数据量：" + klineManager.load(info));
     }
 
     private void reload(KInfo info) {
-        this.popup.confirm("重载K线", "确定重载吗？",
-                () -> this.popup.alert("重载完成，数据量：" + klineManager.reload(info)));
+        template.confirm("重载K线", "确定重载吗？",
+                () -> template.alert("重载完成，数据量：" + klineManager.reload(info)));
     }
 
 }

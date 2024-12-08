@@ -27,16 +27,6 @@ import java.util.stream.Collectors;
 @PageView(name = "涨幅列表", group = "债券", col = 2, row = 1)
 public class RateListPage extends ListPage<Rate> {
 
-    @Injection
-    private RateManager boundManager;
-    @Injection
-    private RuleMapper ruleMapper;
-
-    private Selector<String> type, rule;
-
-    private Button date;
-
-
     private final List<Table.Header<Rate>> headers = Arrays.asList(
             Table.header("规则编号", d -> TextUtil.text(d.getRuleCode()), C, S, Rate::getRuleCode),
             Table.header("规则名称", d -> TextUtil.text(d.getRuleName()), C, S, Rate::getRuleName),
@@ -48,6 +38,12 @@ public class RateListPage extends ListPage<Rate> {
             Table.header("价格2", d -> TextUtil.price(d.getPrice2()), C, E, Rate::getPrice2),
             Table.header("幅度", d -> TextUtil.hundred(d.getRatio()), C, E, Rate::getRatio)
     );
+    @Injection
+    private RateManager boundManager;
+    @Injection
+    private RuleMapper ruleMapper;
+    private Selector<String> type, rule;
+    private Button date;
 
     @Override
     protected List<Table.Header<Rate>> headers() {

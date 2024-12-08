@@ -33,15 +33,14 @@ public class JobService extends Service {
      */
     private static final int PERIOD = 1000;
     /**
-     * 计数器
-     */
-    private final AtomicInteger counter = new AtomicInteger();
-
-    private final long startTime = System.currentTimeMillis();
-    /**
      * 定时器
      */
     private static volatile ScheduledExecutorService service;
+    /**
+     * 计数器
+     */
+    private final AtomicInteger counter = new AtomicInteger();
+    private final long startTime = System.currentTimeMillis();
     /**
      * 唤醒锁
      */

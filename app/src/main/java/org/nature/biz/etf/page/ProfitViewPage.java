@@ -24,9 +24,6 @@ import java.util.List;
 @PageView(name = "盈利总览", group = "ETF", col = 2, row = 1)
 public class ProfitViewPage extends ListPage<ProfitView> {
 
-    @Injection
-    private ProfitManager profitManager;
-
     private final List<Table.Header<ProfitView>> headers = Arrays.asList(
             Table.header("项目", d -> TextUtil.text(d.getTitle()), C, C),
             Table.header("子项1", C, Arrays.asList(
@@ -41,7 +38,8 @@ public class ProfitViewPage extends ListPage<ProfitView> {
                     Table.header("项目", d -> TextUtil.text(d.getTitle3()), C, C),
                     Table.header("值", d -> TextUtil.text(d.getValue3()), C, E)
             )));
-
+    @Injection
+    private ProfitManager profitManager;
     private Button dateBtn;
 
     @Override

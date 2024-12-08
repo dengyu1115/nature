@@ -10,7 +10,7 @@ import org.nature.common.db.builder.util.SqlBuilder;
 import java.util.List;
 
 /**
- *  根据id集合批量删除数据
+ * 根据id集合批量删除数据
  * @author Nature
  * @version 1.0.0
  * @since 2024/1/7

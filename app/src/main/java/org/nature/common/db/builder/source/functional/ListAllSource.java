@@ -1,7 +1,7 @@
 package org.nature.common.db.builder.source.functional;
 
-import org.nature.common.db.builder.model.Mapping;
 import org.nature.common.db.DB;
+import org.nature.common.db.builder.model.Mapping;
 import org.nature.common.db.builder.source.definition.FunctionalSource;
 import org.nature.common.db.builder.util.ModelUtil;
 import org.nature.common.db.builder.util.SqlBuilder;

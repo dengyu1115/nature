@@ -42,8 +42,6 @@ public class RuleListPage extends ListPage<Rule> {
     private LinearLayout page;
     private EditText name, base, ratio, date, expansion;
     private Selector<String> statusSel, typeSel;
-    private Button add;
-
     private final List<Table.Header<Rule>> headers = Arrays.asList(
             Table.header("名称", d -> TextUtil.text(d.getName()), C, S, Rule::getName),
             Table.header("规则类型", d -> TextUtil.text(this.typeName(d.getRuleType())), C, C, Rule::getRuleType),
@@ -58,6 +56,7 @@ public class RuleListPage extends ListPage<Rule> {
             Table.header("波动比率", d -> TextUtil.text(d.getRatio()), C, C, Rule::getRatio),
             Table.header("扩大幅度", d -> TextUtil.text(d.getExpansion()), C, C, Rule::getExpansion)
     );
+    private Button add;
 
     @Override
     protected List<Table.Header<Rule>> headers() {
@@ -95,7 +94,7 @@ public class RuleListPage extends ListPage<Rule> {
      */
     private void add() {
         this.makeWindowStructure();
-        this.popup.confirm("新增", page, () -> this.doEdit(this::save));
+        template.confirm("新增", page, () -> this.doEdit(this::save));
     }
 
     /**
@@ -110,7 +109,7 @@ public class RuleListPage extends ListPage<Rule> {
         this.ratio.setText(d.getRatio().toPlainString());
         this.expansion.setText(d.getExpansion().toPlainString());
         this.statusSel.setValue(d.getStatus());
-        this.popup.confirm("编辑-" + d.getName(), page, () -> this.doEdit(ruleMapper::merge));
+        template.confirm("编辑-" + d.getName(), page, () -> this.doEdit(ruleMapper::merge));
     }
 
     /**
@@ -147,7 +146,7 @@ public class RuleListPage extends ListPage<Rule> {
         rule.setRuleType(type);
         consumer.accept(rule);
         this.refreshData();
-        this.popup.alert("编辑成功！");
+        template.alert("编辑成功！");
     }
 
     /**
@@ -155,10 +154,10 @@ public class RuleListPage extends ListPage<Rule> {
      * @param d 数据
      */
     private void delete(Rule d) {
-        this.popup.confirm("删除项目-" + d.getName(), "确认删除吗？", () -> {
+        template.confirm("删除项目-" + d.getName(), "确认删除吗？", () -> {
             ruleMapper.deleteById(d);
             this.refreshData();
-            this.popup.alert("删除成功！");
+            template.alert("删除成功！");
         });
     }
 
@@ -168,7 +167,7 @@ public class RuleListPage extends ListPage<Rule> {
      */
     private void calcProfit(Rule d) {
         int i = holdManager.calc(d);
-        this.popup.alert("持仓收益计算完成，数据量：" + i);
+        template.alert("持仓收益计算完成，数据量：" + i);
     }
 
     /**

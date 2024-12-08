@@ -23,11 +23,6 @@ import java.util.List;
 @PageView(name = "计算结果", group = "债券", col = 0, row = 0)
 public class ResultListPage extends ListPage<Result> {
 
-    @Injection
-    private CalcManager calcManager;
-
-    private Selector<String> strategy;
-
     /**
      * 表头
      */
@@ -38,6 +33,9 @@ public class ResultListPage extends ListPage<Result> {
             Table.header("类型", d -> TextUtil.text(d.getType()), C, C, Result::getType),
             Table.header("涨幅", d -> TextUtil.hundred(d.getRatio()), C, E, Result::getRatio)
     );
+    @Injection
+    private CalcManager calcManager;
+    private Selector<String> strategy;
 
     @Override
     protected List<Table.Header<Result>> headers() {

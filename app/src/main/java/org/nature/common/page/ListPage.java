@@ -101,7 +101,7 @@ public abstract class ListPage<T> extends Page {
                 Looper.prepare();
                 String message = e.getMessage();
                 message = StringUtils.isBlank(message) ? "未知错误" : message;
-                this.popup.alert(message);
+                template.alert(message);
             } finally {
                 button.setClickable(true);
             }

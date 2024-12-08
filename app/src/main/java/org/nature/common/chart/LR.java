@@ -24,7 +24,7 @@ public class LR<T> extends BR<T> {
 
     @Override
     protected List<Function<T, Double>> fs() {
-        return this.cs.stream().map(i->i.func).collect(Collectors.toList());
+        return this.cs.stream().map(i -> i.func).collect(Collectors.toList());
     }
 
 }

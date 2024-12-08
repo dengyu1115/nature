@@ -24,10 +24,9 @@ import java.util.stream.Collectors;
 @Component
 public class NetHttp {
 
+    public static final Map<String, String> HEADER = Map.of("Referer", "http://fundf10.eastmoney.com/");
     private static final String URL_NET_LIST = "http://api.fund.eastmoney.com/f10/lsjz?fundCode=%s&pageIndex=1&pageSize=100000" +
             "&startDate=%s&endDate=%s";
-    public static final Map<String, String> HEADER = Map.of("Referer", "http://fundf10.eastmoney.com/");
-
 
     /**
      * 查询单位净值

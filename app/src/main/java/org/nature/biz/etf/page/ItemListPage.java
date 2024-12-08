@@ -57,10 +57,6 @@ public class ItemListPage extends ListPage<Item> {
      */
     private Selector<String> type;
     /**
-     * 新增、加载K线、重新加载K线、计算规则按钮
-     */
-    private Button add, calcRule;
-    /**
      * 表头
      */
     private final List<Table.Header<Item>> headers = Arrays.asList(
@@ -72,6 +68,10 @@ public class ItemListPage extends ListPage<Item> {
             Table.header("K线查看", d -> "查看", C, C, this::showKline),
             Table.header("规则查看", d -> "查看", C, C, this::showRule)
     );
+    /**
+     * 新增、加载K线、重新加载K线、计算规则按钮
+     */
+    private Button add, calcRule;
 
     @Override
     protected List<Table.Header<Item>> headers() {
@@ -116,7 +116,7 @@ public class ItemListPage extends ListPage<Item> {
      */
     private void add() {
         this.makeWindowStructure();
-        this.popup.confirm("新增项目", editPop, () -> this.doEdit(this::save));
+        template.confirm("新增项目", editPop, () -> this.doEdit(this::save));
     }
 
     /**
@@ -128,7 +128,7 @@ public class ItemListPage extends ListPage<Item> {
         this.code.setText(d.getCode());
         this.name.setText(d.getName());
         this.type.setValue(d.getType());
-        this.popup.confirm("编辑项目-" + d.getName(), editPop, () -> this.doEdit(itemMapper::merge));
+        template.confirm("编辑项目-" + d.getName(), editPop, () -> this.doEdit(itemMapper::merge));
     }
 
     /**
@@ -148,7 +148,7 @@ public class ItemListPage extends ListPage<Item> {
         item.setType(type);
         consumer.accept(item);
         this.refreshData();
-        this.popup.alert("编辑成功！");
+        template.alert("编辑成功！");
     }
 
     /**
@@ -156,10 +156,10 @@ public class ItemListPage extends ListPage<Item> {
      * @param d 数据
      */
     private void delete(Item d) {
-        this.popup.confirm("删除项目-" + d.getName(), "确认删除吗？", () -> {
+        template.confirm("删除项目-" + d.getName(), "确认删除吗？", () -> {
             itemMapper.deleteById(d);
             this.refreshData();
-            this.popup.alert("删除成功！");
+            template.alert("删除成功！");
         });
     }
 

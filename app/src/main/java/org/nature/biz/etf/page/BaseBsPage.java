@@ -25,15 +25,7 @@ import java.util.stream.Collectors;
  */
 public abstract class BaseBsPage extends ListPage<Hold> {
 
-    @Injection
-    private ItemMapper itemMapper;
-
-    private Selector<String> handleSel;
-
     private final Map<String, String> itemNameMap = new HashMap<>();
-
-    protected abstract List<Hold> data();
-
     private final List<Table.Header<Hold>> headers = Arrays.asList(
             Table.header("项目", d -> TextUtil.text(this.getItem(d)), C, S, this::getItem),
             Table.header("规则", d -> TextUtil.text(d.getRule()), C, S, Hold::getRule),
@@ -54,6 +46,11 @@ public abstract class BaseBsPage extends ListPage<Hold> {
                     Table.header("盈利", d -> TextUtil.amount(d.getProfit()), C, E, Hold::getProfit))
             )
     );
+    @Injection
+    private ItemMapper itemMapper;
+    private Selector<String> handleSel;
+
+    protected abstract List<Hold> data();
 
     @Override
     protected List<Table.Header<Hold>> headers() {

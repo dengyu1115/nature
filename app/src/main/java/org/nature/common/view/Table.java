@@ -42,7 +42,6 @@ public class Table<T> extends LinearLayout {
      * 水平滚动的view集合
      */
     private final Set<HorizontalScrollView> hsViews = new HashSet<>();
-    private final OnScrollChangeListener scrollListener = (v, x, y, ox, oy) -> hsViews.forEach(i -> i.scrollTo(this.scrollX = x, 0));
     /**
      * 排序点击计数
      */
@@ -58,17 +57,13 @@ public class Table<T> extends LinearLayout {
         this.adapter.notifyDataSetChanged();
         return false;
     });
-
     private final Context context;
-
     private final int rowHeight, colWidth;
     /**
      * 表格需要展示的数据集合
      */
     private List<T> data = new ArrayList<>();
-
     private Consumer<T> longClick;
-
     private Header<T> sortCol;
     /**
      * 表格定义
@@ -82,7 +77,7 @@ public class Table<T> extends LinearLayout {
      * 固定表头量
      */
     private int scrollX, oldScrollX, fixedMainHeaders, fixedSubHeaders;
-
+    private final OnScrollChangeListener scrollListener = (v, x, y, ox, oy) -> hsViews.forEach(i -> i.scrollTo(this.scrollX = x, 0));
     private Timer timer;
 
     public Table(Context context, int width, int height, int rows, int columns) {
@@ -96,6 +91,47 @@ public class Table<T> extends LinearLayout {
         this.setLayoutParams(new LayoutParams(colWidth * columns - 1, rowHeight * (rows + 1)));
         // 设置布局方向
         this.setOrientation(VERTICAL);
+    }
+
+    public static <T> Header<T> header(String title, Function<T, String> content) {
+        return new Header<>(title, content, 0, 0, null, null, null);
+    }
+
+    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign) {
+        return new Header<>(title, content, titleAlign, 0, null, null, null);
+    }
+
+    public static <T> Header<T> header(String title, int titleAlign, List<Header<T>> headers) {
+        return new Header<>(title, null, titleAlign, 0, null, null, headers);
+    }
+
+    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign, int contentAlign) {
+        return new Header<>(title, content, titleAlign, contentAlign, null, null, null);
+    }
+
+    public static <T, U extends Comparable<? super U>> Header<T> header(String title, Function<T, String> content, int titleAlign,
+                                                                        int contentAlign, Function<T, U> sort) {
+        return new Header<>(title, content, titleAlign, contentAlign, Sorter.nullsLast(sort), null, null);
+    }
+
+    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign, int contentAlign,
+                                       Comparator<T> sort) {
+        return new Header<>(title, content, titleAlign, contentAlign, sort, null, null);
+    }
+
+    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign, int contentAlign,
+                                       Consumer<T> click) {
+        return new Header<>(title, content, titleAlign, contentAlign, null, click, null);
+    }
+
+    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign, int contentAlign,
+                                       Comparator<T> sort, Consumer<T> click) {
+        return new Header<>(title, content, titleAlign, contentAlign, sort, click, null);
+    }
+
+    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign, int contentAlign,
+                                       Comparator<T> sort, Consumer<T> click, List<Header<T>> headers) {
+        return new Header<>(title, content, titleAlign, contentAlign, sort, click, headers);
     }
 
     /**
@@ -532,47 +568,6 @@ public class Table<T> extends LinearLayout {
         }
         // 计算需要固定的底层表头量
         return this.flatHeaders(headers.subList(0, fixedHeaders)).size();
-    }
-
-    public static <T> Header<T> header(String title, Function<T, String> content) {
-        return new Header<>(title, content, 0, 0, null, null, null);
-    }
-
-    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign) {
-        return new Header<>(title, content, titleAlign, 0, null, null, null);
-    }
-
-    public static <T> Header<T> header(String title, int titleAlign, List<Header<T>> headers) {
-        return new Header<>(title, null, titleAlign, 0, null, null, headers);
-    }
-
-    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign, int contentAlign) {
-        return new Header<>(title, content, titleAlign, contentAlign, null, null, null);
-    }
-
-    public static <T, U extends Comparable<? super U>> Header<T> header(String title, Function<T, String> content, int titleAlign,
-                                                                        int contentAlign, Function<T, U> sort) {
-        return new Header<>(title, content, titleAlign, contentAlign, Sorter.nullsLast(sort), null, null);
-    }
-
-    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign, int contentAlign,
-                                       Comparator<T> sort) {
-        return new Header<>(title, content, titleAlign, contentAlign, sort, null, null);
-    }
-
-    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign, int contentAlign,
-                                       Consumer<T> click) {
-        return new Header<>(title, content, titleAlign, contentAlign, null, click, null);
-    }
-
-    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign, int contentAlign,
-                                       Comparator<T> sort, Consumer<T> click) {
-        return new Header<>(title, content, titleAlign, contentAlign, sort, click, null);
-    }
-
-    public static <T> Header<T> header(String title, Function<T, String> content, int titleAlign, int contentAlign,
-                                       Comparator<T> sort, Consumer<T> click, List<Header<T>> headers) {
-        return new Header<>(title, content, titleAlign, contentAlign, sort, click, headers);
     }
 
     public static class Header<T> {

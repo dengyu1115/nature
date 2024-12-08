@@ -41,14 +41,6 @@ import static org.nature.common.constant.Const.*;
 @SuppressLint("DefaultLocale")
 public class ConfigInfoPage extends ListPage<ConfigInfo> {
 
-    @Injection
-    private ConfigInfoMapper configInfoMapper;
-
-    private Button start, stop, add;
-    private LinearLayout editPop;
-    private Selector<String> jobSel, statusSel;
-    private EditText year, month, day, hour, minute, second;
-
     private final List<Table.Header<ConfigInfo>> headers = Arrays.asList(
             Table.header("名称", d -> JobHolder.getName(d.getCode()), C, S, Sorter.nullsLast(d -> JobHolder.getName(d.getCode()))),
             Table.header("编号", d -> TextUtil.text(d.getCode()), C, S, ConfigInfo::getCode),
@@ -60,6 +52,12 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
             Table.header("分", d -> TextUtil.text(d.getMinute()), C, C, ConfigInfo::getMinute),
             Table.header("秒", d -> TextUtil.text(d.getSecond()), C, C, ConfigInfo::getSecond)
     );
+    @Injection
+    private ConfigInfoMapper configInfoMapper;
+    private Button start, stop, add;
+    private LinearLayout popup;
+    private Selector<String> jobSel, statusSel;
+    private EditText year, month, day, hour, minute, second;
 
     @Override
     protected List<Table.Header<ConfigInfo>> headers() {
@@ -103,7 +101,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
      */
     private void makeWindowStructure() {
         ViewTemplate t = template;
-        editPop = t.block(Gravity.CENTER,
+        popup = t.block(Gravity.CENTER,
                 t.line(L_W, L_H, t.text("任务：", L_W_T, L_H), jobSel = t.selector(L_W_C, L_H)),
                 t.line(L_W, L_H, t.text("年：", L_W_T, L_H), year = t.input(L_W_C, L_H)),
                 t.line(L_W, L_H, t.text("月：", L_W_T, L_H), month = t.input(L_W_C, L_H)),
@@ -124,7 +122,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
      */
     private void add() {
         this.makeWindowStructure();
-        this.popup.confirm("新增", editPop, () -> this.doEdit(this::save));
+        template.confirm("新增", popup, () -> this.doEdit(this::save));
     }
 
     /**
@@ -142,7 +140,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         this.second.setText(d.getSecond());
         this.statusSel.setValue(d.getStatus());
         String name = JobHolder.getName(d.getCode());
-        this.popup.confirm("编辑-" + name, editPop, () -> this.doEdit(configInfoMapper::merge));
+        template.confirm("编辑-" + name, popup, () -> this.doEdit(configInfoMapper::merge));
     }
 
     /**
@@ -151,10 +149,10 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
      */
     private void delete(ConfigInfo d) {
         String name = JobHolder.getName(d.getCode());
-        this.popup.confirm("删除-" + name, "确认删除吗？", () -> {
+        template.confirm("删除-" + name, "确认删除吗？", () -> {
             configInfoMapper.deleteById(d);
             this.refreshData();
-            this.popup.alert("删除成功！");
+            template.alert("删除成功！");
         });
     }
 
@@ -179,7 +177,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         d.setSignature(Md5Util.md5(code, d.getYear(), d.getMonth(), d.getDay(), d.getHour(), d.getMinute(), d.getSecond()));
         consumer.accept(d);
         this.refreshData();
-        this.popup.alert("编辑成功！");
+        template.alert("编辑成功！");
     }
 
     /**
@@ -194,7 +192,7 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
 
     @Override
     protected Consumer<ConfigInfo> longClick() {
-        return i -> this.popup.handle(i, this::delete, this::edit);
+        return i -> template.handle(i, this::delete, this::edit);
     }
 
 }

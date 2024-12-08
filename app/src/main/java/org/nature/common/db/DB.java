@@ -114,6 +114,16 @@ public class DB {
     }
 
     /**
+     * 获取值，如果为空则返回默认值
+     * @param s    字符串
+     * @param func 值转换方法
+     * @return T
+     */
+    private static <T> T getVal(String s, Function<String, T> func) {
+        return s == null ? null : func.apply(s);
+    }
+
+    /**
      * 查询列表数据
      * @param sqlBuilder sqlBuilder
      * @param mapper     值映射
@@ -324,16 +334,6 @@ public class DB {
             // 如果有可用的数据库连接，则唤醒等待的线程
             this.notify();
         }
-    }
-
-    /**
-     * 获取值，如果为空则返回默认值
-     * @param s    字符串
-     * @param func 值转换方法
-     * @return T
-     */
-    private static <T> T getVal(String s, Function<String, T> func) {
-        return s == null ? null : func.apply(s);
     }
 
 }

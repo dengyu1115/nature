@@ -33,15 +33,6 @@ import java.util.stream.Collectors;
 @Component
 public class CalcManager {
 
-    @Injection
-    private NetMapper netMapper;
-    @Injection
-    private ItemMapper itemMapper;
-    @Injection
-    private KlineMapper klineMapper;
-    @Injection
-    private WorkdayManager workdayManager;
-
     /**
      * 策略集合
      */
@@ -69,6 +60,25 @@ public class CalcManager {
             // 判断最适合买入的标的和持有标的的涨幅差是否满足切换差值
             return ratio.subtract(m.ratio).compareTo(d) < 0;
         });
+    }
+
+    @Injection
+    private NetMapper netMapper;
+    @Injection
+    private ItemMapper itemMapper;
+    @Injection
+    private KlineMapper klineMapper;
+    @Injection
+    private WorkdayManager workdayManager;
+
+    /**
+     * 判断是否同一标的
+     * @param a a
+     * @param b b
+     * @return boolean
+     */
+    private static boolean same(IR a, IR b) {
+        return a.code.equals(b.code) && a.type.equals(b.type);
     }
 
     /**
@@ -238,13 +248,10 @@ public class CalcManager {
     }
 
     /**
-     * 判断是否同一标的
-     * @param a a
-     * @param b b
-     * @return boolean
+     * 策略
      */
-    private static boolean same(IR a, IR b) {
-        return a.code.equals(b.code) && a.type.equals(b.type);
+    private interface Strategy {
+        boolean check(IR pre, IR min, BigDecimal diff, List<IR> irs);
     }
 
     @Getter
@@ -253,13 +260,6 @@ public class CalcManager {
         private String code;
         private String type;
         private BigDecimal ratio;
-    }
-
-    /**
-     * 策略
-     */
-    private interface Strategy {
-        boolean check(IR pre, IR min, BigDecimal diff, List<IR> irs);
     }
 
 }

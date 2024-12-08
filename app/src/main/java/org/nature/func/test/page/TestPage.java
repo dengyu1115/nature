@@ -29,7 +29,7 @@ public class TestPage extends Page {
         ClickUtil.onClick(ttsBtn, () -> {
             EditText ttsText = template.textArea(40, 40);
             LinearLayout line = template.line(50, 50, template.text("内容", 5, 7), ttsText);
-            this.popup.confirm("请输入要转语音的文本", line, () -> {
+            template.confirm("请输入要转语音的文本", line, () -> {
                 String text = ttsText.getText().toString();
                 NotifyUtil.speak(text);
             });

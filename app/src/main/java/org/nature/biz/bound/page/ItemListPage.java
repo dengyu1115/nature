@@ -41,7 +41,7 @@ public class ItemListPage extends ListPage<Item> {
     /**
      * 编辑弹窗
      */
-    private LinearLayout editPop;
+    private LinearLayout popup;
     /**
      * 编号、名称
      */
@@ -105,7 +105,7 @@ public class ItemListPage extends ListPage<Item> {
      */
     private void add() {
         this.makeWindowStructure();
-        this.popup.confirm("新增项目", editPop, () -> this.doEdit(this::save));
+        template.confirm("新增项目", popup, () -> this.doEdit(this::save));
     }
 
     /**
@@ -119,7 +119,7 @@ public class ItemListPage extends ListPage<Item> {
         this.type.setValue(d.getType());
         this.fund.setText(d.getFund());
         this.ratio.setText(d.getRatio().toPlainString());
-        this.popup.confirm("编辑项目-" + d.getName(), editPop, () -> this.doEdit(itemMapper::merge));
+        template.confirm("编辑项目-" + d.getName(), popup, () -> this.doEdit(itemMapper::merge));
     }
 
     /**
@@ -146,7 +146,7 @@ public class ItemListPage extends ListPage<Item> {
         item.setRatio(new BigDecimal(ratio));
         consumer.accept(item);
         this.refreshData();
-        this.popup.alert("编辑成功！");
+        template.alert("编辑成功！");
     }
 
     /**
@@ -154,10 +154,10 @@ public class ItemListPage extends ListPage<Item> {
      * @param d 数据
      */
     private void delete(Item d) {
-        this.popup.confirm("删除项目-" + d.getName(), "确认删除吗？", () -> {
+        template.confirm("删除项目-" + d.getName(), "确认删除吗？", () -> {
             itemMapper.deleteById(d);
             this.refreshData();
-            this.popup.alert("删除成功！");
+            template.alert("删除成功！");
         });
     }
 
@@ -166,14 +166,13 @@ public class ItemListPage extends ListPage<Item> {
      */
     private void makeWindowStructure() {
         ViewTemplate t = template;
-        editPop = t.block(Gravity.CENTER,
+        popup = t.block(Gravity.CENTER,
                 t.line(L_W, L_H, t.text("选择复制:", L_W_T, L_H), item = t.selector(L_W_C, L_H)),
                 t.line(L_W, L_H, t.text("名称：", L_W_T, L_H), name = t.input(L_W_C, L_H)),
                 t.line(L_W, L_H, t.text("编号：", L_W_T, L_H), code = t.input(L_W_C, L_H)),
                 t.line(L_W, L_H, t.text("类型：", L_W_T, L_H), type = t.selector(L_W_C, L_H)),
                 t.line(L_W, L_H, t.text("基金编号：", L_W_T, L_H), fund = t.input(L_W_C, L_H)),
-                t.line(L_W, L_H, t.text("比例系数：", L_W_T, L_H), ratio = t.decimal(L_W_C, L_H)),
-                t.line(L_W, L_H)
+                t.line(L_W, L_H, t.text("比例系数：", L_W_T, L_H), ratio = t.decimal(L_W_C, L_H))
         );
         type.mapper(i -> i);
         type.refreshData(Arrays.asList("0", "1"));

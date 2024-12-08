@@ -1,10 +1,10 @@
 package org.nature.biz.etf.manager;
 
-import org.nature.biz.etf.mapper.HoldMapper;
 import org.nature.biz.common.mapper.KlineMapper;
+import org.nature.biz.common.model.Kline;
+import org.nature.biz.etf.mapper.HoldMapper;
 import org.nature.biz.etf.mapper.RuleMapper;
 import org.nature.biz.etf.model.Hold;
-import org.nature.biz.common.model.Kline;
 import org.nature.biz.etf.model.Rule;
 import org.nature.biz.etf.simulator.Simulator;
 import org.nature.biz.etf.simulator.SimulatorBuilder;

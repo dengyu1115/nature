@@ -1,8 +1,8 @@
 package org.nature.biz.etf.simulator;
 
 import org.apache.commons.lang3.StringUtils;
-import org.nature.biz.etf.model.Hold;
 import org.nature.biz.common.model.Kline;
+import org.nature.biz.etf.model.Hold;
 import org.nature.biz.etf.model.Profit;
 import org.nature.common.exception.Warn;
 import org.nature.common.util.DateUtil;
