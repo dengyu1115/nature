@@ -8,7 +8,7 @@ import java.util.function.Function;
  * @version 1.0.0
  * @since 2024/1/22
  */
-public class C<T> {
+public class Content<T> {
     /**
      * 颜色
      */
@@ -18,7 +18,7 @@ public class C<T> {
      */
     public final Function<T, Double> func;
 
-    public C(int color, Function<T, Double> func) {
+    public Content(int color, Function<T, Double> func) {
         this.color = color;
         this.func = func;
     }

@@ -10,21 +10,21 @@ import java.util.stream.Collectors;
  * @version 1.0.0
  * @since 2024/1/22
  */
-public class LR<T> extends BR<T> {
+public class LineRect<T> extends BaseRect<T> {
 
     /**
      * 字段取值函数
      */
-    public final List<C<T>> cs;
+    public final List<Content<T>> contents;
 
-    public LR(int scale, int weight, List<C<T>> cs, Function<Double, String> formatter) {
+    public LineRect(int scale, int weight, List<Content<T>> contents, Function<Double, String> formatter) {
         super(scale, weight, formatter);
-        this.cs = cs;
+        this.contents = contents;
     }
 
     @Override
     protected List<Function<T, Double>> fs() {
-        return this.cs.stream().map(i -> i.func).collect(Collectors.toList());
+        return this.contents.stream().map(i -> i.func).collect(Collectors.toList());
     }
 
 }

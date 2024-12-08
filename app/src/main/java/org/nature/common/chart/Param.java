@@ -9,7 +9,7 @@ import java.util.function.Function;
  * @version 1.0.0
  * @since 2024/1/23
  */
-public class P<T> {
+public class Param<T> {
 
     /**
      * 数据量：默认、最小、最大
@@ -18,11 +18,11 @@ public class P<T> {
     /**
      * 指标数据集合
      */
-    public List<List<Q<T>>> qs;
+    public List<List<Quota<T>>> qs;
     /**
      * 内容数据集合
      */
-    public List<BR<T>> rs;
+    public List<BaseRect<T>> rs;
     /**
      * X轴文案获取函数
      */

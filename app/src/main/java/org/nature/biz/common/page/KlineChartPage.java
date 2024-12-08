@@ -36,56 +36,56 @@ public class KlineChartPage extends Page {
     /**
      * 交易额折线配置
      */
-    public static final List<C<KView>> FUNC_AMOUNT = List.of(
-            new C<>(0xFFFF0000, KView::getAmount)
+    public static final List<Content<KView>> FUNC_AMOUNT = List.of(
+            new Content<>(0xFFFF0000, KView::getAmount)
     );
     /**
      * 均线集合配置
      */
-    public static final List<C<KView>> MA_LIST = List.of(
-            new C<>(0xFFB22222, KView::getMa5),
-            new C<>(0xFFA020F0, KView::getMa10),
-            new C<>(0xFF2E8B57, KView::getMa20),
-            new C<>(0xFF0000CD, KView::getMa60)
+    public static final List<Content<KView>> MA_LIST = List.of(
+            new Content<>(0xFFB22222, KView::getMa5),
+            new Content<>(0xFFA020F0, KView::getMa10),
+            new Content<>(0xFF2E8B57, KView::getMa20),
+            new Content<>(0xFF0000CD, KView::getMa60)
     );
     /**
      * 指标配置
      */
-    private static final List<List<Q<KView>>> QS = List.of(
+    private static final List<List<Quota<KView>>> QS = List.of(
             List.of(
-                    new Q<>("项目:", d -> TextUtil.text(d.getName()), Color.BLACK),
-                    new Q<>("日期:", d -> TextUtil.text(d.getDate()), Color.BLACK),
-                    new Q<>("交易量:", d -> TextUtil.amount(d.getShare()), Color.BLUE),
-                    new Q<>("交易额:", d -> TextUtil.amount(d.getAmount()), Color.BLUE),
-                    new Q<>("涨幅:", d -> TextUtil.hundred(d.getRatioInc()), Color.BLUE)
+                    new Quota<>("项目:", d -> TextUtil.text(d.getName()), Color.BLACK),
+                    new Quota<>("日期:", d -> TextUtil.text(d.getDate()), Color.BLACK),
+                    new Quota<>("交易量:", d -> TextUtil.amount(d.getShare()), Color.BLUE),
+                    new Quota<>("交易额:", d -> TextUtil.amount(d.getAmount()), Color.BLUE),
+                    new Quota<>("涨幅:", d -> TextUtil.hundred(d.getRatioInc()), Color.BLUE)
             ),
             List.of(
-                    new Q<>("开盘:", d -> TextUtil.price(d.getOpen()), Color.GREEN),
-                    new Q<>("收盘:", d -> TextUtil.price(d.getLatest()), Color.GREEN),
-                    new Q<>("最高:", d -> TextUtil.price(d.getHigh()), Color.GREEN),
-                    new Q<>("最低:", d -> TextUtil.price(d.getLow()), Color.GREEN),
-                    new Q<>("累计涨幅:", d -> TextUtil.hundred(d.getRatioTotal()), Color.GREEN)
+                    new Quota<>("开盘:", d -> TextUtil.price(d.getOpen()), Color.GREEN),
+                    new Quota<>("收盘:", d -> TextUtil.price(d.getLatest()), Color.GREEN),
+                    new Quota<>("最高:", d -> TextUtil.price(d.getHigh()), Color.GREEN),
+                    new Quota<>("最低:", d -> TextUtil.price(d.getLow()), Color.GREEN),
+                    new Quota<>("累计涨幅:", d -> TextUtil.hundred(d.getRatioTotal()), Color.GREEN)
             ),
             List.of(
-                    new Q<>("MA5:", d -> TextUtil.price(d.getMa5()), 0xFFB22222),
-                    new Q<>("MA10:", d -> TextUtil.price(d.getMa10()), 0xFFA020F0),
-                    new Q<>("MA20:", d -> TextUtil.price(d.getMa20()), 0xFF2E8B57),
-                    new Q<>("MA60:", d -> TextUtil.price(d.getMa60()), 0xFF0000CD),
-                    new Q<>("振幅:", d -> TextUtil.hundred(d.getRatioDiff()), Color.BLUE)
+                    new Quota<>("MA5:", d -> TextUtil.price(d.getMa5()), 0xFFB22222),
+                    new Quota<>("MA10:", d -> TextUtil.price(d.getMa10()), 0xFFA020F0),
+                    new Quota<>("MA20:", d -> TextUtil.price(d.getMa20()), 0xFF2E8B57),
+                    new Quota<>("MA60:", d -> TextUtil.price(d.getMa60()), 0xFF0000CD),
+                    new Quota<>("振幅:", d -> TextUtil.hundred(d.getRatioDiff()), Color.BLUE)
             )
     );
     /**
      * 图形框配置
      */
-    private static final List<BR<KView>> RS = List.of(
-            new KR<>(1000, 3,
+    private static final List<BaseRect<KView>> RS = List.of(
+            new KlineRect<>(1000, 3,
                     KView::getOpen,
                     KView::getLatest,
                     KView::getHigh,
                     KView::getLow,
                     MA_LIST,
                     TextUtil::price),
-            new LR<>(1000, 1, FUNC_AMOUNT, TextUtil::amount)
+            new LineRect<>(1000, 1, FUNC_AMOUNT, TextUtil::amount)
     );
 
     /**

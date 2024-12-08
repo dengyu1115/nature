@@ -8,7 +8,7 @@ import java.util.function.Function;
  * @version 1.0.0
  * @since 2024/1/22
  */
-public class Q<T> {
+public class Quota<T> {
     /**
      * 标题
      */
@@ -34,7 +34,7 @@ public class Q<T> {
      */
     public int y;
 
-    public Q(String title, Function<T, String> func, int color) {
+    public Quota(String title, Function<T, String> func, int color) {
         this.title = title;
         this.func = func;
         this.color = color;

@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  * @version 1.0.0
  * @since 2024/1/22
  */
-public class KR<T> extends BR<T> {
+public class KlineRect<T> extends BaseRect<T> {
 
     /**
      * 字段取值函数
@@ -32,23 +32,23 @@ public class KR<T> extends BR<T> {
     /**
      * 字段取值函数
      */
-    public final List<C<T>> cs;
+    public final List<Content<T>> contents;
 
-    public KR(int scale, int weight, Function<T, Double> latest, Function<T, Double> open,
-              Function<T, Double> high, Function<T, Double> low,
-              List<C<T>> cs, Function<Double, String> formatter) {
+    public KlineRect(int scale, int weight, Function<T, Double> latest, Function<T, Double> open,
+                     Function<T, Double> high, Function<T, Double> low,
+                     List<Content<T>> contents, Function<Double, String> formatter) {
         super(scale, weight, formatter);
         this.latest = latest;
         this.open = open;
         this.high = high;
         this.low = low;
-        this.cs = cs;
+        this.contents = contents;
     }
 
     @Override
     protected List<Function<T, Double>> fs() {
         List<Function<T, Double>> list = new ArrayList<>(List.of(latest, open, high, low));
-        list.addAll(this.cs.stream().map(i -> i.func).collect(Collectors.toList()));
+        list.addAll(this.contents.stream().map(i -> i.func).collect(Collectors.toList()));
         return list;
     }
 

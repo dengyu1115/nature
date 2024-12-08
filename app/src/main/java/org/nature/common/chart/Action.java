@@ -14,7 +14,7 @@ public class Action<T> {
     /**
      * 参数
      */
-    private final P<T> p;
+    private final Param<T> param;
     /**
      * view
      */
@@ -22,10 +22,10 @@ public class Action<T> {
     /**
      * 矩形框
      */
-    private final XY rect;
+    private final XyIndex rect;
 
-    public Action(P<T> p, View view, XY rect) {
-        this.p = p;
+    public Action(Param<T> param, View view, XyIndex rect) {
+        this.param = param;
         this.view = view;
         this.rect = rect;
     }
@@ -39,21 +39,21 @@ public class Action<T> {
             // 双指操作放大缩小
             this.doScaleList(event);
         } else {
-            if (!p.moving) {
-                float mx = Math.abs(event.getX() - p.lx);
-                float my = Math.abs(event.getY() - p.ly);
+            if (!param.moving) {
+                float mx = Math.abs(event.getX() - param.lx);
+                float my = Math.abs(event.getY() - param.ly);
                 if (mx < 10 && my < 10) {
-                    p.longPressed = (event.getEventTime() - event.getDownTime()) > 500L;
+                    param.longPressed = (event.getEventTime() - event.getDownTime()) > 500L;
                 } else {
-                    p.moving = true;
-                    p.ly = event.getY();
-                    p.lx = event.getX();
+                    param.moving = true;
+                    param.ly = event.getY();
+                    param.lx = event.getX();
                 }
             }
-            if (p.longPressed) {
+            if (param.longPressed) {
                 // 长按移动下标
                 this.doMoveIndex(event);
-            } else if (p.moving) {
+            } else if (param.moving) {
                 // 移动列表
                 this.doMoveList(event);
             }
@@ -65,9 +65,9 @@ public class Action<T> {
      * @param event 事件
      */
     public void up(MotionEvent event) {
-        p.longPressed = false;
-        p.moving = false;
-        p.dx = 0;
+        param.longPressed = false;
+        param.moving = false;
+        param.dx = 0;
     }
 
     /**
@@ -75,8 +75,8 @@ public class Action<T> {
      * @param event 事件
      */
     public void down(MotionEvent event) {
-        p.ly = event.getY();
-        p.lx = event.getX();
+        param.ly = event.getY();
+        param.lx = event.getX();
     }
 
     /**
@@ -85,63 +85,63 @@ public class Action<T> {
      */
     private void doScaleList(MotionEvent event) {
         float dx = Math.abs(event.getX(0) - event.getX(1));
-        if (p.dx == 0) {
-            p.dx = dx;
+        if (param.dx == 0) {
+            param.dx = dx;
             return;
         }
-        float diff = p.dx - dx;
+        float diff = param.dx - dx;
         if (diff == 0) {
             return;
         }
-        p.dx = dx;
+        param.dx = dx;
         if (Math.abs(diff) > 200) {
             return;
         }
         if (diff < 0) { // 缩小
-            if (p.listSize <= p.sizeMin) {
+            if (param.listSize <= param.sizeMin) {
                 return;
             }
             int moveSize = this.moveSize(-diff);
             if (moveSize == 0) {
                 return;
             }
-            p.listSize -= moveSize;
-            if (p.listSize < p.sizeMin) {
-                moveSize -= p.sizeMin - p.listSize;
-                p.listSize = p.sizeMin;
+            param.listSize -= moveSize;
+            if (param.listSize < param.sizeMin) {
+                moveSize -= param.sizeMin - param.listSize;
+                param.listSize = param.sizeMin;
             }
-            p.listStart += moveSize / 2;
-            p.listEnd -= moveSize - moveSize / 2;
+            param.listStart += moveSize / 2;
+            param.listEnd -= moveSize - moveSize / 2;
         } else {
-            int size = p.data.size();
-            int sizeMax = Math.min(p.sizeMax, size);
-            if (p.listSize >= sizeMax) {
+            int size = param.data.size();
+            int sizeMax = Math.min(param.sizeMax, size);
+            if (param.listSize >= sizeMax) {
                 return;
             }
             int moveSize = this.moveSize(diff);
             if (moveSize == 0) {
                 return;
             }
-            p.listSize += moveSize;
-            if (p.listSize > sizeMax) {
-                moveSize -= p.listSize - sizeMax;
-                p.listSize = sizeMax;
+            param.listSize += moveSize;
+            if (param.listSize > sizeMax) {
+                moveSize -= param.listSize - sizeMax;
+                param.listSize = sizeMax;
             }
-            p.listStart -= moveSize / 2;
-            if (p.listStart < 0) {
-                p.listEnd += moveSize - moveSize / 2 - p.listStart;
-                p.listStart = 0;
+            param.listStart -= moveSize / 2;
+            if (param.listStart < 0) {
+                param.listEnd += moveSize - moveSize / 2 - param.listStart;
+                param.listStart = 0;
             } else {
-                p.listEnd += moveSize - moveSize / 2;
-                if (p.listEnd > size) {
-                    p.listStart -= p.listEnd - size;
-                    p.listEnd = size;
+                param.listEnd += moveSize - moveSize / 2;
+                if (param.listEnd > size) {
+                    param.listStart -= param.listEnd - size;
+                    param.listEnd = size;
                 }
             }
         }
-        p.list = p.data.subList(p.listStart, p.listEnd);
-        p.index = p.list.size() - 1;
-        p.curr = p.list.get(p.index);
+        param.list = param.data.subList(param.listStart, param.listEnd);
+        param.index = param.list.size() - 1;
+        param.curr = param.list.get(param.index);
         view.invalidate();
     }
 
@@ -152,18 +152,18 @@ public class Action<T> {
     private void doMoveIndex(MotionEvent event) {
         float x = event.getX(), y = event.getY();
         //  判断是否在有效区域内
-        if (x < rect.sx - p.unitX / 2f || x > rect.ex + p.unitX / 2f || y < rect.sy || y > rect.ey) {
+        if (x < rect.sx - param.unitX / 2f || x > rect.ex + param.unitX / 2f || y < rect.sy || y > rect.ey) {
             return;
         }
         //  计算下标
-        int index = Math.round((x - rect.sx) / p.unitX);
+        int index = Math.round((x - rect.sx) / param.unitX);
         // 判断位置是否发生变化
-        if (p.index == index) {
+        if (param.index == index) {
             return;
         }
         // 当前下标位置设置
-        p.index = index;
-        p.curr = p.list.get(p.index);
+        param.index = index;
+        param.curr = param.list.get(param.index);
         // 操作绘制view
         view.invalidate();
     }
@@ -175,18 +175,18 @@ public class Action<T> {
     private void doMoveList(MotionEvent event) {
         float x = event.getX(), y = event.getY();
         // 判断是否在有效区域内
-        if (x < rect.sx - p.unitX / 2f || x > rect.ex + p.unitX / 2f || y < rect.sy || y > rect.ey) {
+        if (x < rect.sx - param.unitX / 2f || x > rect.ex + param.unitX / 2f || y < rect.sy || y > rect.ey) {
             return;
         }
-        float diff = x - p.lx;
+        float diff = x - param.lx;
         // 没有移动
         if (diff == 0) {
             return;
         }
-        int size = p.data.size();
+        int size = param.data.size();
         if (diff < 0) {
             // 已经移动至末端
-            if (p.listEnd == size) {
+            if (param.listEnd == size) {
                 return;
             }
             // 计算移动量
@@ -195,16 +195,16 @@ public class Action<T> {
             if (moveSize == 0) {
                 return;
             }
-            p.listEnd += moveSize;
+            param.listEnd += moveSize;
             // 移动后超出范围处理
-            if (p.listEnd > size) {
-                moveSize -= (p.listEnd - size);
-                p.listEnd = size;
+            if (param.listEnd > size) {
+                moveSize -= (param.listEnd - size);
+                param.listEnd = size;
             }
-            p.listStart += moveSize;
+            param.listStart += moveSize;
         } else {
             // 已经移动至头部
-            if (p.listStart == 0) {
+            if (param.listStart == 0) {
                 return;
             }
             // 计算移动量
@@ -213,20 +213,20 @@ public class Action<T> {
             if (moveSize == 0) {
                 return;
             }
-            p.listStart -= moveSize;
+            param.listStart -= moveSize;
             // 移动量超出部分重置为有效区域
-            if (p.listStart < 0) {
-                moveSize += p.listStart;
-                p.listStart = 0;
+            if (param.listStart < 0) {
+                moveSize += param.listStart;
+                param.listStart = 0;
             }
-            p.listEnd -= moveSize;
+            param.listEnd -= moveSize;
         }
         // 上一个位置设置
-        p.lx = x;
+        param.lx = x;
         // 展示数据设置
-        p.list = p.data.subList(p.listStart, p.listEnd);
-        p.index = p.list.size() - 1;
-        p.curr = p.list.get(p.index);
+        param.list = param.data.subList(param.listStart, param.listEnd);
+        param.index = param.list.size() - 1;
+        param.curr = param.list.get(param.index);
         // 操作绘制view
         view.invalidate();
     }
@@ -237,7 +237,7 @@ public class Action<T> {
      * @return int
      */
     private int moveSize(float diff) {
-        int moveSize = (int) ((float) p.listSize / (float) (this.rect.ex - this.rect.sx) * diff + 0.5f);
+        int moveSize = (int) ((float) param.listSize / (float) (this.rect.ex - this.rect.sx) * diff + 0.5f);
         if (moveSize == 0 && diff > 20) {
             return 1;
         }

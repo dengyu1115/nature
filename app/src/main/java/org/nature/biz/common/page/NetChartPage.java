@@ -27,35 +27,35 @@ public class NetChartPage extends Page {
     /**
      * 折线配置
      */
-    public static final List<C<NView>> FUNC_DW = List.of(
-            new C<>(Color.RED, NView::getDw),
-            new C<>(Color.GREEN, NView::getNet)
+    public static final List<Content<NView>> FUNC_DW = List.of(
+            new Content<>(Color.RED, NView::getDw),
+            new Content<>(Color.GREEN, NView::getNet)
     );
 
     /**
      * 折线配置
      */
-    public static final List<C<NView>> FUNC_LJ = List.of(
-            new C<>(Color.BLUE, NView::getLj)
+    public static final List<Content<NView>> FUNC_LJ = List.of(
+            new Content<>(Color.BLUE, NView::getLj)
     );
     /**
      * 指标配置
      */
-    private static final List<List<Q<NView>>> QS = List.of(
+    private static final List<List<Quota<NView>>> QS = List.of(
             List.of(
-                    new Q<>("项目:", d -> TextUtil.text(d.getName()), Color.BLACK),
-                    new Q<>("日期:", d -> TextUtil.text(d.getDate()), Color.BLACK),
-                    new Q<>("单位净值:", d -> TextUtil.amount(d.getDw()), Color.RED),
-                    new Q<>("复权净值:", d -> TextUtil.amount(d.getNet()), Color.GREEN),
-                    new Q<>("累计净值:", d -> TextUtil.amount(d.getLj()), Color.BLUE)
+                    new Quota<>("项目:", d -> TextUtil.text(d.getName()), Color.BLACK),
+                    new Quota<>("日期:", d -> TextUtil.text(d.getDate()), Color.BLACK),
+                    new Quota<>("单位净值:", d -> TextUtil.amount(d.getDw()), Color.RED),
+                    new Quota<>("复权净值:", d -> TextUtil.amount(d.getNet()), Color.GREEN),
+                    new Quota<>("累计净值:", d -> TextUtil.amount(d.getLj()), Color.BLUE)
             )
     );
     /**
      * 图形框配置
      */
-    private static final List<BR<NView>> RS = List.of(
-            new LR<>(1000, 1, FUNC_DW, TextUtil::amount),
-            new LR<>(1000, 1, FUNC_LJ, TextUtil::amount)
+    private static final List<BaseRect<NView>> RS = List.of(
+            new LineRect<>(1000, 1, FUNC_DW, TextUtil::amount),
+            new LineRect<>(1000, 1, FUNC_LJ, TextUtil::amount)
     );
 
     @Injection

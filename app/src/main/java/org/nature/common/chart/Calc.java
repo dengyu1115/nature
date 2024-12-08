@@ -19,18 +19,18 @@ public class Calc<T> {
     /**
      * 参数
      */
-    private final P<T> p;
+    private final Param<T> param;
     /**
      * 坐标：整图、图形框
      */
-    private final XY all, rect;
+    private final XyIndex all, rect;
 
     private final View view;
 
-    public Calc(P<T> p, View view, XY rect) {
-        this.p = p;
+    public Calc(Param<T> param, View view, XyIndex rect) {
+        this.param = param;
         this.view = view;
-        this.all = new XY();
+        this.all = new XyIndex();
         this.rect = rect;
     }
 
@@ -40,7 +40,7 @@ public class Calc<T> {
      */
     public void params(List<T> data) {
         this.xParams(data);
-        for (BR<T> r : p.rs) {
+        for (BaseRect<T> r : param.rs) {
             r.calcParams(data);
         }
     }
@@ -73,19 +73,19 @@ public class Calc<T> {
         rect.ex = (int) (all.sx / 20f + all.ex / 20f * 19f + 0.5f);
         rect.sy = (int) (all.sy / 20f * 17f + all.ey / 20f * 3f + 0.5f);
         rect.ey = (int) (all.sy / 20f + all.ey / 20f * 19f + 0.5f);
-        double total = p.rs.stream().mapToDouble(d -> d.weight).sum();
+        double total = param.rs.stream().mapToDouble(d -> d.weight).sum();
         int unit = (int) ((rect.ey - rect.sy) / total + 0.5d);
-        BR<T> r = p.rs.get(0);
+        BaseRect<T> r = param.rs.get(0);
         int sy = rect.sy, ey = sy;
         r.fix(sy, ey);
-        for (int i = 0; i < p.rs.size() - 1; i++) {
-            r = p.rs.get(i);
+        for (int i = 0; i < param.rs.size() - 1; i++) {
+            r = param.rs.get(i);
             ey = ey + r.weight * unit;
             r.fix(sy, ey);
             sy = ey;
         }
         ey = rect.ey;
-        p.rs.get(p.rs.size() - 1).fix(sy, ey);
+        param.rs.get(param.rs.size() - 1).fix(sy, ey);
     }
 
     /**
@@ -104,14 +104,14 @@ public class Calc<T> {
         }
         int sy = (int) (all.sy / 10f * 8f + rect.sy / 10f * 2f + 0.5f);
         int ey = (int) (all.sy / 10f + rect.sy / 10f * 9f + 0.5f);
-        int dif = (ey - sy) / p.qs.size();
-        for (int i = 0; i < p.qs.size(); i++) {
+        int dif = (ey - sy) / param.qs.size();
+        for (int i = 0; i < param.qs.size(); i++) {
             ys[i] = sy + dif * i;
         }
-        for (int i = 0; i < p.qs.size(); i++) {
-            List<Q<T>> q = p.qs.get(i);
-            for (int j = 0; j < q.size(); j++) {
-                q.get(j).fix(sxs[j], exs[j], ys[i]);
+        for (int i = 0; i < param.qs.size(); i++) {
+            List<Quota<T>> quota = param.qs.get(i);
+            for (int j = 0; j < quota.size(); j++) {
+                quota.get(j).fix(sxs[j], exs[j], ys[i]);
             }
         }
     }
@@ -121,14 +121,14 @@ public class Calc<T> {
      * @param data 数据集合
      */
     private void xParams(List<T> data) {
-        List<String> dates = data.stream().filter(Objects::nonNull).map(p.xText).collect(Collectors.toList());
-        p.xTexts = new ArrayList<>();
+        List<String> dates = data.stream().filter(Objects::nonNull).map(param.xText).collect(Collectors.toList());
+        param.xTexts = new ArrayList<>();
         int size = dates.size();
         int middle = size % 2 == 0 ? size / 2 : size / 2 + 1;
         if (middle > size - 1) middle = size - 1;
-        p.xTexts.addAll(Arrays.asList(dates.get(0), dates.get(middle), dates.get(size - 1)));
-        p.intervalX = (int) ((rect.ex - rect.sx) / (double) (p.xTexts.size() - 1) + 0.5d);
-        p.unitX = (float) (rect.ex - rect.sx) / (data.size() - 1);
+        param.xTexts.addAll(Arrays.asList(dates.get(0), dates.get(middle), dates.get(size - 1)));
+        param.intervalX = (int) ((rect.ex - rect.sx) / (double) (param.xTexts.size() - 1) + 0.5d);
+        param.unitX = (float) (rect.ex - rect.sx) / (data.size() - 1);
     }
 
 }

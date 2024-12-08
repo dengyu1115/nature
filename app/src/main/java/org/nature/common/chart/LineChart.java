@@ -23,7 +23,7 @@ public class LineChart<T> extends View {
     /**
      * 参数对象
      */
-    private final P<T> p;
+    private final Param<T> param;
 
     private final Action<T> action;
 
@@ -33,11 +33,11 @@ public class LineChart<T> extends View {
 
     public LineChart(Context context) {
         super(context);
-        XY rect = new XY();
-        this.p = new P<>();
-        this.action = new Action<>(p, this, rect);
-        this.calc = new Calc<>(p, this, rect);
-        this.draw = new Draw<>(p, rect);
+        XyIndex rect = new XyIndex();
+        this.param = new Param<>();
+        this.action = new Action<>(param, this, rect);
+        this.calc = new Calc<>(param, this, rect);
+        this.draw = new Draw<>(param, rect);
     }
 
     /**
@@ -47,10 +47,10 @@ public class LineChart<T> extends View {
      * @param sizeMax     最大展示量
      */
     public void sizeDefault(int sizeDefault, int sizeMin, int sizeMax) {
-        p.sizeDefault = sizeDefault;
-        p.listSize = sizeDefault;
-        p.sizeMin = sizeMin;
-        p.sizeMax = sizeMax;
+        param.sizeDefault = sizeDefault;
+        param.listSize = sizeDefault;
+        param.sizeMin = sizeMin;
+        param.sizeMax = sizeMax;
     }
 
     /**
@@ -59,10 +59,10 @@ public class LineChart<T> extends View {
      * @param rs    图形集合
      * @param xText X轴文案获取函数
      */
-    public void init(List<List<Q<T>>> qs, List<BR<T>> rs, Function<T, String> xText) {
-        p.qs = qs;
-        p.rs = rs;
-        p.xText = xText;
+    public void init(List<List<Quota<T>>> qs, List<BaseRect<T>> rs, Function<T, String> xText) {
+        param.qs = qs;
+        param.rs = rs;
+        param.xText = xText;
     }
 
     /**
@@ -73,30 +73,30 @@ public class LineChart<T> extends View {
         if (data == null) {
             throw new Warn("data is null");
         }
-        p.data = new ArrayList<>(data);
+        param.data = new ArrayList<>(data);
         int size = data.size();
-        if (p.listSize < size) {
+        if (param.listSize < size) {
             // 数量超出的截取尾部展示
-            p.list = data.subList(p.listStart = size - p.listSize, p.listEnd = size);
-        } else if (size >= p.sizeMin) {
+            param.list = data.subList(param.listStart = size - param.listSize, param.listEnd = size);
+        } else if (size >= param.sizeMin) {
             // 数量超过最小size全部展示
-            p.list = data;
-            p.listStart = 0;
-            p.listEnd = size;
+            param.list = data;
+            param.listStart = 0;
+            param.listEnd = size;
         } else {
             // 数据量不足，补全后展示
-            p.list = new ArrayList<>();
-            for (int i = 0; i < p.sizeMin - size; i++) {
-                p.list.add(null);
+            param.list = new ArrayList<>();
+            for (int i = 0; i < param.sizeMin - size; i++) {
+                param.list.add(null);
             }
-            p.list.addAll(data);
-            p.data = p.list;
-            p.listStart = 0;
-            p.listEnd = p.list.size();
+            param.list.addAll(data);
+            param.data = param.list;
+            param.listStart = 0;
+            param.listEnd = param.list.size();
         }
-        p.listSize = p.list.size();
-        p.index = p.list.size() - 1;
-        p.curr = p.list.get(p.index);
+        param.listSize = param.list.size();
+        param.index = param.list.size() - 1;
+        param.curr = param.list.get(param.index);
         this.invalidate();
     }
 
@@ -128,7 +128,7 @@ public class LineChart<T> extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        calc.params(p.list);
+        calc.params(param.list);
         draw.start(canvas);
     }
 

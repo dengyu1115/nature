@@ -12,7 +12,7 @@ import java.util.function.Function;
  * @version 1.0.0
  * @since 2024/1/22
  */
-public abstract class BR<T> {
+public abstract class BaseRect<T> {
     /**
      * 小数位数
      */
@@ -50,7 +50,7 @@ public abstract class BR<T> {
      */
     public List<String> texts;
 
-    public BR(int scale, int weight, Function<Double, String> formatter) {
+    public BaseRect(int scale, int weight, Function<Double, String> formatter) {
         this.scale = scale;
         this.weight = weight;
         this.formatter = formatter;

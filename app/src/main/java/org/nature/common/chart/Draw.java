@@ -14,12 +14,12 @@ import java.util.function.Function;
  */
 public class Draw<T> {
 
-    private final P<T> p;
+    private final Param<T> param;
     private final Paint paint;
-    private final XY rect;
+    private final XyIndex rect;
 
-    public Draw(P<T> p, XY rect) {
-        this.p = p;
+    public Draw(Param<T> param, XyIndex rect) {
+        this.param = param;
         this.rect = rect;
         this.paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     }
@@ -40,8 +40,8 @@ public class Draw<T> {
         canvas.drawLine(sx, sy, ex, sy, paint);
         // x轴线
         canvas.drawLine(sx, ey, ex, ey, paint);
-        for (int i = 1; i < p.rs.size(); i++) {
-            BR<T> r = p.rs.get(i);
+        for (int i = 1; i < param.rs.size(); i++) {
+            BaseRect<T> r = param.rs.get(i);
             canvas.drawLine(sx, r.sy, ex, r.sy, paint);
         }
         // y轴线
@@ -50,7 +50,7 @@ public class Draw<T> {
         canvas.drawLine(ex, sy, ex, ey, paint);
         // x轴刻度
         this.drawXIndex(canvas);
-        for (BR<T> r : p.rs) {
+        for (BaseRect<T> r : param.rs) {
             // y轴刻度平线
             this.drawYIndexLine(canvas, r);
             this.drawYIndex(canvas, r);
@@ -58,14 +58,14 @@ public class Draw<T> {
         this.drawXIndexLine(canvas);
         paint.setTextSize(25f);
         // 顶端指标数据
-        for (List<Q<T>> arr : p.qs) {
-            for (Q<T> q : arr) {
-                this.doDrawText(canvas, q);
+        for (List<Quota<T>> arr : param.qs) {
+            for (Quota<T> quota : arr) {
+                this.doDrawText(canvas, quota);
             }
         }
         paint.setColor(Color.DKGRAY);
         paint.setStyle(Paint.Style.STROKE);
-        for (BR<T> r : p.rs) {
+        for (BaseRect<T> r : param.rs) {
             this.doDrawLine(canvas, r);
         }
     }
@@ -77,7 +77,7 @@ public class Draw<T> {
     private void drawXIndexLine(Canvas canvas) {
         paint.setColor(Color.DKGRAY);
         paint.setPathEffect(new DashPathEffect(new float[]{8, 10, 8, 10}, 0));
-        float x = rect.sx + p.index * p.unitX;
+        float x = rect.sx + param.index * param.unitX;
         canvas.drawLine(x, rect.sy, x, rect.ey, paint);
         paint.setPathEffect(null);
     }
@@ -87,7 +87,7 @@ public class Draw<T> {
      * @param canvas canvas
      * @param r      矩形
      */
-    private void drawYIndex(Canvas canvas, BR<T> r) {
+    private void drawYIndex(Canvas canvas, BaseRect<T> r) {
         paint.setColor(Color.BLACK);
         paint.setTextSize(20f);
         List<String> texts = r.texts;
@@ -114,13 +114,13 @@ public class Draw<T> {
         paint.setColor(Color.BLACK);
         paint.setTextSize(20f);
         // x轴刻度
-        for (int i = 0; i < p.xTexts.size(); i++) {
+        for (int i = 0; i < param.xTexts.size(); i++) {
             // x轴上的文字
-            String text = p.xTexts.get(i);
+            String text = param.xTexts.get(i);
             if (text == null) {
                 continue;
             }
-            float x = rect.sx + i * p.intervalX - this.getTextWidth(paint, text) / 2f;
+            float x = rect.sx + i * param.intervalX - this.getTextWidth(paint, text) / 2f;
             float y = rect.ey + this.getTextHeight(paint, text) / 2f * 3f + 15;
             canvas.drawText(text, x, y, paint);
         }
@@ -131,7 +131,7 @@ public class Draw<T> {
      * @param canvas canvas
      * @param r      矩形
      */
-    private void drawYIndexLine(Canvas canvas, BR<T> r) {
+    private void drawYIndexLine(Canvas canvas, BaseRect<T> r) {
         paint.setColor(Color.LTGRAY);
         paint.setPathEffect(new DashPathEffect(new float[]{8, 10, 8, 10}, 0));
         for (int i = 1; i < r.texts.size() - 1; i++) {
@@ -146,18 +146,18 @@ public class Draw<T> {
      * @param canvas canvas
      * @param r      矩形
      */
-    private void doDrawLine(Canvas canvas, BR<T> r) {
+    private void doDrawLine(Canvas canvas, BaseRect<T> r) {
         Double min = r.min;
         float unit = r.unit;
         int ey = r.ey;
-        if (r instanceof LR) {
+        if (r instanceof LineRect) {
             // 普通折线绘制
-            for (C<T> c : ((LR<T>) r).cs) {
-                this.doDrawLine(canvas, min, unit, ey, c.color, c.func);
+            for (Content<T> content : ((LineRect<T>) r).contents) {
+                this.doDrawLine(canvas, min, unit, ey, content.color, content.func);
             }
-        } else if (r instanceof KR) {
+        } else if (r instanceof KlineRect) {
             // K线绘制
-            this.doDrawKline(canvas, min, unit, ey, ((KR<T>) r));
+            this.doDrawKline(canvas, min, unit, ey, ((KlineRect<T>) r));
         }
 
     }
@@ -176,12 +176,12 @@ public class Draw<T> {
         paint.setStyle(Paint.Style.STROKE);
         Path path = new Path();
         boolean moved = false;
-        for (int i = 0; i < p.list.size(); i++) {
-            T t = p.list.get(i);
+        for (int i = 0; i < param.list.size(); i++) {
+            T t = param.list.get(i);
             if (t == null) {
                 continue;
             }
-            float x = i * p.unitX + rect.sx;
+            float x = i * param.unitX + rect.sx;
             Double d = func.apply(t);
             if (d == null) {
                 continue;
@@ -206,9 +206,9 @@ public class Draw<T> {
      * @param ey     y终止
      * @param r      数据
      */
-    private void doDrawKline(Canvas canvas, double min, float unit, int ey, KR<T> r) {
+    private void doDrawKline(Canvas canvas, double min, float unit, int ey, KlineRect<T> r) {
         // 折线
-        float unitX = p.unitX;
+        float unitX = param.unitX;
         if (unitX < 10) {
             // 数据太密集蜡烛图展示不清楚直接展示折线
             this.doDrawLine(canvas, min, unit, ey, Color.BLUE, r.latest);
@@ -218,8 +218,8 @@ public class Draw<T> {
         if (w > Const.PAD) {
             w = Const.PAD;
         }
-        for (int i = 0; i < p.list.size(); i++) {
-            T t = p.list.get(i);
+        for (int i = 0; i < param.list.size(); i++) {
+            T t = param.list.get(i);
             if (t == null) {
                 continue;
             }
@@ -245,8 +245,8 @@ public class Draw<T> {
             canvas.drawLine(x, y1, x, up, paint);
             canvas.drawLine(x, down, x, y2, paint);
             // 绘制均线
-            for (C<T> c : r.cs) {
-                this.doDrawLine(canvas, min, unit, ey, c.color, c.func);
+            for (Content<T> content : r.contents) {
+                this.doDrawLine(canvas, min, unit, ey, content.color, content.func);
             }
         }
     }
@@ -254,18 +254,18 @@ public class Draw<T> {
     /**
      * 绘制文本
      * @param canvas canvas
-     * @param q      指标对象
+     * @param quota      指标对象
      */
-    private void doDrawText(Canvas canvas, Q<T> q) {
+    private void doDrawText(Canvas canvas, Quota<T> quota) {
         paint.setColor(Color.DKGRAY);
-        String title = q.title;
-        String content = q.content(p.curr);
-        float y = q.y + this.getTextHeight(paint, title) / 2f;
+        String title = quota.title;
+        String content = quota.content(param.curr);
+        float y = quota.y + this.getTextHeight(paint, title) / 2f;
         // 绘制标题，留15间距
-        canvas.drawText(title, q.sx + Const.PAD, y, paint);
-        paint.setColor(q.color);
+        canvas.drawText(title, quota.sx + Const.PAD, y, paint);
+        paint.setColor(quota.color);
         // 绘制值，留15间距
-        canvas.drawText(content, q.ex - this.getTextWidth(paint, content) - Const.PAD, y, paint);
+        canvas.drawText(content, quota.ex - this.getTextWidth(paint, content) - Const.PAD, y, paint);
     }
 
     /**
