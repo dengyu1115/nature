@@ -1,11 +1,8 @@
 package org.nature.biz.common.page;
 
 import android.graphics.Color;
-import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import org.nature.biz.common.mapper.KlineMapper;
 import org.nature.biz.common.model.KInfo;
 import org.nature.biz.common.model.KView;
@@ -26,7 +23,6 @@ import java.util.Locale;
 import java.util.function.Function;
 
 import static org.nature.common.constant.Const.L_H;
-import static org.nature.common.constant.Const.L_W_T;
 
 /**
  * K线图
@@ -111,17 +107,10 @@ public class KlineChartPage extends Page {
 
     @Override
     protected void makeStructure() {
-        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        int width = metrics.widthPixels;
-        float density = metrics.density;
         // 创建两个容器左右布局，左边放图，右边放K线切换按钮
-        LinearLayout left = new LinearLayout(context);
-        LinearLayout right = new LinearLayout(context);
-        left.setLayoutParams(new LayoutParams(width - (int) (100 * density), MATCH_PARENT));
-        left.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout left = template.line(94, 100);
+        LinearLayout right = template.line(6, 100);
         right.setOrientation(LinearLayout.VERTICAL);
-        right.setLayoutParams(new LayoutParams((int) (100 * density), MATCH_PARENT));
-        right.setGravity(Gravity.CENTER_VERTICAL);
         page.addView(left);
         page.addView(right);
         left.addView(chart = new LineChart<>(context));
@@ -143,9 +132,8 @@ public class KlineChartPage extends Page {
         list = klineMapper.listByItem(info.getCode(), info.getType());
         // 按时间正序排序
         list.sort(Comparator.comparing(Kline::getDate));
-        List<KView> viewList = KlineUtil.convert(list, name);
         // 设置K线图加载数据
-        chart.data(viewList);
+        chart.data(KlineUtil.convert(list, name));
     }
 
     /**
@@ -155,7 +143,7 @@ public class KlineChartPage extends Page {
      * @return Button
      */
     private Button klineView(String title, Function<List<Kline>, List<Kline>> func) {
-        Button button = template.button(title, L_W_T, L_H);
+        Button button = template.button(title, 5, L_H);
         ClickUtil.onClick(button, () -> chart.data(KlineUtil.convert(func.apply(list), name)));
         return button;
     }
