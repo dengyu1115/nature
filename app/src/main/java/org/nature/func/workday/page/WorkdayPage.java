@@ -91,7 +91,7 @@ public class WorkdayPage extends ListPage<Month> {
     protected void initHeaderViews(LinearLayout condition) {
         condition.addView(reload = template.button("重新加载", L_W_T, L_H));
         condition.addView(loadLatest = template.button("加载最新", L_W_T, L_H));
-        condition.addView(year = template.selector(10, 7));
+        condition.addView(year = template.selector(L_W_T, L_H));
     }
 
     @Override
