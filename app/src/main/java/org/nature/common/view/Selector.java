@@ -77,7 +77,7 @@ public class Selector<T> extends LinearLayout {
 
     private void makeStructure() {
         this.setLayoutParams(params);
-        this.setBackground(context.getDrawable(R.drawable.common_background));
+        this.setBackground(context.getDrawable(R.drawable.bg_normal));
         this.addView(valueView = this.textView());
         this.buildPopup();
     }
@@ -87,7 +87,7 @@ public class Selector<T> extends LinearLayout {
         popup.setContentView(this.buildListView());
         popup.setHeight(this.height);
         popup.setFocusable(true);
-        popup.setBackgroundDrawable(context.getDrawable(R.drawable.common_background));
+        popup.setBackgroundDrawable(context.getDrawable(R.drawable.bg_normal));
         this.setOnClickListener(v -> {
             popup.setWidth(this.getWidth());
             popup.showAsDropDown(this, 0, 1);

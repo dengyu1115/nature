@@ -7,6 +7,7 @@ import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.holder.PageHolder;
 import org.nature.common.model.PageInfo;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -22,6 +23,8 @@ public class MainPage extends Page {
     private final List<String> tabs = Arrays.asList("基础", "ETF", "债券");
 
     private LinearLayout body;
+
+    private List<Button> tabBtnList = new ArrayList<>();
 
     @Override
     protected void makeStructure() {
@@ -92,7 +95,18 @@ public class MainPage extends Page {
      */
     private Button tabBtn(String name) {
         Button btn = template.button(name, 10, 7);
-        btn.setOnClickListener(v -> this.showMain(PageHolder.get(name)));
+        tabBtnList.add(btn);
+        btn.setOnClickListener(v -> {
+            tabBtnList.forEach(b -> {
+                b.setClickable(b != v);
+                if (b == v) {
+                    b.setBackground(template.background("selected"));
+                } else {
+                    b.setBackground(template.background("normal"));
+                }
+            });
+            this.showMain(PageHolder.get(name));
+        });
         return btn;
     }
 

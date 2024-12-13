@@ -5,7 +5,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.*;
@@ -69,7 +69,7 @@ public class ViewTemplate {
         button.setLayoutParams(new LayoutParams(this.getWidth(w), this.getHeight(h)));
         button.setGravity(Gravity.CENTER);
         button.setPadding(PAD, PAD, PAD, PAD);
-        button.setBackground(context.getDrawable(R.drawable.common_background));
+        button.setBackground(this.background("normal"));
         return button;
     }
 
@@ -114,7 +114,7 @@ public class ViewTemplate {
         text.setLayoutParams(new LayoutParams(this.getWidth(w), this.getHeight(h)));
         text.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
         text.setPadding(PAD, PAD, PAD, PAD);
-        text.setBackground(context.getDrawable(R.drawable.common_background));
+        text.setBackground(this.background("normal"));
         return text;
     }
 
@@ -207,12 +207,11 @@ public class ViewTemplate {
      */
     public Button radio(String name, int w, int h) {
         Button button = this.button(name, w, h);
-        button.setTextColor(Color.DKGRAY);
         button.setHint("");
         button.setOnClickListener(i -> {
-            int color = button.getCurrentTextColor();
-            button.setTextColor(color == Color.RED ? Color.DKGRAY : Color.RED);
-            button.setHint(color == Color.RED ? "" : "1");
+            String hint = (String) button.getHint();
+            button.setHint(!"".equals(hint) ? "" : "1");
+            button.setBackground(!"".equals(hint) ? this.background("normal") : this.background("selected"));
         });
         return button;
     }
@@ -265,6 +264,14 @@ public class ViewTemplate {
             return true;
         });
         return button;
+    }
+
+
+    public Drawable background(String name) {
+        if ("selected".equals(name)) {
+            return context.getDrawable(R.drawable.bg_selected);
+        }
+        return context.getDrawable(R.drawable.bg_normal);
     }
 
     /**
