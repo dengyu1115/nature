@@ -210,8 +210,8 @@ public class ViewTemplate {
         button.setHint("");
         button.setOnClickListener(i -> {
             String hint = (String) button.getHint();
-            button.setHint(!"".equals(hint) ? "" : "1");
-            button.setBackground(!"".equals(hint) ? this.background("normal") : this.background("selected"));
+            button.setHint("".equals(hint) ? "1" : "");
+            button.setBackground("".equals(hint) ? this.background("selected") : this.background("normal"));
         });
         return button;
     }
