@@ -45,7 +45,7 @@ public class Selector<T> extends LinearLayout {
         this.setLayoutParams(new LayoutParams(width, height));
         this.setBackground(context.getDrawable(R.drawable.bg_normal));
         this.valueView = this.buildTextView();
-        this.valueView.setLayoutParams(new LayoutParams(width - 20, height));
+        this.valueView.setLayoutParams(new LayoutParams(width - 30, height));
         this.arrow = this.buildArrow(context);
         this.addView(valueView);
         this.addView(arrow);
@@ -89,11 +89,11 @@ public class Selector<T> extends LinearLayout {
         popup.setFocusable(true);
         popup.setBackgroundDrawable(context.getDrawable(R.drawable.bg_normal));
         this.setOnClickListener(v -> {
-            arrow.setImageDrawable(context.getDrawable(R.drawable.arrow_left));
+            arrow.setImageDrawable(context.getDrawable(R.drawable.icon_arrow_left));
             popup.setWidth(this.getWidth());
             popup.showAsDropDown(this, 0, 1);
         });
-        popup.setOnDismissListener(() -> arrow.setImageDrawable(context.getDrawable(R.drawable.arrow_down)));
+        popup.setOnDismissListener(() -> arrow.setImageDrawable(context.getDrawable(R.drawable.icon_arrow_down)));
         return popup;
     }
 
@@ -126,8 +126,8 @@ public class Selector<T> extends LinearLayout {
 
     private ImageView buildArrow(Context context) {
         ImageView image = new ImageView(context);
-        image.setImageDrawable(context.getDrawable(R.drawable.arrow_down));
-        image.setLayoutParams(new LayoutParams(20, height));
+        image.setLayoutParams(new LayoutParams(30, height));
+        image.setImageDrawable(context.getDrawable(R.drawable.icon_arrow_down));
         return image;
     }
 

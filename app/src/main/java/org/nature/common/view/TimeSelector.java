@@ -58,7 +58,7 @@ public class TimeSelector extends LinearLayout {
     private ImageView buildImage() {
         ImageView view = new ImageView(context);
         view.setLayoutParams(new LayoutParams(30, height));
-        view.setImageDrawable(context.getDrawable(R.drawable.time));
+        view.setImageDrawable(context.getDrawable(R.drawable.icon_time));
         return view;
     }
 

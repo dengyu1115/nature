@@ -234,10 +234,10 @@ public class ViewTemplate {
 
     public Drawable background(String name) {
         if ("success".equals(name)) {
-            return context.getDrawable(R.drawable.btn_success);
+            return context.getDrawable(R.drawable.bg_btn_success);
         }
         if ("primary".equals(name)) {
-            return context.getDrawable(R.drawable.btn_primary);
+            return context.getDrawable(R.drawable.bg_btn_primary);
         }
         return context.getDrawable(R.drawable.bg_normal);
     }
