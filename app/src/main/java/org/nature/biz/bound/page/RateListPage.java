@@ -64,8 +64,8 @@ public class RateListPage extends ListPage<Rate> {
     @Override
     protected void initHeaderViews(LinearLayout condition) {
         condition.addView(type = template.selector(10, 7));
-        condition.addView(rule = template.selector(10, 7));
-        condition.addView(date = template.datePiker(10, 7));
+        condition.addView(rule = template.selector(11, 7));
+        condition.addView(date = template.datePiker(8, 7));
     }
 
     @Override

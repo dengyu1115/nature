@@ -94,7 +94,7 @@ public class ProfitListPage extends ListPage<Profit> {
     @Override
     protected void initHeaderViews(LinearLayout condition) {
         condition.addView(total = template.button("总览", 4, 7));
-        condition.addView(dateRule = template.selector(10, 7));
+        condition.addView(dateRule = template.selector(11, 7));
         condition.addView(dateStart = template.datePiker(10, 7));
         condition.addView(dateEnd = template.datePiker(10, 7));
         condition.addView(item = template.radio("项目", 4, 7));
@@ -175,9 +175,9 @@ public class ProfitListPage extends ListPage<Profit> {
         String today = DateUtil.today();
         String dateEnd = this.dateEnd.getValue();
         if ("".equals(dateRule)) {
-            Warn.check(() -> StringUtils.isNotBlank(dateEnd), "请选择结束日期");
             String dateStart = this.dateStart.getValue();
-            Warn.check(() -> StringUtils.isNotBlank(dateStart), "请选择开始日期");
+            Warn.check(() -> StringUtils.isBlank(dateStart), "请选择开始日期");
+            Warn.check(() -> StringUtils.isBlank(dateEnd), "请选择结束日期");
             Warn.check(() -> dateStart.compareTo(dateEnd) >= 0, "结束日期不可早于开始日期");
             Warn.check(() -> dateStart.compareTo(today) >= 0, "开始日期不可晚于今天");
             return List.of(dateStart, dateEnd);
