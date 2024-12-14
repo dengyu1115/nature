@@ -1,6 +1,5 @@
 package org.nature.biz.bound.page;
 
-import android.widget.Button;
 import android.widget.LinearLayout;
 import org.nature.biz.bound.manager.RateManager;
 import org.nature.biz.bound.mapper.RuleMapper;
@@ -10,6 +9,7 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.TextUtil;
+import org.nature.common.view.DateSelector;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
 
@@ -43,7 +43,7 @@ public class RateListPage extends ListPage<Rate> {
     @Injection
     private RuleMapper ruleMapper;
     private Selector<String> type, rule;
-    private Button date;
+    private DateSelector date;
 
     @Override
     protected List<Table.Header<Rate>> headers() {
@@ -54,7 +54,7 @@ public class RateListPage extends ListPage<Rate> {
     protected List<Rate> listData() {
         String type = this.type.getValue();
         String rule = this.rule.getValue();
-        String date = this.date.getText().toString();
+        String date = this.date.getValue();
         if ("0".equals(type)) {
             return boundManager.listRatio(rule, date);
         }

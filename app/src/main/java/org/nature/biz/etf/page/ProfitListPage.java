@@ -17,6 +17,7 @@ import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.DateUtil;
 import org.nature.common.util.TextUtil;
+import org.nature.common.view.DateSelector;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
 
@@ -70,7 +71,8 @@ public class ProfitListPage extends ListPage<Profit> {
     private ProfitManager profitManager;
     @Injection
     private ItemMapper itemMapper;
-    private Button dateStart, dateEnd, item, rule, total;
+    private DateSelector dateStart, dateEnd;
+    private Button item, rule, total;
     private Selector<String> dateRule;
     private Map<String, String> nameMap;
 
@@ -171,10 +173,10 @@ public class ProfitListPage extends ListPage<Profit> {
 
     private List<String> buildDates(String dateRule) {
         String today = DateUtil.today();
-        String dateEnd = this.dateEnd.getText().toString();
+        String dateEnd = this.dateEnd.getValue();
         if ("".equals(dateRule)) {
             Warn.check(() -> StringUtils.isNotBlank(dateEnd), "请选择结束日期");
-            String dateStart = this.dateStart.getText().toString();
+            String dateStart = this.dateStart.getValue();
             Warn.check(() -> StringUtils.isNotBlank(dateStart), "请选择开始日期");
             Warn.check(() -> dateStart.compareTo(dateEnd) >= 0, "结束日期不可早于开始日期");
             Warn.check(() -> dateStart.compareTo(today) >= 0, "开始日期不可晚于今天");

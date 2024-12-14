@@ -1,6 +1,5 @@
 package org.nature.biz.etf.page;
 
-import android.widget.Button;
 import android.widget.LinearLayout;
 import org.nature.biz.etf.manager.ProfitManager;
 import org.nature.biz.etf.model.ProfitView;
@@ -10,6 +9,7 @@ import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.DateUtil;
 import org.nature.common.util.TextUtil;
+import org.nature.common.view.DateSelector;
 import org.nature.common.view.Table;
 
 import java.util.Arrays;
@@ -40,7 +40,7 @@ public class ProfitViewPage extends ListPage<ProfitView> {
             )));
     @Injection
     private ProfitManager profitManager;
-    private Button dateBtn;
+    private DateSelector dateBtn;
 
     @Override
     protected List<Table.Header<ProfitView>> headers() {
@@ -50,7 +50,7 @@ public class ProfitViewPage extends ListPage<ProfitView> {
     @Override
     protected List<ProfitView> listData() {
         Rule rule = this.getParam();
-        String date = this.dateBtn.getText().toString();
+        String date = this.dateBtn.getValue();
         if ("".equals(date)) {
             date = DateUtil.today();
         }

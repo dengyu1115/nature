@@ -2,8 +2,6 @@ package org.nature.common.view;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.Gravity;
@@ -13,11 +11,8 @@ import android.widget.LinearLayout.LayoutParams;
 import org.nature.R;
 import org.nature.common.constant.Const;
 import org.nature.common.util.ClickUtil;
-import org.nature.common.util.DateUtil;
 
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -222,23 +217,8 @@ public class ViewTemplate {
      * @param h 高
      * @return Button
      */
-    public Button datePiker(int w, int h) {
-        Button button = this.button(w, h);
-        button.setOnClickListener(l -> {
-            String s = button.getText().toString();
-            Date date = s.isEmpty() ? new Date() : DateUtil.parse(s, Const.FORMAT_DAY);
-            Calendar c = Calendar.getInstance();
-            c.setTime(date);
-            DatePickerDialog picker = new DatePickerDialog(context, 3,
-                    (view, year, month, dayOfMonth) -> button.setText(this.getDate(view)),
-                    c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH));
-            picker.show();
-        });
-        button.setOnLongClickListener(v -> {
-            button.setText("");
-            return true;
-        });
-        return button;
+    public DateSelector datePiker(int w, int h) {
+        return new DateSelector(context, this.getWidth(w), this.getHeight(h));
     }
 
     /**
@@ -247,23 +227,8 @@ public class ViewTemplate {
      * @param h 高
      * @return Button
      */
-    public Button timePiker(int w, int h) {
-        Button button = this.button(w, h);
-        button.setOnClickListener(l -> {
-            String s = button.getText().toString();
-            Date date = s.isEmpty() ? new Date() : DateUtil.parse(s, Const.FORMAT_TIME);
-            Calendar c = Calendar.getInstance();
-            c.setTime(date);
-            TimePickerDialog picker = new TimePickerDialog(context, 3,
-                    (view, hour, min) -> button.setText(this.getTime(view)),
-                    c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true);
-            picker.show();
-        });
-        button.setOnLongClickListener(v -> {
-            button.setText("");
-            return true;
-        });
-        return button;
+    public TimeSelector timePiker(int w, int h) {
+        return new TimeSelector(context, this.getWidth(w), this.getHeight(h));
     }
 
 
@@ -382,25 +347,6 @@ public class ViewTemplate {
         dialog.show();
         ClickUtil.onAsyncClick(dialog.getButton(AlertDialog.BUTTON_POSITIVE), supplier, dialog::cancel);
     }
-
-    /**
-     * 获取日期
-     * @param view view
-     * @return String
-     */
-    private String getDate(DatePicker view) {
-        return String.format("%04d%02d%02d", view.getYear(), view.getMonth() + 1, view.getDayOfMonth());
-    }
-
-    /**
-     * 获取时间
-     * @param view view
-     * @return String
-     */
-    private String getTime(TimePicker view) {
-        return String.format("%02d:%02d:00", view.getHour(), view.getMinute());
-    }
-
 
     private int getWidth(float w) {
         return (int) (w * wd + 05f);

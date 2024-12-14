@@ -24,11 +24,11 @@ import java.util.function.Function;
 public class Selector<T> extends LinearLayout {
 
     private final Context context;
-    private final LayoutParams params, tps;
-    private final int height;
+    private final int width, height, popupHeight;
     private final Adapter adapter;
-    private PopupWindow popup;
-    private TextView valueView;
+    private final TextView valueView;
+    private final PopupWindow popup;
+    private final ImageView arrow;
     private Function<T, String> mapper;
     private Runnable changeRun;
     private List<T> data;
@@ -38,11 +38,18 @@ public class Selector<T> extends LinearLayout {
         super(context);
         this.context = context;
         this.data = new ArrayList<>();
-        this.height = height * 5;
-        this.params = new LayoutParams(width, height);
-        this.tps = new LayoutParams(width, height - 3);
+        this.width = width;
+        this.height = height;
+        this.popupHeight = height * 5;
         this.adapter = new Adapter();
-        this.makeStructure();
+        this.setLayoutParams(new LayoutParams(width, height));
+        this.setBackground(context.getDrawable(R.drawable.bg_normal));
+        this.valueView = this.buildTextView();
+        this.valueView.setLayoutParams(new LayoutParams(width - 20, height));
+        this.arrow = this.buildArrow(context);
+        this.addView(valueView);
+        this.addView(arrow);
+        this.popup = this.buildPopup();
     }
 
     public void mapper(Function<T, String> mapper) {
@@ -75,23 +82,19 @@ public class Selector<T> extends LinearLayout {
         valueView.setText(mapper.apply(t));
     }
 
-    private void makeStructure() {
-        this.setLayoutParams(params);
-        this.setBackground(context.getDrawable(R.drawable.bg_normal));
-        this.addView(valueView = this.textView());
-        this.buildPopup();
-    }
-
-    private void buildPopup() {
-        popup = new PopupWindow(context);
+    private PopupWindow buildPopup() {
+        PopupWindow popup = new PopupWindow(context);
         popup.setContentView(this.buildListView());
-        popup.setHeight(this.height);
+        popup.setHeight(this.popupHeight);
         popup.setFocusable(true);
         popup.setBackgroundDrawable(context.getDrawable(R.drawable.bg_normal));
         this.setOnClickListener(v -> {
+            arrow.setImageDrawable(context.getDrawable(R.drawable.arrow_left));
             popup.setWidth(this.getWidth());
             popup.showAsDropDown(this, 0, 1);
         });
+        popup.setOnDismissListener(() -> arrow.setImageDrawable(context.getDrawable(R.drawable.arrow_down)));
+        return popup;
     }
 
     private ListView buildListView() {
@@ -113,18 +116,25 @@ public class Selector<T> extends LinearLayout {
         return listView;
     }
 
+    private TextView buildTextView() {
+        TextView textView = new TextView(context);
+        textView.setLayoutParams(new LayoutParams(width, height - 3));
+        textView.setGravity(Gravity.START | Gravity.CENTER);
+        textView.setPadding(30, 1, 1, 1);
+        return textView;
+    }
+
+    private ImageView buildArrow(Context context) {
+        ImageView image = new ImageView(context);
+        image.setImageDrawable(context.getDrawable(R.drawable.arrow_down));
+        image.setLayoutParams(new LayoutParams(20, height));
+        return image;
+    }
+
     private void doSelect(int i, TextView valueView) {
         T t = data.get(i);
         valueView.setTag(t);
         valueView.setText(mapper.apply(t));
-    }
-
-    private TextView textView() {
-        TextView textView = new TextView(context);
-        textView.setLayoutParams(this.tps);
-        textView.setGravity(Gravity.START | Gravity.CENTER);
-        textView.setPadding(30, 1, 1, 1);
-        return textView;
     }
 
     class Adapter extends BaseAdapter {
@@ -147,7 +157,7 @@ public class Selector<T> extends LinearLayout {
         @Override
         public View getView(int pos, View convertView, ViewGroup viewGroup) {
             if (convertView == null) {
-                convertView = textView();
+                convertView = Selector.this.buildTextView();
             }
             Selector.this.doSelect(pos, (TextView) convertView);
             return convertView;
