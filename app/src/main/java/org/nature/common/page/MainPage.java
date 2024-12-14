@@ -17,14 +17,15 @@ import java.util.List;
  * @version 1.0.0
  * @since 2024/1/9
  */
+@SuppressWarnings("unchecked")
 @Component
 public class MainPage extends Page {
 
     private final List<String> tabs = Arrays.asList("基础", "ETF", "债券");
 
-    private LinearLayout body;
+    private final List<Button> tabBtnList = new ArrayList<>();
 
-    private List<Button> tabBtnList = new ArrayList<>();
+    private LinearLayout body;
 
     @Override
     protected void makeStructure() {
@@ -35,7 +36,7 @@ public class MainPage extends Page {
 
     @Override
     protected void onShow() {
-        this.showMain(PageHolder.get(tabs.get(0)));
+        this.showMain(tabBtnList.get(0));
     }
 
     /**
@@ -61,13 +62,22 @@ public class MainPage extends Page {
 
     /**
      * 展示主体
-     * @param tag 页面菜单内容
+     * @param btn tab按钮
      */
-    private void showMain(List<List<PageInfo>> tag) {
+    private void showMain(Button btn) {
         this.body.removeAllViews();
+        List<List<PageInfo>> tag = (List<List<PageInfo>>) btn.getTag();
         if (tag == null) {
             return;
         }
+        tabBtnList.forEach(b -> {
+            b.setClickable(b != btn);
+            if (b == btn) {
+                b.setBackground(template.background("success"));
+            } else {
+                b.setBackground(template.background("primary"));
+            }
+        });
         for (List<PageInfo> list : tag) {
             this.listMenu(list);
         }
@@ -96,17 +106,8 @@ public class MainPage extends Page {
     private Button tabBtn(String name) {
         Button btn = template.button(name, 10, 7);
         tabBtnList.add(btn);
-        btn.setOnClickListener(v -> {
-            tabBtnList.forEach(b -> {
-                b.setClickable(b != v);
-                if (b == v) {
-                    b.setBackground(template.background("selected"));
-                } else {
-                    b.setBackground(template.background("normal"));
-                }
-            });
-            this.showMain(PageHolder.get(name));
-        });
+        btn.setTag(PageHolder.get(name));
+        btn.setOnClickListener(v -> this.showMain(btn));
         return btn;
     }
 

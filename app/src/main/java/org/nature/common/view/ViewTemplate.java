@@ -69,7 +69,7 @@ public class ViewTemplate {
         button.setLayoutParams(new LayoutParams(this.getWidth(w), this.getHeight(h)));
         button.setGravity(Gravity.CENTER);
         button.setPadding(PAD, PAD, PAD, PAD);
-        button.setBackground(this.background("normal"));
+        button.setBackground(this.background("primary"));
         return button;
     }
 
@@ -211,7 +211,7 @@ public class ViewTemplate {
         button.setOnClickListener(i -> {
             String hint = (String) button.getHint();
             button.setHint("".equals(hint) ? "1" : "");
-            button.setBackground("".equals(hint) ? this.background("selected") : this.background("normal"));
+            button.setBackground("".equals(hint) ? this.background("success") : this.background("primary"));
         });
         return button;
     }
@@ -268,8 +268,11 @@ public class ViewTemplate {
 
 
     public Drawable background(String name) {
-        if ("selected".equals(name)) {
-            return context.getDrawable(R.drawable.bg_selected);
+        if ("success".equals(name)) {
+            return context.getDrawable(R.drawable.btn_success);
+        }
+        if ("primary".equals(name)) {
+            return context.getDrawable(R.drawable.btn_primary);
         }
         return context.getDrawable(R.drawable.bg_normal);
     }
