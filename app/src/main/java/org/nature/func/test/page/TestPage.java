@@ -1,12 +1,11 @@
 package org.nature.func.test.page;
 
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.Page;
-import org.nature.common.util.ClickUtil;
 import org.nature.common.util.NotifyUtil;
+import org.nature.common.view.Button;
+import org.nature.common.view.Input;
 
 /**
  * 测试功能
@@ -26,11 +25,11 @@ public class TestPage extends Page {
 
     @Override
     protected void onShow() {
-        ClickUtil.onClick(ttsBtn, () -> {
-            EditText ttsText = template.textArea(40, 40);
+        ttsBtn.onClick(() -> {
+            Input ttsText = template.textArea(40, 40);
             LinearLayout line = template.line(50, 50, template.text("内容", 5, 7), ttsText);
             template.confirm("请输入要转语音的文本", line, () -> {
-                String text = ttsText.getText().toString();
+                String text = ttsText.getValue();
                 NotifyUtil.speak(text);
             });
         });

@@ -6,8 +6,10 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.*;
+import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.TextView;
+import android.widget.Toast;
 import org.nature.R;
 import org.nature.common.constant.Const;
 import org.nature.common.util.ClickUtil;
@@ -55,30 +57,13 @@ public class ViewTemplate {
 
     /**
      * 按钮
-     * @param w 宽
-     * @param h 高
-     * @return Button
-     */
-    public Button button(int w, int h) {
-        Button button = new Button(context);
-        button.setLayoutParams(new LayoutParams(this.getWidth(w), this.getHeight(h)));
-        button.setGravity(Gravity.CENTER);
-        button.setPadding(PAD, PAD, PAD, PAD);
-        button.setBackground(this.background("primary"));
-        return button;
-    }
-
-    /**
-     * 按钮
      * @param name 名称
      * @param w    宽
      * @param h    高
      * @return Button
      */
     public Button button(String name, int w, int h) {
-        Button button = this.button(w, h);
-        button.setText(name);
-        return button;
+        return new Button(context, name, this.getWidth(w), this.getHeight(h));
     }
 
     /**
@@ -103,14 +88,8 @@ public class ViewTemplate {
      * @param h 高
      * @return EditText
      */
-    public EditText input(int w, int h) {
-        EditText text = new EditText(context);
-        text.setTextSize(12);
-        text.setLayoutParams(new LayoutParams(this.getWidth(w), this.getHeight(h)));
-        text.setGravity(Gravity.CENTER_VERTICAL | Gravity.START);
-        text.setPadding(PAD, PAD, PAD, PAD);
-        text.setBackground(this.background("normal"));
-        return text;
+    public Input input(int w, int h) {
+        return new Input(context, this.getWidth(w), this.getHeight(h));
     }
 
     /**
@@ -119,10 +98,10 @@ public class ViewTemplate {
      * @param h 高
      * @return EditText
      */
-    public EditText decimal(int w, int h) {
-        EditText editText = this.input(w, h);
-        editText.setInputType(TYPE_CLASS_NUMBER | TYPE_NUMBER_FLAG_DECIMAL | TYPE_NUMBER_FLAG_SIGNED);
-        return editText;
+    public Input decimal(int w, int h) {
+        Input view = this.input(w, h);
+        view.setInputType(TYPE_CLASS_NUMBER | TYPE_NUMBER_FLAG_DECIMAL | TYPE_NUMBER_FLAG_SIGNED);
+        return view;
     }
 
     /**
@@ -131,10 +110,10 @@ public class ViewTemplate {
      * @param h 高
      * @return EditText
      */
-    public EditText number(int w, int h) {
-        EditText editText = this.input(w, h);
-        editText.setInputType(TYPE_CLASS_NUMBER | TYPE_NUMBER_FLAG_SIGNED);
-        return editText;
+    public Input number(int w, int h) {
+        Input view = this.input(w, h);
+        view.setInputType(TYPE_CLASS_NUMBER | TYPE_NUMBER_FLAG_SIGNED);
+        return view;
     }
 
     /**
@@ -143,10 +122,10 @@ public class ViewTemplate {
      * @param h 高
      * @return EditText
      */
-    public EditText textArea(int w, int h) {
-        EditText text = this.input(w, h);
-        text.setGravity(Gravity.TOP | Gravity.START);
-        return text;
+    public Input textArea(int w, int h) {
+        Input view = this.input(w, h);
+        view.setTextGravity(Gravity.TOP | Gravity.START);
+        return view;
     }
 
     /**
@@ -202,11 +181,11 @@ public class ViewTemplate {
      */
     public Button radio(String name, int w, int h) {
         Button button = this.button(name, w, h);
-        button.setHint("");
-        button.setOnClickListener(i -> {
-            String hint = (String) button.getHint();
-            button.setHint("".equals(hint) ? "1" : "");
-            button.setBackground("".equals(hint) ? this.background("success") : this.background("primary"));
+        button.setTag("");
+        button.onClick(() -> {
+            String hint = (String) button.getTag();
+            button.setTag("".equals(hint) ? "1" : "");
+            button.setBtnBackground("".equals(hint) ? this.background("success") : this.background("primary"));
         });
         return button;
     }
@@ -231,6 +210,9 @@ public class ViewTemplate {
         return new TimeSelector(context, this.getWidth(w), this.getHeight(h));
     }
 
+    public <T> Tab<T> tab(int w, int h, int columns) {
+        return new Tab<>(context, this.getWidth(w), this.getHeight(h), columns);
+    }
 
     public Drawable background(String name) {
         if ("success".equals(name)) {
@@ -239,7 +221,10 @@ public class ViewTemplate {
         if ("primary".equals(name)) {
             return context.getDrawable(R.drawable.bg_btn_primary);
         }
-        return context.getDrawable(R.drawable.bg_normal);
+        if ("normal".equals(name)) {
+            return context.getDrawable(R.drawable.bg_normal);
+        }
+        return context.getDrawable(R.drawable.bg_empty);
     }
 
     /**

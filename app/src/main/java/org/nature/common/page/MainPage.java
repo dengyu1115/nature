@@ -1,15 +1,17 @@
 package org.nature.common.page;
 
 import android.view.Gravity;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.holder.PageHolder;
+import org.nature.common.model.Menu;
 import org.nature.common.model.PageInfo;
+import org.nature.common.view.Button;
+import org.nature.common.view.Tab;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 主页面
@@ -23,9 +25,9 @@ public class MainPage extends Page {
 
     private final List<String> tabs = Arrays.asList("基础", "ETF", "债券");
 
-    private final List<Button> tabBtnList = new ArrayList<>();
-
     private LinearLayout body;
+
+    private Tab<Menu> tab;
 
     @Override
     protected void makeStructure() {
@@ -36,19 +38,23 @@ public class MainPage extends Page {
 
     @Override
     protected void onShow() {
-        this.showMain(tabBtnList.get(0));
+        tab.onChange(this::showMain);
+        tab.setData(tabs.stream().map(i -> {
+            List<List<PageInfo>> list = PageHolder.get(i);
+            Menu menu = new Menu();
+            menu.setName(i);
+            menu.setList(list);
+            return menu;
+        }).collect(Collectors.toList()));
     }
 
     /**
      * 头部布局
      */
     private void header() {
-        LinearLayout header = template.line(100, 7);
-        header.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
-        page.addView(header);
-        for (String i : tabs) {
-            header.addView(this.tabBtn(i));
-        }
+        this.tab = template.tab(100, 7, 10);
+        this.tab.setMapper(Menu::getName);
+        page.addView(tab);
     }
 
     /**
@@ -62,23 +68,14 @@ public class MainPage extends Page {
 
     /**
      * 展示主体
-     * @param btn tab按钮
+     * @param menu 菜单数据
      */
-    private void showMain(Button btn) {
+    private void showMain(Menu menu) {
         this.body.removeAllViews();
-        List<List<PageInfo>> tag = (List<List<PageInfo>>) btn.getTag();
-        if (tag == null) {
+        if (menu == null) {
             return;
         }
-        tabBtnList.forEach(b -> {
-            b.setClickable(b != btn);
-            if (b == btn) {
-                b.setBackground(template.background("success"));
-            } else {
-                b.setBackground(template.background("primary"));
-            }
-        });
-        for (List<PageInfo> list : tag) {
+        for (List<PageInfo> list : menu.getList()) {
             this.listMenu(list);
         }
     }
@@ -98,18 +95,6 @@ public class MainPage extends Page {
         }
     }
 
-    /**
-     * TAB按钮
-     * @param name 名称
-     * @return Button
-     */
-    private Button tabBtn(String name) {
-        Button btn = template.button(name, 10, 7);
-        tabBtnList.add(btn);
-        btn.setTag(PageHolder.get(name));
-        btn.setOnClickListener(v -> this.showMain(btn));
-        return btn;
-    }
 
     /**
      * 菜单按钮
@@ -119,6 +104,7 @@ public class MainPage extends Page {
      */
     private Button menuBtn(String name, Class<? extends Page> clz) {
         Button btn = template.button(name, 10, 7);
+        btn.setBtnBackground(template.background("empty"));
         btn.setOnClickListener(v -> this.show(clz));
         return btn;
     }

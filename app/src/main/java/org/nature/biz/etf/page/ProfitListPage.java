@@ -1,7 +1,6 @@
 package org.nature.biz.etf.page;
 
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -17,6 +16,7 @@ import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.DateUtil;
 import org.nature.common.util.TextUtil;
+import org.nature.common.view.Button;
 import org.nature.common.view.DateSelector;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
@@ -103,7 +103,7 @@ public class ProfitListPage extends ListPage<Profit> {
 
     @Override
     protected void initHeaderBehaviours() {
-        total.setOnClickListener(v -> this.show(ProfitViewPage.class, this.getParam()));
+        total.onClick(() -> this.show(ProfitViewPage.class, this.getParam()));
         dateRule.mapper(dateRuleMap::get);
         dateRule.onChangeRun(this::toggleDateBtn);
         dateRule.refreshData(dateRuleList);
@@ -145,8 +145,8 @@ public class ProfitListPage extends ListPage<Profit> {
      * @return 合并后集合
      */
     private List<Profit> merge(List<Profit> profits) {
-        boolean itemFlag = StringUtils.isNotBlank(this.item.getHint());
-        boolean ruleFlag = StringUtils.isNotBlank(this.rule.getHint());
+        boolean itemFlag = StringUtils.isNotBlank((String) this.item.getTag());
+        boolean ruleFlag = StringUtils.isNotBlank((String) this.rule.getTag());
         Function<Profit, String> groupKey;
         if (!itemFlag && !ruleFlag) {
             groupKey = i -> String.join(Const.DELIMITER, i.getDate(), i.getCode(), i.getType(), i.getRule(), this.getItemName(i));

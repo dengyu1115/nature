@@ -1,6 +1,5 @@
 package org.nature.biz.common.page;
 
-import android.widget.Button;
 import android.widget.LinearLayout;
 import org.nature.biz.common.mapper.KlineMapper;
 import org.nature.biz.common.model.KInfo;
@@ -9,6 +8,7 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.TextUtil;
+import org.nature.common.view.Button;
 import org.nature.common.view.Table;
 
 import java.util.Arrays;
@@ -55,7 +55,7 @@ public class KlineListPage extends ListPage<Kline> {
 
     @Override
     protected void initHeaderBehaviours() {
-        chart.setOnClickListener(l -> this.show(KlineChartPage.class, this.getParam()));
+        chart.onClick(() -> this.show(KlineChartPage.class, this.getParam()));
     }
 
     @Override

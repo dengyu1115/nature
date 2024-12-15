@@ -15,6 +15,14 @@ import org.nature.common.util.DateUtil;
 import java.util.Calendar;
 import java.util.Date;
 
+import static org.nature.common.constant.Const.PAD;
+
+/**
+ * 日期选择器
+ * @author Nature
+ * @version 1.0.0
+ * @since 2024/12/15
+ */
 @SuppressLint({"ViewConstructor", "UseCompatLoadingForDrawables", "DefaultLocale", "ResourceType"})
 public class DateSelector extends LinearLayout {
 
@@ -28,9 +36,45 @@ public class DateSelector extends LinearLayout {
         this.width = width;
         this.height = height;
         this.setLayoutParams(new LayoutParams(width, height));
-        this.setBackground(context.getDrawable(R.drawable.bg_normal));
-        this.addView(this.buildImage());
-        this.addView(textView = this.buildTextView());
+        this.setPadding(PAD, PAD, PAD, PAD);
+        LinearLayout container = this.buildContainer();
+        this.addView(container);
+        container.addView(this.buildImage());
+        container.addView(textView = this.buildTextView());
+        this.setActions();
+    }
+
+    public void setValue(String value) {
+        this.textView.setText(value);
+    }
+
+    public String getValue() {
+        return textView.getText().toString();
+    }
+
+    private LinearLayout buildContainer() {
+        LinearLayout container = new LinearLayout(this.context);
+        container.setLayoutParams(new LayoutParams(width - PAD * 2, height - PAD * 2));
+        container.setBackground(context.getDrawable(R.drawable.bg_normal));
+        return container;
+    }
+
+    private ImageView buildImage() {
+        ImageView view = new ImageView(context);
+        view.setLayoutParams(new LayoutParams(30, height - PAD * 2));
+        view.setImageDrawable(context.getDrawable(R.drawable.icon_date));
+        return view;
+    }
+
+    private TextView buildTextView() {
+        TextView textView = new TextView(context);
+        textView.setLayoutParams(new LayoutParams(width - 30 - PAD * 2, height - PAD * 2));
+        textView.setGravity(Gravity.START | Gravity.CENTER);
+        textView.setPadding(1, 1, 1, 1);
+        return textView;
+    }
+
+    private void setActions() {
         this.setOnClickListener(l -> {
             String s = textView.getText().toString();
             Date date = s.isEmpty() ? new Date() : DateUtil.parse(s, Const.FORMAT_DAY);
@@ -45,29 +89,6 @@ public class DateSelector extends LinearLayout {
             textView.setText("");
             return true;
         });
-    }
-
-    public void setValue(String value) {
-        this.textView.setText(value);
-    }
-
-    public String getValue() {
-        return textView.getText().toString();
-    }
-
-    private ImageView buildImage() {
-        ImageView view = new ImageView(context);
-        view.setLayoutParams(new LayoutParams(30, height));
-        view.setImageDrawable(context.getDrawable(R.drawable.icon_date));
-        return view;
-    }
-
-    private TextView buildTextView() {
-        TextView textView = new TextView(context);
-        textView.setLayoutParams(new LayoutParams(width - 30, height - 2));
-        textView.setGravity(Gravity.START | Gravity.CENTER);
-        textView.setPadding(1, 1, 1, 1);
-        return textView;
     }
 
     /**

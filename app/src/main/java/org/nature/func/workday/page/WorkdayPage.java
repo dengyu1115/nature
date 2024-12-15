@@ -2,8 +2,6 @@ package org.nature.func.workday.page;
 
 import android.annotation.SuppressLint;
 import android.view.Gravity;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -13,11 +11,8 @@ import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.ClickUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.Selector;
-import org.nature.common.view.Table;
-import org.nature.common.view.ViewTemplate;
+import org.nature.common.view.*;
 import org.nature.func.workday.manager.WorkdayManager;
 import org.nature.func.workday.mapper.WorkdayMapper;
 import org.nature.func.workday.model.Month;
@@ -60,7 +55,7 @@ public class WorkdayPage extends ListPage<Month> {
     /**
      * 工作日属性输入框
      */
-    private EditText date;
+    private Input date;
 
     @Override
     protected List<Table.Header<Month>> headers() {
@@ -99,12 +94,12 @@ public class WorkdayPage extends ListPage<Month> {
         year.mapper(i -> i);
         year.refreshData(this.initYears());
         year.setValue(DateFormatUtils.format(new Date(), Const.FORMAT_YEAR));
-        ClickUtil.onAsyncClick(loadLatest, () -> {
+        loadLatest.onAsyncClick(() -> {
             String year = this.year.getValue();
             Warn.check(() -> StringUtils.isBlank(year), "请选择年份");
             return String.format("加载完成,共%s条", workDayManager.load(year));
         });
-        ClickUtil.onClick(reload, () -> template.confirmAsync("重新加载数据", "确定重新加载吗？", () -> {
+        reload.onClick(() -> template.confirmAsync("重新加载数据", "确定重新加载吗？", () -> {
             String year = this.year.getValue();
             Warn.check(() -> StringUtils.isBlank(year), "请选择年份");
             return String.format("加载完成,共%s条", workDayManager.reload(year));
@@ -132,7 +127,7 @@ public class WorkdayPage extends ListPage<Month> {
 
     private void edit(String type, String day) {
         this.makeWindowStructure();
-        this.date.setText(day);
+        this.date.setValue(day);
         this.type.setValue(type);
         template.confirm("编辑-" + day, page, () -> this.doEdit(workdayMapper::merge));
     }
@@ -142,7 +137,7 @@ public class WorkdayPage extends ListPage<Month> {
      * @param consumer 处理逻辑
      */
     private void doEdit(Consumer<Workday> consumer) {
-        String date = this.date.getText().toString();
+        String date = this.date.getValue();
         Warn.check(date::isEmpty, "请填写日期");
         String type = this.type.getValue();
         Warn.check(type::isEmpty, "请选择类型");

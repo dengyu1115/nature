@@ -1,8 +1,6 @@
 package org.nature.biz.bound.page;
 
 import android.view.Gravity;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import org.nature.biz.bound.mapper.ItemMapper;
 import org.nature.biz.bound.model.Item;
@@ -10,12 +8,9 @@ import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.ClickUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.Selector;
-import org.nature.common.view.Table;
+import org.nature.common.view.*;
 import org.nature.common.view.Table.Header;
-import org.nature.common.view.ViewTemplate;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -45,7 +40,7 @@ public class ItemListPage extends ListPage<Item> {
     /**
      * 编号、名称
      */
-    private EditText code, name, fund, ratio;
+    private Input code, name, fund, ratio;
     /**
      * 类型下拉选项
      */
@@ -87,7 +82,7 @@ public class ItemListPage extends ListPage<Item> {
 
     @Override
     protected void initHeaderBehaviours() {
-        ClickUtil.onClick(add, this::add);
+        add.onClick(this::add);
     }
 
     @Override
@@ -114,11 +109,11 @@ public class ItemListPage extends ListPage<Item> {
      */
     private void edit(Item d) {
         this.makeWindowStructure();
-        this.code.setText(d.getCode());
-        this.name.setText(d.getName());
+        this.code.setValue(d.getCode());
+        this.name.setValue(d.getName());
         this.type.setValue(d.getType());
-        this.fund.setText(d.getFund());
-        this.ratio.setText(d.getRatio().toPlainString());
+        this.fund.setValue(d.getFund());
+        this.ratio.setValue(d.getRatio().toPlainString());
         template.confirm("编辑项目-" + d.getName(), popup, () -> this.doEdit(itemMapper::merge));
     }
 
@@ -127,15 +122,15 @@ public class ItemListPage extends ListPage<Item> {
      * @param consumer 编辑逻辑
      */
     private void doEdit(Consumer<Item> consumer) {
-        String code = this.code.getText().toString();
+        String code = this.code.getValue();
         Warn.check(code::isEmpty, "请填写编号");
         String type = this.type.getValue();
         Warn.check(type::isEmpty, "请选择类型");
-        String name = this.name.getText().toString();
+        String name = this.name.getValue();
         Warn.check(name::isEmpty, "请填写名称");
-        String fund = this.fund.getText().toString();
+        String fund = this.fund.getValue();
         Warn.check(fund::isEmpty, "请填写基金编号");
-        String ratio = this.ratio.getText().toString();
+        String ratio = this.ratio.getValue();
         Warn.check(ratio::isEmpty, "请填写比例系数");
         Item item = new Item();
         item.setRule(this.getParam());
@@ -187,11 +182,11 @@ public class ItemListPage extends ListPage<Item> {
             if (d == null) {
                 return;
             }
-            this.code.setText(d.getCode());
-            this.name.setText(d.getName());
+            this.code.setValue(d.getCode());
+            this.name.setValue(d.getName());
             this.type.setValue(d.getType());
-            this.fund.setText(d.getFund());
-            this.ratio.setText(d.getRatio().toPlainString());
+            this.fund.setValue(d.getFund());
+            this.ratio.setValue(d.getRatio().toPlainString());
         });
         item.refreshData(this.listItems());
     }

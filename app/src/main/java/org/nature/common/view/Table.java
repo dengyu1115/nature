@@ -196,7 +196,7 @@ public class Table<T> extends LinearLayout {
         }
         // 有滚动部分添加滚动view
         line.addView(this.divider(1, MATCH_PARENT));
-        HorizontalScrollView scrollView = this.horizontalScrollView();
+        HorizontalScrollView scrollView = this.buildHorizontalscrollview();
         scrollView.setOnScrollChangeListener(scrollListener);
         LinearLayout innerLine = this.buildRowView();
         scrollView.addView(innerLine);
@@ -248,7 +248,7 @@ public class Table<T> extends LinearLayout {
         }
         // 有滚动部分添加滚动view
         line.addView(this.divider(1, MATCH_PARENT));
-        HorizontalScrollView scrollView = this.horizontalScrollView();
+        HorizontalScrollView scrollView = this.buildHorizontalscrollview();
         scrollView.setOnScrollChangeListener(scrollListener);
         LinearLayout innerLine = this.buildRowView();
         scrollView.addView(innerLine);
@@ -410,7 +410,7 @@ public class Table<T> extends LinearLayout {
      * 水平滚动view
      * @return HorizontalScrollView
      */
-    private HorizontalScrollView horizontalScrollView() {
+    private HorizontalScrollView buildHorizontalscrollview() {
         HorizontalScrollView hsv = new HorizontalScrollView(context);
         hsv.setScrollBarSize(0);
         hsv.setOverScrollMode(View.OVER_SCROLL_NEVER);

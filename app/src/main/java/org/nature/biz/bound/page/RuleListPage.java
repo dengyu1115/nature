@@ -1,8 +1,6 @@
 package org.nature.biz.bound.page;
 
 import android.view.Gravity;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import org.nature.biz.bound.manager.RuleManager;
 import org.nature.biz.bound.mapper.RuleMapper;
@@ -11,11 +9,8 @@ import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.ClickUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.Selector;
-import org.nature.common.view.Table;
-import org.nature.common.view.ViewTemplate;
+import org.nature.common.view.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -39,7 +34,7 @@ public class RuleListPage extends ListPage<Rule> {
     private RuleManager ruleManager;
 
     private LinearLayout popup;
-    private EditText code, name, dateStart, dateEnd, days, diff;
+    private Input code, name, dateStart, dateEnd, days, diff;
     private Selector<String> statusSel;
     private final List<Table.Header<Rule>> headers = Arrays.asList(
             Table.header("编号", d -> TextUtil.text(d.getCode()), C, S, Rule::getCode),
@@ -73,7 +68,7 @@ public class RuleListPage extends ListPage<Rule> {
 
     @Override
     protected void initHeaderBehaviours() {
-        ClickUtil.onClick(add, this::add);
+        add.onClick(this::add);
     }
 
     @Override
@@ -100,12 +95,12 @@ public class RuleListPage extends ListPage<Rule> {
      */
     private void edit(Rule d) {
         this.makeWindowStructure();
-        this.code.setText(d.getCode());
-        this.name.setText(d.getName());
-        this.dateStart.setText(d.getDateStart());
-        this.dateEnd.setText(d.getDateEnd());
-        this.days.setText(String.valueOf(d.getDays()));
-        this.diff.setText(d.getDiff().toPlainString());
+        this.code.setValue(d.getCode());
+        this.name.setValue(d.getName());
+        this.dateStart.setValue(d.getDateStart());
+        this.dateEnd.setValue(d.getDateEnd());
+        this.days.setValue(String.valueOf(d.getDays()));
+        this.diff.setValue(d.getDiff().toPlainString());
         this.statusSel.setValue(d.getStatus());
         template.confirm("编辑-" + d.getName(), popup, () -> this.doEdit(ruleMapper::merge));
     }
@@ -115,16 +110,16 @@ public class RuleListPage extends ListPage<Rule> {
      * @param consumer 处理逻辑
      */
     private void doEdit(Consumer<Rule> consumer) {
-        String code = this.code.getText().toString();
+        String code = this.code.getValue();
         Warn.check(code::isEmpty, "请填写名称");
-        String name = this.name.getText().toString();
+        String name = this.name.getValue();
         Warn.check(name::isEmpty, "请填写名称");
-        String dateStart = this.dateStart.getText().toString();
+        String dateStart = this.dateStart.getValue();
         Warn.check(dateStart::isEmpty, "请填写开始日期");
-        String dateEnd = this.dateEnd.getText().toString();
-        String days = this.days.getText().toString();
+        String dateEnd = this.dateEnd.getValue();
+        String days = this.days.getValue();
         Warn.check(days::isEmpty, "请数据天数");
-        String diff = this.diff.getText().toString();
+        String diff = this.diff.getValue();
         Warn.check(diff::isEmpty, "请填写触发差值");
         String status = this.statusSel.getValue();
         Warn.check(status::isEmpty, "请选择状态");

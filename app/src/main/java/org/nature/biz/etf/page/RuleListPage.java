@@ -1,8 +1,6 @@
 package org.nature.biz.etf.page;
 
 import android.view.Gravity;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import org.nature.biz.etf.manager.HoldManager;
 import org.nature.biz.etf.mapper.RuleMapper;
@@ -13,9 +11,7 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.Selector;
-import org.nature.common.view.Table;
-import org.nature.common.view.ViewTemplate;
+import org.nature.common.view.*;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -40,7 +36,7 @@ public class RuleListPage extends ListPage<Rule> {
     private HoldManager holdManager;
 
     private LinearLayout page;
-    private EditText name, base, ratio, date, expansion;
+    private Input name, base, ratio, date, expansion;
     private Selector<String> statusSel, typeSel;
     private final List<Table.Header<Rule>> headers = Arrays.asList(
             Table.header("名称", d -> TextUtil.text(d.getName()), C, S, Rule::getName),
@@ -76,7 +72,7 @@ public class RuleListPage extends ListPage<Rule> {
 
     @Override
     protected void initHeaderBehaviours() {
-        add.setOnClickListener(v -> this.add());
+        add.onClick(this::add);
     }
 
     @Override
@@ -103,11 +99,11 @@ public class RuleListPage extends ListPage<Rule> {
      */
     private void edit(Rule d) {
         this.makeWindowStructure();
-        this.name.setText(d.getName());
-        this.date.setText(d.getDate());
-        this.base.setText(d.getBase().toPlainString());
-        this.ratio.setText(d.getRatio().toPlainString());
-        this.expansion.setText(d.getExpansion().toPlainString());
+        this.name.setValue(d.getName());
+        this.date.setValue(d.getDate());
+        this.base.setValue(d.getBase().toPlainString());
+        this.ratio.setValue(d.getRatio().toPlainString());
+        this.expansion.setValue(d.getExpansion().toPlainString());
         this.statusSel.setValue(d.getStatus());
         template.confirm("编辑-" + d.getName(), page, () -> this.doEdit(ruleMapper::merge));
     }
@@ -117,17 +113,17 @@ public class RuleListPage extends ListPage<Rule> {
      * @param consumer 处理逻辑
      */
     private void doEdit(Consumer<Rule> consumer) {
-        String name = this.name.getText().toString();
+        String name = this.name.getValue();
         Warn.check(name::isEmpty, "请填写名称");
-        String date = this.date.getText().toString();
+        String date = this.date.getValue();
         if (date.isEmpty()) {
             date = null;
         }
-        String base = this.base.getText().toString();
+        String base = this.base.getValue();
         Warn.check(base::isEmpty, "请填写金额基数");
-        String ratio = this.ratio.getText().toString();
+        String ratio = this.ratio.getValue();
         Warn.check(ratio::isEmpty, "请填写波动比率");
-        String expansion = this.expansion.getText().toString();
+        String expansion = this.expansion.getValue();
         Warn.check(expansion::isEmpty, "请填写扩大幅度");
         String status = this.statusSel.getValue();
         Warn.check(status::isEmpty, "请选择状态");

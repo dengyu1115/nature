@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
+import static org.nature.common.constant.Const.PAD;
+
 /**
  * 下拉选择器
  * @author Nature
@@ -25,10 +27,11 @@ public class Selector<T> extends LinearLayout {
 
     private final Context context;
     private final int width, height, popupHeight;
-    private final Adapter adapter;
     private final TextView valueView;
+    private final LinearLayout container;
     private final PopupWindow popup;
     private final ImageView arrow;
+    private final Adapter adapter;
     private Function<T, String> mapper;
     private Runnable changeRun;
     private List<T> data;
@@ -40,15 +43,17 @@ public class Selector<T> extends LinearLayout {
         this.data = new ArrayList<>();
         this.width = width;
         this.height = height;
-        this.popupHeight = height * 5;
-        this.adapter = new Adapter();
+        this.popupHeight = (height - 10) * 5;
         this.setLayoutParams(new LayoutParams(width, height));
-        this.setBackground(context.getDrawable(R.drawable.bg_normal));
+        this.setPadding(PAD, PAD, PAD, PAD);
+        this.container = this.buildContainer();
+        this.addView(container);
+        this.adapter = new Adapter();
         this.valueView = this.buildTextView();
-        this.valueView.setLayoutParams(new LayoutParams(width - 30, height));
+        this.valueView.setLayoutParams(new LayoutParams(width - 30 - PAD * 2, height - PAD * 2));
         this.arrow = this.buildArrow(context);
-        this.addView(valueView);
-        this.addView(arrow);
+        container.addView(valueView);
+        container.addView(arrow);
         this.popup = this.buildPopup();
     }
 
@@ -63,7 +68,7 @@ public class Selector<T> extends LinearLayout {
     public void refreshData(List<T> data) {
         this.data = data;
         this.adapter.notifyDataSetChanged();
-        if (!data.isEmpty() && (valueView.getText() == null || valueView.getText().length() == 0)) {
+        if (!data.isEmpty() && valueView.getTag() == null) {
             this.doSelect(0, valueView);
             value = (T) valueView.getTag();
             if (changeRun != null) {
@@ -82,6 +87,13 @@ public class Selector<T> extends LinearLayout {
         valueView.setText(mapper.apply(t));
     }
 
+    private LinearLayout buildContainer() {
+        LinearLayout container = new LinearLayout(this.context);
+        container.setLayoutParams(new LayoutParams(width - PAD * 2, height - PAD * 2));
+        container.setBackground(context.getDrawable(R.drawable.bg_normal));
+        return container;
+    }
+
     private PopupWindow buildPopup() {
         PopupWindow popup = new PopupWindow(context);
         popup.setContentView(this.buildListView());
@@ -90,8 +102,8 @@ public class Selector<T> extends LinearLayout {
         popup.setBackgroundDrawable(context.getDrawable(R.drawable.bg_normal));
         this.setOnClickListener(v -> {
             arrow.setImageDrawable(context.getDrawable(R.drawable.icon_arrow_left));
-            popup.setWidth(this.getWidth());
-            popup.showAsDropDown(this, 0, 1);
+            popup.setWidth(width - 10);
+            popup.showAsDropDown(container, 0, 1);
         });
         popup.setOnDismissListener(() -> arrow.setImageDrawable(context.getDrawable(R.drawable.icon_arrow_down)));
         return popup;
@@ -100,6 +112,8 @@ public class Selector<T> extends LinearLayout {
     private ListView buildListView() {
         ListView listView = new ListView(context);
         listView.setAdapter(adapter);
+        listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        listView.setScrollBarSize(1);
         listView.setOnItemClickListener((parent, view, position, id) -> {
             popup.dismiss();
             TextView textView = (TextView) view;
@@ -118,7 +132,7 @@ public class Selector<T> extends LinearLayout {
 
     private TextView buildTextView() {
         TextView textView = new TextView(context);
-        textView.setLayoutParams(new LayoutParams(width, height - 3));
+        textView.setLayoutParams(new LayoutParams(width - PAD * 2, height - PAD * 2 - 3));
         textView.setGravity(Gravity.START | Gravity.CENTER);
         textView.setPadding(30, 1, 1, 1);
         return textView;
@@ -126,7 +140,7 @@ public class Selector<T> extends LinearLayout {
 
     private ImageView buildArrow(Context context) {
         ImageView image = new ImageView(context);
-        image.setLayoutParams(new LayoutParams(30, height));
+        image.setLayoutParams(new LayoutParams(30, height - PAD * 2));
         image.setImageDrawable(context.getDrawable(R.drawable.icon_arrow_down));
         return image;
     }

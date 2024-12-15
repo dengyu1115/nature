@@ -1,14 +1,13 @@
 package org.nature.biz.common.page;
 
-import android.widget.Button;
 import android.widget.LinearLayout;
 import org.nature.biz.common.manager.NetManager;
 import org.nature.biz.common.model.NInfo;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.ClickUtil;
 import org.nature.common.util.TextUtil;
+import org.nature.common.view.Button;
 import org.nature.common.view.Table;
 
 import java.util.Arrays;
@@ -59,9 +58,8 @@ public class NInfoListPage extends ListPage<NInfo> {
 
     @Override
     protected void initHeaderBehaviours() {
-        ClickUtil.onAsyncClick(load, this::loadAll);
-        ClickUtil.onClick(reload, () ->
-                template.confirmAsync("K线重载", "确定重新加载全部K线数据？", this::reloadAll));
+        load.onAsyncClick(this::loadAll);
+        reload.onClick(() -> template.confirmAsync("K线重载", "确定重新加载全部K线数据？", this::reloadAll));
     }
 
     @Override

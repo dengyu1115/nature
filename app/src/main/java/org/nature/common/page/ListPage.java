@@ -4,10 +4,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.view.Gravity;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import org.apache.commons.lang3.StringUtils;
+import org.nature.common.view.Button;
 import org.nature.common.view.Table;
 
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 public abstract class ListPage<T> extends Page {
 
     private Table<T> excel;
-    private Button button;
+    private Button query;
     private TextView total;
     private final Handler handler = new Handler(Looper.myLooper(), msg -> {
         this.total.setText(String.valueOf(this.excel.getDataSize()));
@@ -47,7 +47,7 @@ public abstract class ListPage<T> extends Page {
      * 初始化按钮行为
      */
     private void initBehaviours() {
-        this.button.setOnClickListener(v -> this.refreshData());
+        this.query.onClick(this::refreshData);
         this.excel.setLongClick(this.longClick());
         this.initHeaderBehaviours();
     }
@@ -64,7 +64,7 @@ public abstract class ListPage<T> extends Page {
         handle.setPadding(3, 0, 7, 0);
         LinearLayout header = template.line(100, 7, condition, handle);
         page.addView(header);
-        handle.addView(button = template.button("查询", 5, 7));
+        handle.addView(query = template.button("查询", 5, 7));
         this.initHeaderViews(condition);
     }
 
@@ -94,7 +94,7 @@ public abstract class ListPage<T> extends Page {
     protected void refreshData() {
         new Thread(() -> {
             try {
-                button.setClickable(false);
+                query.setBtnClickable(false);
                 this.excel.data(this.listData());
                 this.refreshTotal();
             } catch (Exception e) {
@@ -103,7 +103,7 @@ public abstract class ListPage<T> extends Page {
                 message = StringUtils.isBlank(message) ? "未知错误" : message;
                 template.alert(message);
             } finally {
-                button.setClickable(true);
+                query.setBtnClickable(true);
             }
         }).start();
     }

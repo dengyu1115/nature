@@ -1,8 +1,6 @@
 package org.nature.biz.etf.page;
 
 import android.view.Gravity;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import org.apache.commons.lang3.StringUtils;
 import org.nature.biz.common.model.KInfo;
@@ -14,11 +12,8 @@ import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.ClickUtil;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.Selector;
-import org.nature.common.view.Table;
-import org.nature.common.view.ViewTemplate;
+import org.nature.common.view.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,17 +36,13 @@ public class ItemListPage extends ListPage<Item> {
     @Injection
     private HoldManager holdManager;
     /**
-     * 关键字
+     * 关键字、编号、名称
      */
-    private EditText keyword;
+    private Input keyword, code, name;
     /**
      * 编辑弹窗
      */
     private LinearLayout editPop;
-    /**
-     * 编号、名称
-     */
-    private EditText code, name;
     /**
      * 类型下拉选项
      */
@@ -81,7 +72,7 @@ public class ItemListPage extends ListPage<Item> {
     @Override
     protected List<Item> listData() {
         List<Item> list = itemMapper.listAll();
-        String keyword = this.keyword.getText().toString();
+        String keyword = this.keyword.getValue();
         if (StringUtils.isNotBlank(keyword)) {
             list = list.stream().filter(i -> i.getName().contains(keyword)).collect(Collectors.toList());
         }
@@ -97,8 +88,8 @@ public class ItemListPage extends ListPage<Item> {
 
     @Override
     protected void initHeaderBehaviours() {
-        ClickUtil.onClick(add, this::add);
-        ClickUtil.onAsyncClick(calcRule, this::calcHold);
+        add.onClick(this::add);
+        calcRule.onAsyncClick(this::calcHold);
     }
 
     @Override
@@ -125,8 +116,8 @@ public class ItemListPage extends ListPage<Item> {
      */
     private void edit(Item d) {
         this.makeWindowStructure();
-        this.code.setText(d.getCode());
-        this.name.setText(d.getName());
+        this.code.setValue(d.getCode());
+        this.name.setValue(d.getName());
         this.type.setValue(d.getType());
         template.confirm("编辑项目-" + d.getName(), editPop, () -> this.doEdit(itemMapper::merge));
     }
@@ -136,9 +127,9 @@ public class ItemListPage extends ListPage<Item> {
      * @param consumer 编辑逻辑
      */
     private void doEdit(Consumer<Item> consumer) {
-        String code = this.code.getText().toString();
+        String code = this.code.getValue();
         Warn.check(code::isEmpty, "请填写编号");
-        String name = this.name.getText().toString();
+        String name = this.name.getValue();
         Warn.check(name::isEmpty, "请填写名称");
         String type = this.type.getValue();
         Warn.check(type::isEmpty, "请选择类型");

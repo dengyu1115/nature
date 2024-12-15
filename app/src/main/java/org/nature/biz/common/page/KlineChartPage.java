@@ -1,7 +1,6 @@
 package org.nature.biz.common.page;
 
 import android.graphics.Color;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import org.nature.biz.common.mapper.KlineMapper;
 import org.nature.biz.common.model.KInfo;
@@ -12,8 +11,8 @@ import org.nature.common.chart.*;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.Page;
-import org.nature.common.util.ClickUtil;
 import org.nature.common.util.TextUtil;
+import org.nature.common.view.Button;
 
 import java.time.LocalDate;
 import java.time.temporal.WeekFields;
@@ -144,7 +143,7 @@ public class KlineChartPage extends Page {
      */
     private Button klineView(String title, Function<List<Kline>, List<Kline>> func) {
         Button button = template.button(title, 5, L_H);
-        ClickUtil.onClick(button, () -> chart.data(KlineUtil.convert(func.apply(list), name)));
+        button.onClick(() -> chart.data(KlineUtil.convert(func.apply(list), name)));
         return button;
     }
 

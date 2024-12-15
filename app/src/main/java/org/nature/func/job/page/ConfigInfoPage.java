@@ -3,21 +3,16 @@ package org.nature.func.job.page;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.view.Gravity;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.ioc.holder.JobHolder;
 import org.nature.common.page.ListPage;
-import org.nature.common.util.ClickUtil;
 import org.nature.common.util.Md5Util;
 import org.nature.common.util.Sorter;
 import org.nature.common.util.TextUtil;
-import org.nature.common.view.Selector;
-import org.nature.common.view.Table;
-import org.nature.common.view.ViewTemplate;
+import org.nature.common.view.*;
 import org.nature.func.job.enums.Status;
 import org.nature.func.job.mapper.ConfigInfoMapper;
 import org.nature.func.job.model.ConfigInfo;
@@ -54,10 +49,11 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
     );
     @Injection
     private ConfigInfoMapper configInfoMapper;
-    private Button start, stop, add;
+    private Button start, add;
     private LinearLayout popup;
     private Selector<String> jobSel, statusSel;
-    private EditText year, month, day, hour, minute, second;
+    private Input year, month, day, hour, minute, second;
+    private boolean running;
 
     @Override
     protected List<Table.Header<ConfigInfo>> headers() {
@@ -74,16 +70,25 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
     @Override
     protected void initHeaderViews(LinearLayout condition) {
         condition.addView(start = template.button("启动", 5, 7));
-        condition.addView(stop = template.button("停止", 5, 7));
         condition.addView(add = template.button("+", 3, 7));
     }
 
     @Override
     protected void initHeaderBehaviours() {
         Intent service = new Intent(context, JobService.class);
-        ClickUtil.onClick(start, () -> context.startService(service));
-        ClickUtil.onClick(stop, () -> context.stopService(service));
-        ClickUtil.onClick(add, this::add);
+        start.onClick(() -> {
+            running = !running;
+            if (running) {
+                context.startService(service);
+                start.setText("停止");
+                start.setBtnBackground(template.background("success"));
+            } else {
+                context.stopService(service);
+                start.setText("启动");
+                start.setBtnBackground(template.background("primary"));
+            }
+        });
+        add.onClick(this::add);
     }
 
     @Override
@@ -132,12 +137,12 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
     private void edit(ConfigInfo d) {
         this.makeWindowStructure();
         this.jobSel.setValue(d.getCode());
-        this.year.setText(d.getYear());
-        this.month.setText(d.getMonth());
-        this.day.setText(d.getDay());
-        this.hour.setText(d.getHour());
-        this.minute.setText(d.getMinute());
-        this.second.setText(d.getSecond());
+        this.year.setValue(d.getYear());
+        this.month.setValue(d.getMonth());
+        this.day.setValue(d.getDay());
+        this.hour.setValue(d.getHour());
+        this.minute.setValue(d.getMinute());
+        this.second.setValue(d.getSecond());
         this.statusSel.setValue(d.getStatus());
         String name = JobHolder.getName(d.getCode());
         template.confirm("编辑-" + name, popup, () -> this.doEdit(configInfoMapper::merge));
@@ -168,12 +173,12 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
         ConfigInfo d = new ConfigInfo();
         d.setCode(code);
         d.setStatus(status);
-        d.setYear(TextUtil.getString(this.year));
-        d.setMonth(TextUtil.getString(this.month));
-        d.setDay(TextUtil.getString(this.day));
-        d.setHour(TextUtil.getString(this.hour));
-        d.setMinute(TextUtil.getString(this.minute));
-        d.setSecond(TextUtil.getString(this.second));
+        d.setYear(this.year.getValue());
+        d.setMonth(this.month.getValue());
+        d.setDay(this.day.getValue());
+        d.setHour(this.hour.getValue());
+        d.setMinute(this.minute.getValue());
+        d.setSecond(this.second.getValue());
         d.setSignature(Md5Util.md5(code, d.getYear(), d.getMonth(), d.getDay(), d.getHour(), d.getMinute(), d.getSecond()));
         consumer.accept(d);
         this.refreshData();
