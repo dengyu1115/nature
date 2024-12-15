@@ -60,16 +60,6 @@ public class ClickUtil {
     }
 
     /**
-     * 给view设置点击事件，并处理点击事件（主线程执行）
-     * @param view     view
-     * @param supplier 执行逻辑
-     */
-    public static void onAsyncClick(View view, Supplier<String> supplier) {
-        view.setOnClickListener(v -> ClickUtil.asyncClick(v, supplier, () -> {
-        }));
-    }
-
-    /**
      * 点击处理（主线程执行）
      * @param view     view
      * @param runnable 执行逻辑

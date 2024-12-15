@@ -34,11 +34,8 @@ public class Tab<T> extends LinearLayout {
     private final int height, colWidth;
     private final LinearLayout row;
     private final List<LinearLayout> tabs;
-
-
     private Consumer<T> onChange;
     private Function<T, String> mapper;
-
     private T value;
 
     public Tab(Context context, int width, int height, int columns) {
