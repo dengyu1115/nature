@@ -4,9 +4,10 @@ import org.nature.common.db.annotation.TableModel;
 import org.nature.common.db.proxy.MapperProxy;
 import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Component;
+import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.JobExec;
-import org.nature.common.ioc.annotation.PageView;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
  * @version 1.0.0
  * @since 2019/11/21 16:33
  */
+@SuppressWarnings("all")
 public class InstanceHolder {
 
     /**
@@ -28,7 +30,6 @@ public class InstanceHolder {
      * @param cls 实例class
      * @return 实例
      */
-    @SuppressWarnings("all")
     public static <T> T get(Class<T> cls) {
         Map<String, Object> map = CTX.get(cls);
         if (map == null) {
@@ -44,24 +45,19 @@ public class InstanceHolder {
         return (T) values.toArray()[0];
     }
 
-    @SuppressWarnings("all")
     public static <T> List<T> list(Class<T> cls) {
         Map<String, Object> map = CTX.getOrDefault(cls, new HashMap<>());
         return Arrays.stream(map.values().toArray()).map(i -> (T) i).collect(Collectors.toList());
     }
 
-    @SuppressWarnings("all")
     public static <T> Map<String, T> map(Class<T> cls) {
         Map<String, Object> map = CTX.getOrDefault(cls, new HashMap<>());
         return map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, i -> (T) i.getValue()));
     }
 
-    @SuppressWarnings("all")
     public static <T> void add(Class<T> cls) {
         Object o;
-        if (cls.isAnnotationPresent(Component.class)
-                || cls.isAnnotationPresent(PageView.class)
-                || cls.isAnnotationPresent(JobExec.class)) {
+        if (cls.isAnnotationPresent(Component.class) || cls.isAnnotationPresent(JobExec.class)) {
             try {
                 o = cls.newInstance();
             } catch (Exception e) {
@@ -102,6 +98,30 @@ public class InstanceHolder {
         }
         // 父类添加对象
         add(sc, name, o);
+    }
+
+    /**
+     * 注入
+     * @param cls 类
+     * @param o   实例
+     */
+    public static void inject(Class<?> cls, Object o) {
+        Field[] fields = cls.getDeclaredFields();
+        for (Field field : fields) {
+            if (field.isAnnotationPresent(Injection.class)) {
+                Class<?> type = field.getType();
+                field.setAccessible(true);
+                try {
+                    field.set(o, InstanceHolder.get(type));
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        Class<?> sc = cls.getSuperclass();
+        if (sc != null && !sc.equals(Object.class)) {
+            inject(sc, o);
+        }
     }
 
 }

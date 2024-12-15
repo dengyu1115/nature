@@ -13,7 +13,6 @@ import org.nature.common.view.ViewTemplate;
  */
 public abstract class Page {
 
-    protected static final int MATCH_PARENT = LinearLayout.LayoutParams.MATCH_PARENT;
     protected static final int C = 0, S = 1, E = 2;
     protected Context context;
     protected ViewTemplate template;
@@ -85,12 +84,5 @@ public abstract class Page {
      */
     protected abstract void onShow();
 
-    /**
-     * 是否多实例
-     * @return true多实例
-     */
-    protected boolean isProtocol() {
-        return false;
-    }
 
 }

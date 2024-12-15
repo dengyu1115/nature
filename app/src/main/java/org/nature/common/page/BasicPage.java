@@ -23,7 +23,9 @@ public class BasicPage extends LinearLayout {
 
     private final Stack<Page> pages;
 
-    private final Map<Class<?>, Page> map;
+    private final Map<String, Page> map;
+
+    private String path;
 
     public BasicPage(Context context) {
         super(context);
@@ -47,20 +49,25 @@ public class BasicPage extends LinearLayout {
      * @param param 参数
      */
     public <T extends Page, P> void show(Class<T> clz, P param) {
+        String path = clz.getName();
+        if (this.path == null) {
+            this.path = path;
+        } else {
+            this.path = this.path + ":" + path;
+        }
         // 获取页面，已创建的页面直接获取
-        Page page = map.get(clz);
+        Page page = map.get(this.path);
         if (page != null) {
             page.setParam(param);
             this.show(page);
         } else {
             // 未创建的新创建
             try {
-                page = InstanceHolder.get(clz);
+                page = clz.getConstructor().newInstance();
+                InstanceHolder.inject(clz, page);
                 page.doCreate(this);
                 page.setParam(param);
-                if (!page.isProtocol()) {
-                    map.put(clz, page);
-                }
+                map.put(this.path, page);
                 this.show(page);
             } catch (Exception e) {
                 throw new RuntimeException(e);
@@ -104,6 +111,7 @@ public class BasicPage extends LinearLayout {
             this.removeView(view);
         }
         this.viewHandle(v -> v.setVisibility(VISIBLE));
+        this.path = path.substring(0, path.lastIndexOf(":"));
     }
 
     /**

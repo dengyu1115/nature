@@ -101,6 +101,10 @@ public class ComponentStarter {
             } catch (ClassNotFoundException e) {
                 throw new Warn("class not found:" + e.getMessage());
             }
+            PageView pageView = cls.getAnnotation(PageView.class);
+            if (pageView != null) {
+                PageHolder.register(cls, pageView);
+            }
             if (!this.isNeedType(cls)) {
                 continue;
             }
@@ -125,7 +129,6 @@ public class ComponentStarter {
         PageView pageView = cls.getAnnotation(PageView.class);
         if (pageView != null) {
             this.inject(cls, InstanceHolder.get(cls));
-            PageHolder.register(cls, pageView);
         }
         JobExec jobExec = cls.getAnnotation(JobExec.class);
         if (jobExec != null) {
@@ -168,7 +171,6 @@ public class ComponentStarter {
         int modifiers = cls.getModifiers();
         return !cls.isInterface() && !Modifier.isAbstract(modifiers) && Modifier.isPublic(modifiers)
                 && (cls.getAnnotation(Component.class) != null
-                || cls.getAnnotation(PageView.class) != null
                 || cls.getAnnotation(JobExec.class) != null)
                 || cls.isInterface() && cls.getAnnotation(TableModel.class) != null;
     }
