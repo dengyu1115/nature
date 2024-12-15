@@ -23,6 +23,7 @@ import java.util.function.Function;
 import static android.graphics.drawable.GradientDrawable.Orientation.RIGHT_LEFT;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static org.nature.common.constant.Const.PAD;
 
 /**
  * 表格
@@ -83,12 +84,12 @@ public class Table<T> extends LinearLayout {
     public Table(Context context, int width, int height, int rows, int columns) {
         super(context);
         this.context = context;
-        this.rowHeight = (int) (height / (float) (rows + 1) + 0.5f);
-        this.colWidth = (int) (width / (float) columns + 0.5f);
-        // 设置行间线
-        this.setBaselineAligned(true);
+        this.rowHeight = (int) ((height - PAD * 2) / (float) (rows + 1) + 0.5f) - 1;
+        this.colWidth = (int) ((width - PAD * 2) / (float) columns + 0.5f);
+        // 设置行间线(宽度多+1，因为列计算时候减了1)
+        this.setPadding(PAD, PAD, width - colWidth * columns - PAD + 1, height - rowHeight * (rows + 1) - PAD + 1);
         // 设置布局参数
-        this.setLayoutParams(new LayoutParams(colWidth * columns - 1, rowHeight * (rows + 1)));
+        this.setLayoutParams(new LayoutParams(width, height));
         // 设置布局方向
         this.setOrientation(VERTICAL);
     }

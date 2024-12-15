@@ -194,7 +194,7 @@ public class ItemListPage extends ListPage<Item> {
                 t.line(L_W, L_H)
         );
         type.mapper(i -> i);
-        type.refreshData(Arrays.asList("0", "1"));
+        type.setData(Arrays.asList("0", "1"));
     }
 
     /**

@@ -105,7 +105,7 @@ public class MainPage extends Page {
     private Button menuBtn(String name, Class<? extends Page> clz) {
         Button btn = template.button(name, 10, 7);
         btn.setBtnBackground(template.background("empty"));
-        btn.setOnClickListener(v -> this.show(clz));
+        btn.onClick(() -> this.show(clz));
         return btn;
     }
 }

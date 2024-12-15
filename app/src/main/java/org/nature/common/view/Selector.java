@@ -65,7 +65,7 @@ public class Selector<T> extends LinearLayout {
         this.changeRun = run;
     }
 
-    public void refreshData(List<T> data) {
+    public void setData(List<T> data) {
         this.data = data;
         this.adapter.notifyDataSetChanged();
         if (!data.isEmpty() && valueView.getTag() == null) {
@@ -101,7 +101,7 @@ public class Selector<T> extends LinearLayout {
         popup.setFocusable(true);
         popup.setBackgroundDrawable(context.getDrawable(R.drawable.bg_normal));
         this.setOnClickListener(v -> {
-            arrow.setImageDrawable(context.getDrawable(R.drawable.icon_arrow_left));
+            arrow.setImageDrawable(context.getDrawable(R.drawable.icon_arrow_up));
             popup.setWidth(width - 10);
             popup.showAsDropDown(container, 0, 1);
         });

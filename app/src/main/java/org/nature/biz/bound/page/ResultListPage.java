@@ -56,7 +56,7 @@ public class ResultListPage extends ListPage<Result> {
     @Override
     protected void initHeaderBehaviours() {
         strategy.mapper(i -> i);
-        strategy.refreshData(Arrays.asList("MIN", "DIFF", "!DIFF"));
+        strategy.setData(Arrays.asList("MIN", "DIFF", "!DIFF"));
     }
 
     @Override

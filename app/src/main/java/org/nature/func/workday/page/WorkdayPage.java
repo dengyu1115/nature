@@ -92,7 +92,7 @@ public class WorkdayPage extends ListPage<Month> {
     @Override
     protected void initHeaderBehaviours() {
         year.mapper(i -> i);
-        year.refreshData(this.initYears());
+        year.setData(this.initYears());
         year.setValue(DateFormatUtils.format(new Date(), Const.FORMAT_YEAR));
         loadLatest.onAsyncClick(() -> {
             String year = this.year.getValue();
@@ -160,7 +160,7 @@ public class WorkdayPage extends ListPage<Month> {
         );
         date.setFocusable(false);
         type.mapper(i -> i);
-        type.refreshData(Arrays.asList("H", "W"));
+        type.setData(Arrays.asList("H", "W"));
     }
 
 }

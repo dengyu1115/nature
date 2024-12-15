@@ -31,7 +31,9 @@ public class Button extends LinearLayout {
     private final int width, height;
     private final TextView valueView;
 
-    // 异步事件处理器
+    /**
+     * 异步事件处理器
+     */
     private final Handler handler;
 
     private Long millis;
@@ -44,15 +46,7 @@ public class Button extends LinearLayout {
         this.setLayoutParams(new LayoutParams(width, height));
         this.setPadding(PAD, PAD, PAD, PAD);
         this.addView(valueView = this.buildTextView(name));
-        this.handler = new Handler(Looper.myLooper(), msg -> {
-            Bundle data = msg.getData();
-            String message = data.getString("data");
-            if (message != null) {
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
-            }
-            this.valueView.setClickable(data.getInt("handle") != 1);
-            return false;
-        });
+        this.handler = this.buildHandler(context);
     }
 
     public void setText(String value) {
@@ -60,38 +54,19 @@ public class Button extends LinearLayout {
     }
 
     public void onClick(Runnable runnable) {
-        this.valueView.setOnClickListener(view -> runnable.run());
+        this.valueView.setOnClickListener(view -> {
+            this.doClick(() -> {
+                runnable.run();
+                return null;
+            });
+        });
     }
 
     public void onAsyncClick(Supplier<String> supplier) {
-        this.valueView.setOnClickListener(view -> new Thread(() -> {
-            try {
-                handler.sendMessage(this.message(1, null));
-                if (millis != null) {
-                    throw new Warn("重复点击");
-                }
-                millis = System.currentTimeMillis();
-                String s = supplier.get();
-                if (s != null) {
-                    // 有处理结果信息则提示
-                    handler.sendMessage(this.message(1, s));
-                }
-                // 通知执行后续步骤
-                handler.sendMessage(this.message(0, null));
-            } catch (Warn e) {
-                // 进行消息提示
-                handler.sendMessage(this.message(0, e.getMessage()));
-            } catch (Exception e) {
-                // 进行消息提示
-                handler.sendMessage(this.message(0, "系统错误:" + e));
-            } finally {
-                handler.sendMessage(this.message(0, null));
-                millis = null;
-            }
-        }).start());
+        this.valueView.setOnClickListener(view -> new Thread(() -> this.doClick(supplier)).start());
     }
 
-    public void setBtnClickable(boolean clickable) {
+    public void setClickable(boolean clickable) {
         this.handler.sendMessage(this.message(clickable ? 0 : 1, null));
     }
 
@@ -109,6 +84,20 @@ public class Button extends LinearLayout {
         return view;
     }
 
+    private Handler buildHandler(Context context) {
+        return new Handler(Looper.myLooper(), msg -> {
+            Bundle data = msg.getData();
+            String message = data.getString("data");
+            if (message != null) {
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+            }
+            boolean clickable = data.getInt("handle") != 1;
+            super.setClickable(clickable);
+            this.valueView.setClickable(clickable);
+            return false;
+        });
+    }
+
     /**
      * 消息构建
      * @param handle  操作
@@ -120,6 +109,41 @@ public class Button extends LinearLayout {
         msg.getData().putInt("handle", handle);
         msg.getData().putString("data", content);
         return msg;
+    }
+
+
+    private void doClick(Supplier<String> supplier) {
+        try {
+            handler.sendMessage(this.message(1, null));
+            if (this.getMillis() != null) {
+                throw new Warn("重复点击");
+            }
+            this.setMillis(System.currentTimeMillis());
+            String s = supplier.get();
+            if (s != null) {
+                // 有处理结果信息则提示
+                handler.sendMessage(this.message(1, s));
+            }
+            // 通知执行后续步骤
+            handler.sendMessage(this.message(0, null));
+        } catch (Warn e) {
+            // 进行消息提示
+            handler.sendMessage(this.message(0, e.getMessage()));
+        } catch (Exception e) {
+            // 进行消息提示
+            handler.sendMessage(this.message(0, "系统错误:" + e));
+        } finally {
+            handler.sendMessage(this.message(0, null));
+            this.setMillis(null);
+        }
+    }
+
+    private synchronized void setMillis(Long millis) {
+        this.millis = millis;
+    }
+
+    private synchronized Long getMillis() {
+        return this.millis;
     }
 
 }

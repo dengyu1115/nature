@@ -179,7 +179,7 @@ public class RuleListPage extends ListPage<Rule> {
                 t.line(L_W, L_H, t.text("状态：", L_W_T, L_H), statusSel = t.selector(L_W_C, L_H))
         );
         statusSel.mapper(this::statusName);
-        statusSel.refreshData(Arrays.asList("1", "0"));
+        statusSel.setData(Arrays.asList("1", "0"));
     }
 
     /**

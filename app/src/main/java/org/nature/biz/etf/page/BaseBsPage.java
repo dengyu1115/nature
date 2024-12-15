@@ -85,7 +85,7 @@ public abstract class BaseBsPage extends ListPage<Hold> {
             }
             return "请选择";
         });
-        handleSel.refreshData(Arrays.asList("0", "1", "2"));
+        handleSel.setData(Arrays.asList("0", "1", "2"));
     }
 
     @Override

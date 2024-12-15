@@ -74,9 +74,9 @@ public class RateListPage extends ListPage<Rate> {
         Map<String, String> map = rules.stream().collect(Collectors.toMap(Rule::getCode, Rule::getName));
         List<String> ruleCodes = rules.stream().map(Rule::getCode).collect(Collectors.toList());
         rule.mapper(map::get);
-        rule.refreshData(ruleCodes);
+        rule.setData(ruleCodes);
         type.mapper(i -> "0".equals(i) ? "涨幅" : "对比");
-        type.refreshData(List.of("0", "1"));
+        type.setData(List.of("0", "1"));
     }
 
     @Override

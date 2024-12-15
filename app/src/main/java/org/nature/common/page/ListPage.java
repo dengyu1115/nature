@@ -58,10 +58,8 @@ public abstract class ListPage<T> extends Page {
     private void header() {
         LinearLayout condition = template.line(90, 7);
         condition.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
-        condition.setPadding(3, 0, 3, 0);
         LinearLayout handle = template.line(10, 7);
         handle.setGravity(Gravity.END | Gravity.CENTER_VERTICAL);
-        handle.setPadding(3, 0, 7, 0);
         LinearLayout header = template.line(100, 7, condition, handle);
         page.addView(header);
         handle.addView(query = template.button("查询", 5, 7));
@@ -94,7 +92,7 @@ public abstract class ListPage<T> extends Page {
     protected void refreshData() {
         new Thread(() -> {
             try {
-                query.setBtnClickable(false);
+                query.setClickable(false);
                 this.excel.data(this.listData());
                 this.refreshTotal();
             } catch (Exception e) {
@@ -103,7 +101,7 @@ public abstract class ListPage<T> extends Page {
                 message = StringUtils.isBlank(message) ? "未知错误" : message;
                 template.alert(message);
             } finally {
-                query.setBtnClickable(true);
+                query.setClickable(true);
             }
         }).start();
     }

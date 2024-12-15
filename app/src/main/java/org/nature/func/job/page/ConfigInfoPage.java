@@ -117,9 +117,9 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
                 t.line(L_W, L_H, t.text("状态：", L_W_T, L_H), statusSel = t.selector(L_W_C, L_H))
         );
         jobSel.mapper(JobHolder::getName);
-        jobSel.refreshData(JobHolder.jobs());
+        jobSel.setData(JobHolder.jobs());
         statusSel.mapper(Status::name);
-        statusSel.refreshData(Status.codes());
+        statusSel.setData(Status.codes());
     }
 
     /**

@@ -170,7 +170,7 @@ public class ItemListPage extends ListPage<Item> {
                 t.line(L_W, L_H, t.text("比例系数：", L_W_T, L_H), ratio = t.decimal(L_W_C, L_H))
         );
         type.mapper(i -> i);
-        type.refreshData(Arrays.asList("0", "1"));
+        type.setData(Arrays.asList("0", "1"));
         item.mapper(i -> {
             if (i == null) {
                 return "请选择";
@@ -188,7 +188,7 @@ public class ItemListPage extends ListPage<Item> {
             this.fund.setValue(d.getFund());
             this.ratio.setValue(d.getRatio().toPlainString());
         });
-        item.refreshData(this.listItems());
+        item.setData(this.listItems());
     }
 
     /**
