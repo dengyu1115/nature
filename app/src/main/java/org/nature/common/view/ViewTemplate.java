@@ -334,7 +334,7 @@ public class ViewTemplate {
     }
 
     private int getWidth(float w) {
-        return (int) (w * wd + 05f);
+        return (int) (w * wd + 0.5f);
     }
 
     private int getHeight(float h) {
