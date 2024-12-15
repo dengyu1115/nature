@@ -1,5 +1,7 @@
 package org.nature.common.constant;
 
+import android.graphics.Color;
+
 /**
  * 常量
  * @author Nature
@@ -55,6 +57,10 @@ public interface Const {
      * 格式化：时分秒
      */
     String FORMAT_TIME = "HH:mm:ss";
+    /**
+     * 背景颜色
+     */
+    int BG_COLOR = Color.parseColor("#ff99cc00");
     /**
      * 间隔、行宽、行宽-标题、行宽-内容、行高
      */

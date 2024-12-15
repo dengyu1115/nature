@@ -2,7 +2,6 @@ package org.nature.common.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
@@ -23,6 +22,7 @@ import java.util.function.Function;
 import static android.graphics.drawable.GradientDrawable.Orientation.RIGHT_LEFT;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static org.nature.common.constant.Const.BG_COLOR;
 import static org.nature.common.constant.Const.PAD;
 
 /**
@@ -34,11 +34,7 @@ import static org.nature.common.constant.Const.PAD;
 @SuppressLint({"DefaultLocale", "ClickableViewAccessibility", "ViewConstructor"})
 public class Table<T> extends LinearLayout {
 
-    /**
-     * 背景颜色
-     */
-    private static final int BG_COLOR = Color.parseColor("#ff99cc00");
-    private static final int PADDING = 10, SCROLL_BAR_SIZE = 3;
+    private static final int PADDING = 10, SCROLL_BAR_SIZE = 1;
     /**
      * 水平滚动的view集合
      */

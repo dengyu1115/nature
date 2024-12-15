@@ -2,6 +2,7 @@ package org.nature.common.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
+import static android.graphics.drawable.GradientDrawable.Orientation.RIGHT_LEFT;
+import static org.nature.common.constant.Const.BG_COLOR;
 import static org.nature.common.constant.Const.PAD;
 
 /**
@@ -114,6 +117,8 @@ public class Selector<T> extends LinearLayout {
         listView.setAdapter(adapter);
         listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         listView.setScrollBarSize(1);
+        listView.setDivider(new GradientDrawable(RIGHT_LEFT, new int[]{BG_COLOR, BG_COLOR, BG_COLOR}));
+        listView.setDividerHeight(1);
         listView.setOnItemClickListener((parent, view, position, id) -> {
             popup.dismiss();
             TextView textView = (TextView) view;
@@ -132,7 +137,7 @@ public class Selector<T> extends LinearLayout {
 
     private TextView buildTextView() {
         TextView textView = new TextView(context);
-        textView.setLayoutParams(new LayoutParams(width - PAD * 2, height - PAD * 2 - 3));
+        textView.setLayoutParams(new LayoutParams(width - PAD * 2, height - PAD * 2 - 1));
         textView.setGravity(Gravity.START | Gravity.CENTER);
         textView.setPadding(30, 1, 1, 1);
         return textView;

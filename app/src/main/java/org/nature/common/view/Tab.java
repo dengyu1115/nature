@@ -18,6 +18,7 @@ import java.util.function.Function;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+import static org.nature.common.constant.Const.BG_COLOR;
 import static org.nature.common.constant.Const.PAD;
 
 /**
@@ -28,8 +29,6 @@ import static org.nature.common.constant.Const.PAD;
  */
 @SuppressLint({"ViewConstructor", "UseCompatLoadingForDrawables", "DefaultLocale", "ResourceType"})
 public class Tab<T> extends LinearLayout {
-
-    private static final int BG_COLOR = Color.parseColor("#ff99cc00");
 
     private final Context context;
     private final int height, colWidth;
@@ -110,12 +109,12 @@ public class Tab<T> extends LinearLayout {
         tab.setOrientation(VERTICAL);
         TextView text = new TextView(context);
         text.setGravity(Gravity.CENTER);
-        text.setLayoutParams(new LayoutParams(colWidth, height - PAD * 2 - 1));
+        text.setLayoutParams(new LayoutParams(colWidth, height - PAD * 2 - 2));
         text.setTag(datum);
         text.setText(this.mapper.apply(datum));
         tab.addView(text);
         View line = new View(context);
-        line.setLayoutParams(new LayoutParams(colWidth, 1));
+        line.setLayoutParams(new LayoutParams(colWidth, 2));
         line.setBackgroundColor(BG_COLOR);
         tab.addView(line);
         text.setOnClickListener(v -> this.doSelectItem(datum, tab));
