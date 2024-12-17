@@ -55,11 +55,11 @@ public class InstanceHolder {
         return map.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, i -> (T) i.getValue()));
     }
 
-    public static <T> void add(Class<T> cls) {
+    public static <T> void instant(Class<T> cls) {
         Object o;
         if (cls.isAnnotationPresent(Component.class) || cls.isAnnotationPresent(JobExec.class)) {
             try {
-                o = cls.newInstance();
+                o = cls.getConstructor().newInstance();
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -69,35 +69,7 @@ public class InstanceHolder {
             throw new Warn("class is not marked as component:" + cls);
         }
         // 添加至上下文
-        add(cls, cls.getName(), o);
-    }
-
-    /**
-     * 添加至上下文
-     * @param cls  类
-     * @param name 名称
-     * @param o    实例
-     * @param <T>  类型
-     */
-    private static <T> void add(Class<T> cls, String name, Object o) {
-        if (cls == null) {
-            return;
-        }
-        // 获取类对应的map，往map中按名称添加实例对象
-        Map<String, Object> map = CTX.computeIfAbsent(cls, k -> new HashMap<>());
-        map.put(name, o);
-        Class<?>[] interfaces = cls.getInterfaces();
-        for (Class<?> i : interfaces) {
-            // 接口添加对象
-            add(i, name, o);
-        }
-        Class<? super T> sc = cls.getSuperclass();
-        // 顶级Object类不处理
-        if (Object.class.equals(sc)) {
-            return;
-        }
-        // 父类添加对象
-        add(sc, name, o);
+        doInstant(cls, cls.getName(), o);
     }
 
     /**
@@ -122,6 +94,34 @@ public class InstanceHolder {
         if (sc != null && !sc.equals(Object.class)) {
             inject(sc, o);
         }
+    }
+
+    /**
+     * 添加至上下文
+     * @param cls  类
+     * @param name 名称
+     * @param o    实例
+     * @param <T>  类型
+     */
+    private static <T> void doInstant(Class<T> cls, String name, Object o) {
+        if (cls == null) {
+            return;
+        }
+        // 获取类对应的map，往map中按名称添加实例对象
+        Map<String, Object> map = CTX.computeIfAbsent(cls, k -> new HashMap<>());
+        map.put(name, o);
+        Class<?>[] interfaces = cls.getInterfaces();
+        for (Class<?> i : interfaces) {
+            // 接口添加对象
+            doInstant(i, name, o);
+        }
+        Class<? super T> sc = cls.getSuperclass();
+        // 顶级Object类不处理
+        if (Object.class.equals(sc)) {
+            return;
+        }
+        // 父类添加对象
+        doInstant(sc, name, o);
     }
 
 }

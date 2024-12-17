@@ -5,7 +5,6 @@ import dalvik.system.DexFile;
 import org.nature.common.db.annotation.TableModel;
 import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Component;
-import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.JobExec;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.ioc.holder.InstanceHolder;
@@ -13,7 +12,6 @@ import org.nature.common.ioc.holder.JobHolder;
 import org.nature.common.ioc.holder.PageHolder;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -75,7 +73,7 @@ public class ComponentStarter {
         Enumeration<String> entries = home.entries();
         List<Class<?>> classes = this.collect(entries);
         for (Class<?> i : classes) {
-            InstanceHolder.add(i);
+            InstanceHolder.instant(i);
         }
         for (Class<?> i : classes) {
             this.inject(i);
@@ -101,6 +99,7 @@ public class ComponentStarter {
             } catch (ClassNotFoundException e) {
                 throw new Warn("class not found:" + e.getMessage());
             }
+            // 页面注册生成菜单数据
             PageView pageView = cls.getAnnotation(PageView.class);
             if (pageView != null) {
                 PageHolder.register(cls, pageView);
@@ -120,45 +119,17 @@ public class ComponentStarter {
     private void inject(Class<?> cls) {
         Component component = cls.getAnnotation(Component.class);
         if (component != null) {
-            this.inject(cls, InstanceHolder.get(cls));
+            InstanceHolder.inject(cls, InstanceHolder.get(cls));
         }
         TableModel tableModel = cls.getAnnotation(TableModel.class);
         if (tableModel != null) {
-            this.inject(cls, InstanceHolder.get(cls));
-        }
-        PageView pageView = cls.getAnnotation(PageView.class);
-        if (pageView != null) {
-            this.inject(cls, InstanceHolder.get(cls));
+            InstanceHolder.inject(cls, InstanceHolder.get(cls));
         }
         JobExec jobExec = cls.getAnnotation(JobExec.class);
         if (jobExec != null) {
             Object o = InstanceHolder.get(cls);
-            this.inject(cls, o);
+            InstanceHolder.inject(cls, o);
             JobHolder.register(jobExec, o);
-        }
-    }
-
-    /**
-     * 注入
-     * @param cls 类
-     * @param o   实例
-     */
-    private void inject(Class<?> cls, Object o) {
-        Field[] fields = cls.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(Injection.class)) {
-                Class<?> type = field.getType();
-                field.setAccessible(true);
-                try {
-                    field.set(o, InstanceHolder.get(type));
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-        Class<?> sc = cls.getSuperclass();
-        if (sc != null && !sc.equals(Object.class)) {
-            this.inject(sc, o);
         }
     }
 
