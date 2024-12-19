@@ -50,6 +50,7 @@ public class Input extends LinearLayout {
 
     private EditText buildTextView() {
         EditText view = new EditText(context);
+        view.setTextSize(14);
         view.setLayoutParams(new LayoutParams(width - PAD * 2, height - PAD * 2));
         view.setBackground(context.getDrawable(R.drawable.bg_normal));
         view.setGravity(Gravity.START | Gravity.CENTER);
