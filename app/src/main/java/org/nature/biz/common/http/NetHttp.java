@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class NetHttp {
 
     public static final Map<String, String> HEADER = Map.of("Referer", "http://fundf10.eastmoney.com/");
-    private static final String URL_NET_LIST = "http://api.fund.eastmoney.com/f10/lsjz?fundCode=%s&pageIndex=1&pageSize=100000" +
+    private static final String URL_NET_LIST = "http://api.fund.eastmoney.com/f10/lsjz?fundCode=%s&pageIndex=%s&pageSize=20" +
             "&startDate=%s&endDate=%s";
 
     /**
@@ -38,17 +38,14 @@ public class NetHttp {
     public List<Net> list(String code, String dateStart, String dateEnd) {
         dateStart = this.format(dateStart);
         dateEnd = this.format(dateEnd);
-        String url = String.format(URL_NET_LIST, code, dateStart, dateEnd);
-        String response = HttpUtil.doGet(url, HEADER, lines -> lines.collect(Collectors.toList()).get(0));
-        JSONObject json = JSON.parseObject(response);
-        // 获取所需字段
-        JSONObject data = json.getJSONObject("Data");
-        if (data == null) {
-            throw new Warn("历史净值数据缺失：" + code);
-        }
-        JSONArray list = data.getJSONArray("LSJZList");
-        if (list == null) {
-            throw new Warn("历史净值数据缺失：" + code + ":" + dateStart + ":" + dateEnd);
+        int page = 0;
+        JSONArray list = new JSONArray();
+        while (true) {
+            JSONArray array = this.list(code, dateStart, dateEnd, page++);
+            if (array.isEmpty()) {
+                break;
+            }
+            list.addAll(array);
         }
         List<Net> results = new ArrayList<>();
         BigDecimal ldw = this.latestNet(list, "DWJZ");
@@ -66,6 +63,22 @@ public class NetHttp {
         }
         // 解析响应，获取净值
         return results;
+    }
+
+    private JSONArray list(String code, String dateStart, String dateEnd, int page) {
+        String url = String.format(URL_NET_LIST, code, page, dateStart, dateEnd);
+        String response = HttpUtil.doGet(url, HEADER, lines -> lines.collect(Collectors.toList()).get(0));
+        JSONObject json = JSON.parseObject(response);
+        // 获取所需字段
+        JSONObject data = json.getJSONObject("Data");
+        if (data == null) {
+            throw new Warn("历史净值数据缺失：" + code);
+        }
+        JSONArray list = data.getJSONArray("LSJZList");
+        if (list == null) {
+            throw new Warn("历史净值数据缺失：" + code + ":" + dateStart + ":" + dateEnd);
+        }
+        return list;
     }
 
     /**

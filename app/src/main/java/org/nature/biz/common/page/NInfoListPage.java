@@ -59,7 +59,7 @@ public class NInfoListPage extends ListPage<NInfo> {
     @Override
     protected void initHeaderBehaviours() {
         load.onAsyncClick(this::loadAll);
-        reload.onClick(() -> template.confirmAsync("K线重载", "确定重新加载全部K线数据？", this::reloadAll));
+        reload.onClick(() -> template.confirmAsync("净值重载", "确定重新加载全部净值数据？", this::reloadAll));
     }
 
     @Override
@@ -82,7 +82,7 @@ public class NInfoListPage extends ListPage<NInfo> {
      * @return 提示信息
      */
     private String loadAll() {
-        return "所有K线加载完成，数据量：" + netManager.loadAll();
+        return "所有净值加载完成，数据量：" + netManager.loadAll();
     }
 
     /**
@@ -90,7 +90,7 @@ public class NInfoListPage extends ListPage<NInfo> {
      * @return 提示信息
      */
     private String reloadAll() {
-        return "所有K线重载完成，数据量：" + netManager.reloadAll();
+        return "所有净值重载完成，数据量：" + netManager.reloadAll();
     }
 
     private void load(NInfo info) {
@@ -98,7 +98,7 @@ public class NInfoListPage extends ListPage<NInfo> {
     }
 
     private void reload(NInfo info) {
-        template.confirm("重载K线", "确定重载吗？",
+        template.confirm("重载净值", "确定重载吗？",
                 () -> template.alert("重载完成，数据量：" + netManager.reload(info.getCode())));
     }
 
