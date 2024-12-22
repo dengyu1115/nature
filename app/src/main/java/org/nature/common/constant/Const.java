@@ -64,6 +64,6 @@ public interface Const {
     /**
      * 间隔、行宽、行宽-标题、行宽-内容、行高
      */
-    int PAGE_WIDTH = 2168, PAGE_HEIGHT = 1080, PAD = 5, L_W = 25, L_W_T = 10, L_W_C = 14, L_H = 7;
+    int PAGE_WIDTH = 2188, PAGE_HEIGHT = 1080, PAD = 5, L_W = 25, L_W_T = 10, L_W_C = 14, L_H = 7;
 
 }
