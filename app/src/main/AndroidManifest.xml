@@ -17,18 +17,21 @@
                  android:label="@string/app_name"
                  android:supportsRtl="true"
                  android:theme="@style/FullScreen"
-                 android:launchMode="standard"
+                 android:launchMode="singleInstance"
                  android:usesCleartextTraffic="true"
                  android:requestLegacyExternalStorage="true"
                  tools:ignore="AllowBackup">
-        <activity android:name=".common.activity.MainActivity" android:screenOrientation="landscape"
-                  android:exported="true">
+        <activity android:name=".common.activity.MainActivity"
+                  android:screenOrientation="landscape"
+                  android:exported="true"
+                  tools:ignore="DiscouragedApi">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <service android:name=".func.job.service.JobService" android:foregroundServiceType="specialUse"/>
+        <service android:name=".func.job.service.JobService"
+                 android:foregroundServiceType="specialUse"/>
     </application>
     <queries>
         <intent>
