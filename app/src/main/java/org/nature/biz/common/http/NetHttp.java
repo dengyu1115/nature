@@ -57,6 +57,9 @@ public class NetHttp {
             net.setDate(o.getString("FSRQ").replace("-", ""));
             net.setDw(o.getBigDecimal("DWJZ"));
             BigDecimal lj = o.getBigDecimal("LJJZ");
+            if (lj == null) {
+                continue;
+            }
             net.setLj(lj);
             net.setNet(this.calcNet(ldw, llj, lj));
             results.add(net);

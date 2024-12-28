@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
  * @version 1.0.0
  * @since 2024/1/9
  */
-@SuppressWarnings("unchecked")
 @Component
 public class MainPage extends Page {
 

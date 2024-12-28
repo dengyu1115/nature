@@ -42,7 +42,7 @@ public class RuleListPage extends ListPage<Rule> {
             Table.header("开始日期", d -> TextUtil.text(d.getDateStart()), C, C, Rule::getDateStart),
             Table.header("结束日期", d -> TextUtil.text(d.getDateEnd()), C, C, Rule::getDateEnd),
             Table.header("数据天数", d -> TextUtil.text(d.getDays()), C, C, Rule::getDays),
-            Table.header("出发差值", d -> TextUtil.text(d.getDiff()), C, C, Rule::getDiff),
+            Table.header("触发差值", d -> TextUtil.text(d.getDiff()), C, C, Rule::getDiff),
             Table.header("状态", d -> TextUtil.text(this.statusName(d.getStatus())), C, C, Rule::getStatus),
             Table.header("项目集合", d -> "+", C, C, this::items),
             Table.header("计算", d -> "+", C, C, this::calc),

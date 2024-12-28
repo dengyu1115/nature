@@ -19,7 +19,6 @@ import static android.Manifest.permission.*;
 
 /**
  * 应用入口（对其他组件使用单例模式加载）
- *
  * @author Nature
  * @version 1.0.0
  * @since 2024/1/5
@@ -43,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         //  请求全局存储权限
         this.verifyStoragePermissions(this);
         // 启动组件（控制只执行一次）
-        if (!((this.getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) == 0)) {
+        if ((this.getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
             return;
         }
         // 单例组件加载
