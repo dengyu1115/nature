@@ -11,6 +11,7 @@ import org.nature.common.chart.*;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.Page;
+import org.nature.common.util.ClickUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.Button;
 
@@ -143,7 +144,7 @@ public class KlineChartPage extends Page {
      */
     private Button klineView(String title, Function<List<Kline>, List<Kline>> func) {
         Button button = template.button(title, 5, L_H);
-        button.onClick(() -> chart.data(KlineUtil.convert(func.apply(list), name)));
+        ClickUtil.onClick(button, () -> chart.data(KlineUtil.convert(func.apply(list), name)));
         return button;
     }
 

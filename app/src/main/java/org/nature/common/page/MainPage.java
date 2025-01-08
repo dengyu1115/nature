@@ -6,6 +6,7 @@ import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.holder.PageHolder;
 import org.nature.common.model.Menu;
 import org.nature.common.model.PageInfo;
+import org.nature.common.util.ClickUtil;
 import org.nature.common.view.Button;
 import org.nature.common.view.Tab;
 
@@ -103,8 +104,8 @@ public class MainPage extends Page {
      */
     private Button menuBtn(String name, Class<? extends Page> clz) {
         Button btn = template.button(name, 10, 7);
-        btn.setBtnBackground(template.background("empty"));
-        btn.onClick(() -> this.show(clz));
+        btn.setBackground(template.background("empty"));
+        ClickUtil.onClick(btn, () -> this.show(clz));
         return btn;
     }
 }

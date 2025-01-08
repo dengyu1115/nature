@@ -7,6 +7,7 @@ import org.nature.biz.common.model.Kline;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
+import org.nature.common.util.ClickUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.Button;
 import org.nature.common.view.Table;
@@ -55,7 +56,7 @@ public class KlineListPage extends ListPage<Kline> {
 
     @Override
     protected void initHeaderBehaviours() {
-        chart.onClick(() -> this.show(KlineChartPage.class, this.getParam()));
+        ClickUtil.onClick(chart, () -> this.show(KlineChartPage.class, this.getParam()));
     }
 
     @Override

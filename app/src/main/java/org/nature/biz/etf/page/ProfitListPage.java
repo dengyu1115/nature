@@ -14,6 +14,7 @@ import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
+import org.nature.common.util.ClickUtil;
 import org.nature.common.util.DateUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.Button;
@@ -103,7 +104,7 @@ public class ProfitListPage extends ListPage<Profit> {
 
     @Override
     protected void initHeaderBehaviours() {
-        total.onClick(() -> this.show(ProfitViewPage.class, this.getParam()));
+        ClickUtil.onClick(total, () -> this.show(ProfitViewPage.class, this.getParam()));
         dateRule.mapper(dateRuleMap::get);
         dateRule.onChangeRun(this::toggleDateBtn);
         dateRule.setData(dateRuleList);

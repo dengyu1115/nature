@@ -3,14 +3,12 @@ package org.nature.common.view;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import lombok.Setter;
 import org.nature.common.util.ClickUtil;
 import org.nature.common.util.Sorter;
 
@@ -47,19 +45,16 @@ public class Table<T> extends LinearLayout {
      * listview适配器
      */
     private final Adapter adapter = new Adapter();
-    /**
-     * 异步处理类
-     */
-    private final Handler handler = new Handler(Looper.myLooper(), msg -> {
-        this.adapter.notifyDataSetChanged();
-        return false;
-    });
     private final Context context;
     private final int rowHeight, colWidth;
     /**
      * 表格需要展示的数据集合
      */
     private List<T> data = new ArrayList<>();
+    /**
+     * 设置长按事件
+     */
+    @Setter
     private Consumer<T> longClick;
     private Header<T> sortCol;
     /**
@@ -156,7 +151,7 @@ public class Table<T> extends LinearLayout {
      */
     public void data(List<T> data) {
         this.data = data;
-        this.handler.sendMessage(new Message());
+        this.adapter.notifyDataSetChanged();
     }
 
     /**
@@ -165,14 +160,6 @@ public class Table<T> extends LinearLayout {
      */
     public int getDataSize() {
         return data.size();
-    }
-
-    /**
-     * 设置长按事件
-     * @param click 长按处理逻辑
-     */
-    public void setLongClick(Consumer<T> click) {
-        this.longClick = click;
     }
 
     /**

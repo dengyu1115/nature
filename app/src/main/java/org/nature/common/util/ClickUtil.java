@@ -6,11 +6,8 @@ import android.os.Looper;
 import android.os.Message;
 import android.view.View;
 import android.widget.Toast;
-import org.apache.commons.lang3.StringUtils;
 import org.nature.common.exception.Warn;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 /**
@@ -20,14 +17,6 @@ import java.util.function.Supplier;
  * @since 2024/1/5
  */
 public class ClickUtil {
-    /**
-     * view-时间 map
-     */
-    private static final Map<View, Long> VIEW_TIME_MAP = new ConcurrentHashMap<>();
-    /**
-     * 上次点击时间记录
-     */
-    private static long millis;
 
     /**
      * 给view设置点击事件，并处理点击事件（主线程执行）
@@ -35,7 +24,7 @@ public class ClickUtil {
      * @param runnable 执行逻辑
      */
     public static void onClick(View view, Runnable runnable) {
-        view.setOnClickListener(v -> ClickUtil.click(v, runnable, () -> {
+        view.setOnClickListener(v -> ClickUtil.exec(v, runnable, () -> {
         }));
     }
 
@@ -46,7 +35,17 @@ public class ClickUtil {
      * @param handled  执行完毕后下一步执行
      */
     public static void onClick(View view, Runnable runnable, Runnable handled) {
-        view.setOnClickListener(v -> ClickUtil.click(v, runnable, handled));
+        view.setOnClickListener(v -> ClickUtil.exec(v, runnable, handled));
+    }
+
+    /**
+     * 给view设置点击事件，并处理点击事件（主线程执行）
+     * @param view     view
+     * @param supplier 执行逻辑
+     */
+    public static void onAsyncClick(View view, Supplier<String> supplier) {
+        view.setOnClickListener(v -> ClickUtil.asyncExec(v, supplier, () -> {
+        }));
     }
 
     /**
@@ -56,7 +55,7 @@ public class ClickUtil {
      * @param handled  执行完毕后下一步执行
      */
     public static void onAsyncClick(View view, Supplier<String> supplier, Runnable handled) {
-        view.setOnClickListener(v -> ClickUtil.asyncClick(v, supplier, handled));
+        view.setOnClickListener(v -> ClickUtil.asyncExec(v, supplier, handled));
     }
 
     /**
@@ -65,28 +64,21 @@ public class ClickUtil {
      * @param runnable 执行逻辑
      * @param handled  执行完毕后下一步执行
      */
-    private static void click(View view, Runnable runnable, Runnable handled) {
+    private static void exec(View view, Runnable runnable, Runnable handled) {
         // 设置view不可点击
         try {
             view.setClickable(false);
-            long currMillis = System.currentTimeMillis();
-            if (currMillis - millis < 1000) {
-                throw new Warn("点击过于频繁");
-            }
             runnable.run();
             handled.run();
         } catch (Warn e) {
             // 弹出提示
             Toast.makeText(view.getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
         } catch (Exception e) {
-            e.printStackTrace();
             // 弹出提示
             Toast.makeText(view.getContext(), "系统错误", Toast.LENGTH_LONG).show();
         } finally {
             // 恢复view可点击
             view.setClickable(true);
-            // 上次点击时间重置
-            millis = System.currentTimeMillis();
         }
     }
 
@@ -96,55 +88,55 @@ public class ClickUtil {
      * @param supplier 执行逻辑
      * @param handled  执行完毕后下一步执行
      */
-    private static void asyncClick(View view, Supplier<String> supplier, Runnable handled) {
+    private static void asyncExec(View view, Supplier<String> supplier, Runnable handled) {
         // 异步事件处理器
         Handler handler = new Handler(Looper.myLooper(), msg -> {
-            String message = msg.getData().getString("data");
+            Bundle data = msg.getData();
+            String message = data.getString("data");
             if (message != null) {
                 Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
-            } else {
+            }
+            if (data.getBoolean("handled") && handled != null) {
                 handled.run();
             }
+            view.setClickable(data.getBoolean("clickable"));
             return false;
         });
         new Thread(() -> {
             try {
-                view.setClickable(false);
-                Long millis = VIEW_TIME_MAP.get(view);
-                if (millis != null) {
-                    throw new Warn("重复点击");
-                }
-                VIEW_TIME_MAP.put(view, System.currentTimeMillis());
+                handler.sendMessage(message(false, false, null));
                 String s = supplier.get();
                 if (s != null) {
                     // 有处理结果信息则提示
-                    handler.sendMessage(message(s));
+                    handler.sendMessage(message(false, false, s));
                 }
                 // 通知执行后续步骤
-                handler.sendMessage(new Message());
+                handler.sendMessage(message(false, true, null));
             } catch (Warn e) {
                 // 进行消息提示
-                handler.sendMessage(message(e.getMessage()));
+                handler.sendMessage(message(false, false, e.getMessage()));
             } catch (Exception e) {
                 // 进行消息提示
-                handler.sendMessage(message("系统错误:" + e));
+                handler.sendMessage(message(false, false, "系统错误:" + e));
             } finally {
-                view.setClickable(true);
-                VIEW_TIME_MAP.remove(view);
+                handler.sendMessage(message(true, false, null));
             }
         }).start();
     }
 
+
     /**
      * 消息构建
-     * @param content 消息内容
+     * @param clickable 是否可点击
+     * @param handled   执行已处理后置逻辑
+     * @param message   消息内容
      * @return Message
      */
-    private static Message message(String content) {
+    private static Message message(boolean clickable, boolean handled, String message) {
         Message msg = new Message();
-        Bundle data = new Bundle();
-        data.putString("data", StringUtils.isBlank(content) ? "未知错误" : content);
-        msg.setData(data);
+        msg.getData().putBoolean("clickable", clickable);
+        msg.getData().putBoolean("handled", handled);
+        msg.getData().putString("message", message);
         return msg;
     }
 }

@@ -6,6 +6,7 @@ import org.nature.biz.common.model.KInfo;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
+import org.nature.common.util.ClickUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.Button;
 import org.nature.common.view.Table;
@@ -59,8 +60,8 @@ public class KInfoListPage extends ListPage<KInfo> {
 
     @Override
     protected void initHeaderBehaviours() {
-        load.onAsyncClick(this::loadAll);
-        reload.onClick(() -> template.confirmAsync("K线重载", "确定重新加载全部K线数据？", this::reloadAll));
+        ClickUtil.onAsyncClick(load, this::loadAll);
+        ClickUtil.onClick(reload, () -> template.confirmAsync("K线重载", "确定重新加载全部K线数据？", this::reloadAll));
     }
 
     @Override

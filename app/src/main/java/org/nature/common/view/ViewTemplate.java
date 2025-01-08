@@ -182,10 +182,10 @@ public class ViewTemplate {
     public Button radio(String name, int w, int h) {
         Button button = this.button(name, w, h);
         button.setTag("");
-        button.onClick(() -> {
+        ClickUtil.onClick(button, () -> {
             String hint = (String) button.getTag();
             button.setTag("".equals(hint) ? "1" : "");
-            button.setBtnBackground("".equals(hint) ? this.background("success") : this.background("primary"));
+            button.setBackground(this.background("".equals(hint) ? "success" : "primary"));
         });
         return button;
     }
@@ -304,13 +304,11 @@ public class ViewTemplate {
         titleView.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
         builder.setCustomTitle(titleView);
         consumer.accept(builder);
-        builder.setPositiveButton("确定", (di, i) -> {
-            runnable.run();
-            di.dismiss();
-        });
+        builder.setPositiveButton("确定", null);
         builder.setNegativeButton("取消", (di, i) -> di.dismiss());
         AlertDialog dialog = builder.create();
         dialog.show();
+        ClickUtil.onClick(dialog.getButton(AlertDialog.BUTTON_POSITIVE), runnable, dialog::cancel);
     }
 
     /**
@@ -326,8 +324,7 @@ public class ViewTemplate {
         builder.setCustomTitle(titleView);
         consumer.accept(builder);
         builder.setPositiveButton("确定", null);
-        builder.setNegativeButton("取消", (di, i) -> {
-        });
+        builder.setNegativeButton("取消", (di, i) -> di.dismiss());
         AlertDialog dialog = builder.create();
         dialog.show();
         ClickUtil.onAsyncClick(dialog.getButton(AlertDialog.BUTTON_POSITIVE), supplier, dialog::cancel);

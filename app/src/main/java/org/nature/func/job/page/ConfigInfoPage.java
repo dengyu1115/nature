@@ -9,6 +9,7 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.ioc.holder.JobHolder;
 import org.nature.common.page.ListPage;
+import org.nature.common.util.ClickUtil;
 import org.nature.common.util.Md5Util;
 import org.nature.common.util.Sorter;
 import org.nature.common.util.TextUtil;
@@ -76,19 +77,19 @@ public class ConfigInfoPage extends ListPage<ConfigInfo> {
     @Override
     protected void initHeaderBehaviours() {
         Intent service = new Intent(context, JobService.class);
-        start.onClick(() -> {
+        ClickUtil.onClick(start, () -> {
             running = !running;
             if (running) {
                 context.startService(service);
                 start.setText("停止");
-                start.setBtnBackground(template.background("success"));
+                start.setBackground(template.background("success"));
             } else {
                 context.stopService(service);
                 start.setText("启动");
-                start.setBtnBackground(template.background("primary"));
+                start.setBackground(template.background("primary"));
             }
         });
-        add.onClick(this::add);
+        ClickUtil.onClick(add, this::add);
     }
 
     @Override

@@ -11,6 +11,7 @@ import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
+import org.nature.common.util.ClickUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.*;
 import org.nature.func.workday.manager.WorkdayManager;
@@ -94,12 +95,12 @@ public class WorkdayPage extends ListPage<Month> {
         year.mapper(i -> i);
         year.setData(this.initYears());
         year.setValue(DateFormatUtils.format(new Date(), Const.FORMAT_YEAR));
-        loadLatest.onAsyncClick(() -> {
+        ClickUtil.onAsyncClick(loadLatest, () -> {
             String year = this.year.getValue();
             Warn.check(() -> StringUtils.isBlank(year), "请选择年份");
             return String.format("加载完成,共%s条", workDayManager.load(year));
         });
-        reload.onClick(() -> template.confirmAsync("重新加载数据", "确定重新加载吗？", () -> {
+        ClickUtil.onClick(reload, () -> template.confirmAsync("重新加载数据", "确定重新加载吗？", () -> {
             String year = this.year.getValue();
             Warn.check(() -> StringUtils.isBlank(year), "请选择年份");
             return String.format("加载完成,共%s条", workDayManager.reload(year));

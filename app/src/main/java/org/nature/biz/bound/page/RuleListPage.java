@@ -9,6 +9,7 @@ import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.ListPage;
+import org.nature.common.util.ClickUtil;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.*;
 
@@ -68,12 +69,7 @@ public class RuleListPage extends ListPage<Rule> {
 
     @Override
     protected void initHeaderBehaviours() {
-        add.onClick(this::add);
-    }
-
-    @Override
-    protected int getTotalColumns() {
-        return 9;
+        ClickUtil.onClick(add, this::add);
     }
 
     @Override

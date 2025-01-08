@@ -7,6 +7,7 @@ import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import org.apache.commons.lang3.StringUtils;
+import org.nature.common.util.ClickUtil;
 import org.nature.common.view.Button;
 import org.nature.common.view.Table;
 
@@ -21,11 +22,19 @@ import java.util.function.Consumer;
  */
 public abstract class ListPage<T> extends Page {
 
-    private Table<T> excel;
+    private Table<T> table;
     private Button query;
     private TextView total;
     private final Handler handler = new Handler(Looper.myLooper(), msg -> {
-        this.total.setText(String.valueOf(this.excel.getDataSize()));
+        int handle = msg.getData().getInt("handle");
+        if (handle == 2) {
+            this.query.setClickable(false);
+        } else if (handle == 1) {
+            this.query.setClickable(true);
+        } else {
+            this.table.data(this.listData());
+            this.total.setText(String.valueOf(this.table.getDataSize()));
+        }
         return false;
     });
 
@@ -47,8 +56,8 @@ public abstract class ListPage<T> extends Page {
      * 初始化按钮行为
      */
     private void initBehaviours() {
-        this.query.onClick(this::refreshData);
-        this.excel.setLongClick(this.longClick());
+        ClickUtil.onClick(this.query, this::refreshData);
+        this.table.setLongClick(this.longClick());
         this.initHeaderBehaviours();
     }
 
@@ -70,9 +79,9 @@ public abstract class ListPage<T> extends Page {
      * 主体布局
      */
     private void body() {
-        this.excel = template.table(100, 87, this.getTotalRows(), this.getTotalColumns());
-        this.excel.setHeaders(this.headers(), this.getFixedColumns());
-        page.addView(this.excel);
+        this.table = template.table(100, 87, this.getTotalRows(), this.getTotalColumns());
+        this.table.setHeaders(this.headers(), this.getFixedColumns());
+        page.addView(this.table);
     }
 
     /**
@@ -91,17 +100,14 @@ public abstract class ListPage<T> extends Page {
      */
     protected void refreshData() {
         new Thread(() -> {
+            Looper.prepare();
             try {
-                query.setClickable(false);
-                this.excel.data(this.listData());
+                this.setQueryClickable(false);
                 this.refreshTotal();
             } catch (Exception e) {
-                Looper.prepare();
-                String message = e.getMessage();
-                message = StringUtils.isBlank(message) ? "未知错误" : message;
-                template.alert(message);
+                template.alert(StringUtils.isBlank(e.getMessage()) ? "未知错误" : e.getMessage());
             } finally {
-                query.setClickable(true);
+                this.setQueryClickable(true);
             }
         }).start();
     }
@@ -110,7 +116,15 @@ public abstract class ListPage<T> extends Page {
      * 刷新汇总值
      */
     private void refreshTotal() {
-        handler.sendMessage(new Message());
+        Message msg = new Message();
+        msg.getData().putInt("handle", 3);
+        handler.sendMessage(msg);
+    }
+
+    private void setQueryClickable(boolean clickable) {
+        Message msg = new Message();
+        msg.getData().putInt("handle", clickable ? 1 : 2);
+        handler.sendMessage(msg);
     }
 
     /**
