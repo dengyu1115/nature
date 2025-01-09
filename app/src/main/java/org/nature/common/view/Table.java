@@ -69,7 +69,7 @@ public class Table<T> extends LinearLayout {
      * 固定表头量
      */
     private int scrollX, oldScrollX, fixedMainHeaders, fixedSubHeaders;
-    private final OnScrollChangeListener scrollListener = (v, x, y, ox, oy) -> hsViews.forEach(i -> i.scrollTo(this.scrollX = x, 0));
+    private final OnScrollChangeListener scrollListener = (v, x, y, ox, oy) -> this.scrollAll(this.scrollX = x);
     private Timer timer;
 
     public Table(Context context, int width, int height, int rows, int columns) {
@@ -207,8 +207,8 @@ public class Table<T> extends LinearLayout {
         listView.setDividerHeight(1);
         listView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         // 数据刷新完成滚动所有view到同一位置
-        listView.getViewTreeObserver().addOnGlobalLayoutListener(() -> hsViews.forEach(i -> i.scrollTo(this.scrollX, 0)));
-        listView.setOnScrollChangeListener((v, x, y, ox, oy) -> hsViews.forEach(i -> i.scrollTo(this.scrollX, 0)));
+        listView.getViewTreeObserver().addOnGlobalLayoutListener(() -> this.scrollAll(this.scrollX));
+        listView.setOnScrollChangeListener((v, x, y, ox, oy) -> this.scrollAll(this.scrollX));
         return listView;
     }
 
@@ -358,7 +358,7 @@ public class Table<T> extends LinearLayout {
                     } else {
                         // 已停止滚动，取消滚动变更监听，滚动所有行到固定位置
                         scrollView.setOnScrollChangeListener(null);
-                        hsViews.forEach(i -> i.scrollTo(scrollX = stopPos, 0));
+                        Table.this.scrollAll(scrollX = stopPos);
                         // 滚动位置固定后关闭定时器
                         timer.cancel();
                         timer = null;
@@ -552,6 +552,14 @@ public class Table<T> extends LinearLayout {
         }
         // 计算需要固定的底层表头量
         return this.flatHeaders(headers.subList(0, fixedHeaders)).size();
+    }
+
+    /**
+     * 滚动所有横向view
+     * @param scrollX 滚动距离
+     */
+    private void scrollAll(int scrollX) {
+        hsViews.forEach(i -> i.scrollTo(scrollX, 0));
     }
 
     public static class Header<T> {
