@@ -92,7 +92,7 @@ public class ClickUtil {
         // 异步事件处理器
         Handler handler = new Handler(Looper.myLooper(), msg -> {
             Bundle data = msg.getData();
-            String message = data.getString("data");
+            String message = data.getString("message");
             if (message != null) {
                 Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
             }
@@ -106,10 +106,8 @@ public class ClickUtil {
             try {
                 handler.sendMessage(message(false, false, null));
                 String s = supplier.get();
-                if (s != null) {
-                    // 有处理结果信息则提示
-                    handler.sendMessage(message(false, false, s));
-                }
+                // 有处理结果信息则提示
+                handler.sendMessage(message(false, false, s));
                 // 通知执行后续步骤
                 handler.sendMessage(message(false, true, null));
             } catch (Warn e) {

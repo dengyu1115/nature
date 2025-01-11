@@ -1,5 +1,6 @@
 package org.nature.biz.etf.simulator;
 
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.nature.biz.common.model.Kline;
 import org.nature.biz.etf.model.Hold;
@@ -31,6 +32,7 @@ public class GridSimulator implements Simulator {
     private final List<Kline> list;
     private final SortedSet<Hold> holds;
     private final SortedSet<Hold> holdsTemp;
+    @Getter
     private final List<Hold> holdList;
     private final List<Profit> profits;
 
@@ -117,10 +119,6 @@ public class GridSimulator implements Simulator {
                 profits.add(this.calcProfit());
             }
         }
-    }
-
-    public List<Hold> getHoldList() {
-        return this.holdList;
     }
 
     public List<Hold> latestHandle() {
