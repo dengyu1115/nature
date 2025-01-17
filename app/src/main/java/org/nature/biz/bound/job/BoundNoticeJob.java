@@ -76,12 +76,14 @@ public class BoundNoticeJob implements Job {
             recordSet.add(key);
             list.add(i.getName1() + "和" + i.getName2() + "相差" + ratio.multiply(HUNDRED) + "%");
         }
+        // 没有新的通知不用进行后续处理
         if (list.isEmpty()) {
-            // 通知
-            String text = "出现机会" + String.join("，", list) + "。";
-            NotifyUtil.speak(text);
-            NotifyUtil.notifyOne("债券差价", text);
+            return;
         }
+        // 通知
+        String text = "出现机会" + String.join("，", list) + "。";
+        NotifyUtil.speak(text);
+        NotifyUtil.notifyOne("债券差价", text);
         recordManager.set(RECORD_TYPE, today, recordSet);
     }
 
