@@ -26,14 +26,14 @@ public abstract class ListPage<T> extends Page {
     private Button query;
     private TextView total;
     private final Handler handler = new Handler(Looper.myLooper(), msg -> {
-        int handle = msg.getData().getInt("handle");
-        if (handle == 2) {
-            this.query.setClickable(false);
-        } else if (handle == 1) {
+        try {
             this.query.setClickable(true);
-        } else {
             this.table.data(this.listData());
             this.total.setText(String.valueOf(this.table.getDataSize()));
+        } catch (Exception e) {
+            template.alert(StringUtils.isBlank(e.getMessage()) ? "未知错误" : e.getMessage());
+        } finally {
+            this.query.setClickable(true);
         }
         return false;
     });
@@ -101,30 +101,8 @@ public abstract class ListPage<T> extends Page {
     protected void refreshData() {
         new Thread(() -> {
             Looper.prepare();
-            try {
-                this.setQueryClickable(false);
-                this.refreshTotal();
-            } catch (Exception e) {
-                template.alert(StringUtils.isBlank(e.getMessage()) ? "未知错误" : e.getMessage());
-            } finally {
-                this.setQueryClickable(true);
-            }
+            handler.sendMessage(new Message());
         }).start();
-    }
-
-    /**
-     * 刷新汇总值
-     */
-    private void refreshTotal() {
-        Message msg = new Message();
-        msg.getData().putInt("handle", 3);
-        handler.sendMessage(msg);
-    }
-
-    private void setQueryClickable(boolean clickable) {
-        Message msg = new Message();
-        msg.getData().putInt("handle", clickable ? 1 : 2);
-        handler.sendMessage(msg);
     }
 
     /**
