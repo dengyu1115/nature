@@ -78,7 +78,7 @@ public class Table<T> extends LinearLayout {
         this.rowHeight = (int) ((height - PAD * 2) / (float) (rows + 1) + 0.5f) - 1;
         this.colWidth = (int) ((width - PAD * 2) / (float) columns + 0.5f);
         // 设置行间线(宽度多+1，因为列计算时候减了1)
-        this.setPadding(PAD, PAD, width - colWidth * columns - PAD + 1, height - rowHeight * (rows + 1) - PAD + 1);
+        this.setPadding(PAD, PAD, width - colWidth * columns - PAD + 1, height - (rowHeight + 1) * (rows + 1) - PAD + 1);
         // 设置布局参数
         this.setLayoutParams(new LayoutParams(width, height));
         // 设置布局方向
