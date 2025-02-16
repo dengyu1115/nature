@@ -1,12 +1,8 @@
 package org.nature.common.page;
 
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import org.apache.commons.lang3.StringUtils;
 import org.nature.common.util.ClickUtil;
 import org.nature.common.view.Button;
 import org.nature.common.view.Table;
@@ -25,18 +21,6 @@ public abstract class ListPage<T> extends Page {
     private Table<T> table;
     private Button query;
     private TextView total;
-    private final Handler handler = new Handler(Looper.myLooper(), msg -> {
-        try {
-            this.query.setClickable(true);
-            this.table.data(this.listData());
-            this.total.setText(String.valueOf(this.table.getDataSize()));
-        } catch (Exception e) {
-            template.alert(StringUtils.isBlank(e.getMessage()) ? "未知错误" : e.getMessage());
-        } finally {
-            this.query.setClickable(true);
-        }
-        return false;
-    });
 
     @Override
     protected void makeStructure() {
@@ -99,10 +83,10 @@ public abstract class ListPage<T> extends Page {
      * 刷新数据
      */
     protected void refreshData() {
-        new Thread(() -> {
-            Looper.prepare();
-            handler.sendMessage(new Message());
-        }).start();
+        ClickUtil.asyncExec(this.query, () -> {
+            this.table.data(this.listData());
+            return null;
+        }, () -> this.total.setText(String.valueOf(this.table.getDataSize())));
     }
 
     /**

@@ -23,8 +23,10 @@ public class ClickUtil {
      * @param runnable 执行逻辑
      */
     public static void onClick(View view, Runnable runnable) {
-        view.setOnClickListener(v -> ClickUtil.exec(v, runnable, () -> {
-        }));
+        view.setOnClickListener(v -> ClickUtil.exec(v, () -> {
+            runnable.run();
+            return null;
+        }, null));
     }
 
     /**
@@ -34,7 +36,10 @@ public class ClickUtil {
      * @param handled  执行完毕后下一步执行
      */
     public static void onClick(View view, Runnable runnable, Runnable handled) {
-        view.setOnClickListener(v -> ClickUtil.exec(v, runnable, handled));
+        view.setOnClickListener(v -> ClickUtil.exec(v, () -> {
+            runnable.run();
+            return null;
+        }, handled));
     }
 
     /**
@@ -57,26 +62,32 @@ public class ClickUtil {
         view.setOnClickListener(v -> ClickUtil.asyncExec(v, supplier, handled));
     }
 
+
     /**
-     * 点击处理（主线程执行）
+     * 执行
      * @param view     view
-     * @param runnable 执行逻辑
-     * @param handled  执行完毕后下一步执行
+     * @param supplier supplier
+     * @param handled  handled
      */
-    private static void exec(View view, Runnable runnable, Runnable handled) {
-        // 设置view不可点击
+    public static void exec(View view, Supplier<String> supplier, Runnable handled) {
         try {
             view.setClickable(false);
-            runnable.run();
-            handled.run();
+            String message = supplier.get();
+            // 有处理结果信息则提示
+            if (message != null) {
+                Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
+            }
+            // 通知执行后续步骤
+            if (handled != null) {
+                handled.run();
+            }
         } catch (Warn e) {
-            // 弹出提示
+            // 进行消息提示
             Toast.makeText(view.getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
         } catch (Exception e) {
-            // 弹出提示
-            Toast.makeText(view.getContext(), "系统错误", Toast.LENGTH_LONG).show();
+            // 进行消息提示
+            Toast.makeText(view.getContext(), "系统错误:" + e.getMessage(), Toast.LENGTH_LONG).show();
         } finally {
-            // 恢复view可点击
             view.setClickable(true);
         }
     }
@@ -87,29 +98,10 @@ public class ClickUtil {
      * @param supplier 执行逻辑
      * @param handled  执行完毕后下一步执行
      */
-    private static void asyncExec(View view, Supplier<String> supplier, Runnable handled) {
+    public static void asyncExec(View view, Supplier<String> supplier, Runnable handled) {
         // 异步事件处理器
         Handler handler = new Handler(Looper.myLooper(), msg -> {
-            try {
-                view.setClickable(false);
-                String message = supplier.get();
-                // 有处理结果信息则提示
-                if (message != null) {
-                    Toast.makeText(view.getContext(), message, Toast.LENGTH_LONG).show();
-                }
-                // 通知执行后续步骤
-                if (handled != null) {
-                    handled.run();
-                }
-            } catch (Warn e) {
-                // 进行消息提示
-                Toast.makeText(view.getContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-            } catch (Exception e) {
-                // 进行消息提示
-                Toast.makeText(view.getContext(), "系统错误:" + e, Toast.LENGTH_LONG).show();
-            } finally {
-                view.setClickable(true);
-            }
+            ClickUtil.exec(view, supplier, handled);
             return false;
         });
         new Thread(() -> {
