@@ -87,5 +87,9 @@ public class Profit extends BaseModel {
      * 收益率
      */
     private BigDecimal profitRatio = BigDecimal.ZERO;
+    /**
+     * 当前金额
+     */
+    private BigDecimal amountCurr = BigDecimal.ZERO;
 
 }

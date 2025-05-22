@@ -60,13 +60,13 @@ public class ProfitManager {
      */
     public List<Profit> list(List<String> dates) {
         // 查询全部有效规则数据
-        List<Rule> rules = ruleManager.listValid();
+        List<Rule> list = ruleManager.listValid();
         if (dates.size() == 1) {
             String date = dates.get(0);
-            return rules.stream().map(i -> this.copy(i, this.calc(i, date)))
+            return list.stream().map(i -> this.copy(i, this.calc(i, date)))
                     .filter(Objects::nonNull).collect(Collectors.toList());
         }
-        return rules.stream().map(rule -> this.list(rule, dates)).flatMap(List::stream).collect(Collectors.toList());
+        return list.stream().map(i -> this.list(i, dates)).flatMap(List::stream).collect(Collectors.toList());
     }
 
     /**
@@ -107,17 +107,17 @@ public class ProfitManager {
      */
     private List<ProfitView> buildView(List<Rule> rules, String dateEnd) {
         // 计算收益
-        Profit profit = rules.stream().map(i -> this.calc(i, dateEnd)).filter(Objects::nonNull)
+        Profit p = rules.stream().map(i -> this.calc(i, dateEnd)).filter(Objects::nonNull)
                 .reduce(new Profit(), this::merge);
         // 构建总览数据
         List<ProfitView> results = new ArrayList<>();
-        results.add(new ProfitView("日期", "开始", profit.getDateStart(), "结束", profit.getDateEnd(), EMPTY, EMPTY));
-        results.add(new ProfitView("操作次数", "买入", profit.getTimesBuy() + EMPTY, "卖出", profit.getTimesSell() + EMPTY, EMPTY, EMPTY));
-        results.add(new ProfitView("投入金额", "最大", TextUtil.amount(profit.getPaidMax()), "剩余", TextUtil.amount(profit.getPaidLeft()), "总额", TextUtil.amount(profit.getPaidTotal())));
-        results.add(new ProfitView("回收金额", EMPTY, EMPTY, EMPTY, EMPTY, "总额", TextUtil.amount(profit.getReturned())));
-        results.add(new ProfitView("份额", EMPTY, EMPTY, EMPTY, EMPTY, "总额", TextUtil.text(profit.getShareTotal())));
-        results.add(new ProfitView("盈利金额", "卖出", TextUtil.amount(profit.getProfitSold()), "持有", TextUtil.amount(profit.getProfitHold()), "总额", TextUtil.amount(profit.getProfitTotal())));
-        results.add(new ProfitView("收益率", "卖出/最大", TextUtil.hundred(profit.getProfitRatio()), EMPTY, EMPTY, EMPTY, EMPTY));
+        results.add(new ProfitView("日期", "开始", p.getDateStart(), "结束", p.getDateEnd(), EMPTY, EMPTY));
+        results.add(new ProfitView("当前持有", "份额", TextUtil.text(p.getShareTotal()), "金额", TextUtil.amount(p.getAmountCurr()), EMPTY, EMPTY));
+        results.add(new ProfitView("操作次数", "买入", p.getTimesBuy() + EMPTY, "卖出", p.getTimesSell() + EMPTY, EMPTY, EMPTY));
+        results.add(new ProfitView("投入金额", "最大", TextUtil.amount(p.getPaidMax()), "剩余", TextUtil.amount(p.getPaidLeft()), "总额", TextUtil.amount(p.getPaidTotal())));
+        results.add(new ProfitView("回收金额", EMPTY, EMPTY, EMPTY, EMPTY, "总额", TextUtil.amount(p.getReturned())));
+        results.add(new ProfitView("盈利金额", "卖出", TextUtil.amount(p.getProfitSold()), "持有", TextUtil.amount(p.getProfitHold()), "总额", TextUtil.amount(p.getProfitTotal())));
+        results.add(new ProfitView("收益率", "卖出/最大", TextUtil.hundred(p.getProfitRatio()), EMPTY, EMPTY, EMPTY, EMPTY));
         return results;
     }
 
@@ -177,12 +177,11 @@ public class ProfitManager {
         a.setProfitHold(a.getProfitHold().add(b.getProfitHold()));
         a.setProfitTotal(a.getProfitTotal().add(b.getProfitTotal()));
         a.setReturned(a.getReturned().add(b.getReturned()));
+        a.setAmountCurr(a.getPaidLeft().add(a.getProfitHold()));
         BigDecimal paidMax = a.getPaidMax();
-        if (paidMax.compareTo(BigDecimal.ZERO) == 0) {
-            a.setProfitRatio(BigDecimal.ZERO);
-        } else {
-            a.setProfitRatio(a.getProfitSold().divide(paidMax, SCALE, RoundingMode.HALF_UP));
-        }
+        BigDecimal profitRatio = paidMax.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO :
+                a.getProfitSold().divide(paidMax, SCALE, RoundingMode.HALF_UP);
+        a.setProfitRatio(profitRatio);
         return a;
     }
 
@@ -211,11 +210,9 @@ public class ProfitManager {
         profit.setProfitTotal(a.getProfitTotal().subtract(b.getProfitTotal()));
         profit.setReturned(a.getReturned().subtract(b.getReturned()));
         BigDecimal paidMax = profit.getPaidMax();
-        if (paidMax.compareTo(BigDecimal.ZERO) == 0) {
-            profit.setProfitRatio(BigDecimal.ZERO);
-        } else {
-            profit.setProfitRatio(profit.getProfitSold().divide(paidMax, SCALE, RoundingMode.HALF_UP));
-        }
+        BigDecimal profitRatio = paidMax.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO :
+                profit.getProfitSold().divide(paidMax, SCALE, RoundingMode.HALF_UP);
+        profit.setProfitRatio(profitRatio);
         return profit;
     }
 
