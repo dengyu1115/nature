@@ -23,12 +23,11 @@ public class RecordManager {
 
     /**
      * 获取指定代码和日期的记录内容
-     * 
-     * @param code  记录的标识符
-     * @param date  记录的日期
-     * @param t     默认返回值，当记录不存在时返回该值
-     * @param type  返回值的类型引用
-     * @return      返回解析后的记录内容对象
+     * @param code 记录的标识符
+     * @param date 记录的日期
+     * @param t    默认返回值，当记录不存在时返回该值
+     * @param type 返回值的类型引用
+     * @return 返回解析后的记录内容对象
      */
     public <T> T get(String code, String date, T t, TypeReference<T> type) {
         // 创建查询条件
@@ -46,10 +45,9 @@ public class RecordManager {
 
     /**
      * 保存指定代码和日期的记录内容
-     * 
-     * @param code  记录的标识符
-     * @param date  记录的日期
-     * @param t     要保存的内容对象
+     * @param code 记录的标识符
+     * @param date 记录的日期
+     * @param t    要保存的内容对象
      */
     public <T> void set(String code, String date, T t) {
         // 创建记录对象
