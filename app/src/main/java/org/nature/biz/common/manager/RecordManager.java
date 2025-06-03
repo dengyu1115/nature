@@ -17,7 +17,6 @@ import org.nature.common.ioc.annotation.Injection;
 @Component
 public class RecordManager {
 
-    // 注入记录映射器，用于与数据库交互
     @Injection
     private RecordMapper recordMapper;
 
