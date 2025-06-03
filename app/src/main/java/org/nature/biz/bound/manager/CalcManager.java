@@ -128,27 +128,8 @@ public class CalcManager {
             // 上一交易日修改为本次处理的交易日
             preWd = workday;
             // 计算标的涨幅数据
-            List<IR> irs = items.stream().map(i -> {
-                IR r = new IR();
-                String code = i.getCode();
-                String type = i.getType();
-                String fund = i.getFund();
-                r.setCode(code);
-                r.setType(type);
-                String pk = this.pk(code, type, workday);
-                BigDecimal price = priceMap.get(pk);
-                if (price == null) {
-                    throw new Warn("价格数据不存在：" + pk);
-                }
-                String nk = this.nk(fund, netDate);
-                BigDecimal net = netMap.get(nk);
-                if (net == null) {
-                    throw new Warn("净值数据不存在：" + nk);
-                }
-                BigDecimal ratio = price.subtract(net).multiply(i.getRatio()).divide(net, 8, RoundingMode.HALF_UP);
-                r.setRatio(ratio);
-                return r;
-            }).collect(Collectors.toList());
+            List<IR> irs = items.stream().map(i -> this.buildIR(i, workday, priceMap, netDate, netMap))
+                    .collect(Collectors.toList());
             IR min = irs.stream().min(Comparator.comparing(IR::getRatio)).orElseThrow(() -> new Warn("无数据"));
             // 首次买入操作
             if (preItem == null) {
@@ -182,6 +163,38 @@ public class CalcManager {
             results.add(this.buildResult(code, type, name, ruleName, ratio));
         }
         return results;
+    }
+
+    /**
+     * 构建IR对象
+     * @param i        项目
+     * @param workday  工作日
+     * @param priceMap 价格数据
+     * @param netDate  净值日期
+     * @param netMap   净值数据
+     * @return IR
+     */
+    private IR buildIR(Item i, String workday, Map<String, BigDecimal> priceMap,
+                       String netDate, Map<String, BigDecimal> netMap) {
+        IR r = new IR();
+        String code = i.getCode();
+        String type = i.getType();
+        String fund = i.getFund();
+        r.setCode(code);
+        r.setType(type);
+        String pk = this.pk(code, type, workday);
+        BigDecimal price = priceMap.get(pk);
+        if (price == null) {
+            throw new Warn("价格数据不存在：" + pk);
+        }
+        String nk = this.nk(fund, netDate);
+        BigDecimal net = netMap.get(nk);
+        if (net == null) {
+            throw new Warn("净值数据不存在：" + nk);
+        }
+        BigDecimal ratio = price.subtract(net).multiply(i.getRatio()).divide(net, 8, RoundingMode.HALF_UP);
+        r.setRatio(ratio);
+        return r;
     }
 
     /**
