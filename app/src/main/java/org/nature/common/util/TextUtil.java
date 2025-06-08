@@ -71,17 +71,7 @@ public class TextUtil {
         return TextUtil.text(o, i -> String.format("%.4f", i));
     }
 
-    public static Double getDouble(String s) {
-        if (s == null || s.isEmpty() || s.equals("-") || s.equals("---")) {
-            return null;
-        }
-        if (s.endsWith("%")) {
-            s = s.replace("%", "");
-        }
-        return Double.valueOf(s);
-    }
-
-    public static BigDecimal getDecimal(String s) {
+    public static BigDecimal decimal(String s) {
         if (s == null || s.isEmpty() || s.equals("-") || s.equals("---")) {
             return null;
         }
@@ -91,11 +81,11 @@ public class TextUtil {
         return new BigDecimal(s);
     }
 
-    public static String getString(EditText et) {
+    public static String string(EditText et) {
         return et.getText().toString().trim();
     }
 
-    public static BigDecimal getDecimal(EditText et) {
+    public static BigDecimal decimal(EditText et) {
         String val = et.getText().toString().trim();
         if (val.isEmpty()) {
             return null;
@@ -104,17 +94,6 @@ public class TextUtil {
             throw new Warn("decimal format error:" + val);
         }
         return new BigDecimal(val);
-    }
-
-    public static Integer getInteger(EditText et) {
-        String val = et.getText().toString().trim();
-        if (val.isEmpty()) {
-            return null;
-        }
-        if (!NumberUtils.isDigits(val)) {
-            throw new Warn("number format error:" + val);
-        }
-        return Integer.valueOf(val);
     }
 
     public static String join(String... arr) {

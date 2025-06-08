@@ -72,12 +72,12 @@ public class KlineHttp {
         kline.setCode(code);
         kline.setType(type);
         kline.setDate(s[0].replace(HYPHEN, EMPTY));
-        kline.setOpen(TextUtil.getDecimal(s[1]));
-        kline.setLatest(TextUtil.getDecimal(s[2]));
-        kline.setHigh(TextUtil.getDecimal(s[3]));
-        kline.setLow(TextUtil.getDecimal(s[4]));
-        kline.setShare(TextUtil.getDecimal(s[5]));
-        kline.setAmount(TextUtil.getDecimal(s[6]));
+        kline.setOpen(TextUtil.decimal(s[1]));
+        kline.setLatest(TextUtil.decimal(s[2]));
+        kline.setHigh(TextUtil.decimal(s[3]));
+        kline.setLow(TextUtil.decimal(s[4]));
+        kline.setShare(TextUtil.decimal(s[5]));
+        kline.setAmount(TextUtil.decimal(s[6]));
         return kline;
     }
 
