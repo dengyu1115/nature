@@ -1,8 +1,6 @@
 package org.nature.common.util;
 
-import java.io.Serializable;
 import java.util.Comparator;
-import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -13,22 +11,27 @@ import java.util.function.Function;
  */
 public class Sorter {
 
+    /**
+     * 创建一个比较器，将null值排在最后
+     * @param keyExtractor 从对象中提取比较键的函数
+     * @param <T>          被比较的对象类型
+     * @param <U>          可比较的键类型
+     * @return Comparator<T> 比较器
+     */
     public static <T, U extends Comparable<? super U>> Comparator<T> nullsLast(
             Function<? super T, ? extends U> keyExtractor) {
-        Objects.requireNonNull(keyExtractor);
-        return (Comparator<T> & Serializable)
-                (c1, c2) -> {
-                    U u1 = keyExtractor.apply(c1), u2 = keyExtractor.apply(c2);
-                    if (u1 != null && u2 != null) {
-                        return u1.compareTo(u2);
-                    }
-                    if (u1 == null && u2 != null) {
-                        return -1;
-                    }
-                    if (u1 != null) {
-                        return 1;
-                    }
-                    return 0;
-                };
+        return Comparator.comparing(keyExtractor, Comparator.nullsLast(Comparator.naturalOrder()));
+    }
+
+    /**
+     * 创建一个比较器，将null值排在最前
+     * @param keyExtractor 从对象中提取比较键的函数
+     * @param <T>          被比较的对象类型
+     * @param <U>          可比较的键类型
+     * @return Comparator<T> 比较器
+     */
+    public static <T, U extends Comparable<? super U>> Comparator<T> nullsFirst(
+            Function<? super T, ? extends U> keyExtractor) {
+        return Comparator.comparing(keyExtractor, Comparator.nullsFirst(Comparator.naturalOrder()));
     }
 }
