@@ -29,7 +29,7 @@ public class Rule extends BaseModel {
     @Id(order = 2)
     private String type;
     /**
-     * 项目名称
+     * 规则名称
      */
     @Id(order = 3)
     private String name;
