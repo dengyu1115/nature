@@ -75,7 +75,7 @@ public abstract class BaseBsPage extends ListPage<Hold> {
 
     @Override
     protected void initHeaderViews(LinearLayout condition) {
-        condition.addView(handleSel = template.selector(8, 7));
+        condition.addView(handleSel = template.selector(9, 7));
         handleSel.mapper(i -> {
             if ("1".equals(i)) {
                 return "买";
