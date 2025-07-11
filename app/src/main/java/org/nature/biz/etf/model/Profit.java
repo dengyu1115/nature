@@ -32,15 +32,15 @@ public class Profit extends BaseModel {
      */
     private String rule;
     /**
-     * 日期
+     * 日期（理论上的区间结束日期，查询条件中会用这个日期取数）
      */
     private String date;
     /**
-     * 开始日期
+     * 开始日期（收益的实际开始计算日期）
      */
     private String dateStart;
     /**
-     * 结束日期
+     * 结束日期（收益的实际结束计算日期）
      */
     private String dateEnd;
     /**

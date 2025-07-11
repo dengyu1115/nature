@@ -110,15 +110,15 @@ public class ProfitManager {
         Profit p = rules.stream().map(i -> this.calc(i, dateEnd)).filter(Objects::nonNull)
                 .reduce(new Profit(), this::merge);
         // 构建总览数据
-        List<ProfitView> results = new ArrayList<>();
-        results.add(new ProfitView("日期", "开始", p.getDateStart(), "结束", p.getDateEnd(), EMPTY, EMPTY));
-        results.add(new ProfitView("当前持有", "份额", TextUtil.text(p.getShareTotal()), "金额", TextUtil.amount(p.getAmountCurr()), EMPTY, EMPTY));
-        results.add(new ProfitView("操作次数", "买入", p.getTimesBuy() + EMPTY, "卖出", p.getTimesSell() + EMPTY, EMPTY, EMPTY));
-        results.add(new ProfitView("投入金额", "最大", TextUtil.amount(p.getPaidMax()), "剩余", TextUtil.amount(p.getPaidLeft()), "总额", TextUtil.amount(p.getPaidTotal())));
-        results.add(new ProfitView("回收金额", EMPTY, EMPTY, EMPTY, EMPTY, "总额", TextUtil.amount(p.getReturned())));
-        results.add(new ProfitView("盈利金额", "卖出", TextUtil.amount(p.getProfitSold()), "持有", TextUtil.amount(p.getProfitHold()), "总额", TextUtil.amount(p.getProfitTotal())));
-        results.add(new ProfitView("收益率", "卖出/最大", TextUtil.hundred(p.getProfitRatio()), EMPTY, EMPTY, EMPTY, EMPTY));
-        return results;
+        return List.of(
+                new ProfitView("日期", "开始", p.getDateStart(), "结束", p.getDateEnd(), EMPTY, EMPTY),
+                new ProfitView("当前持有", "份额", TextUtil.text(p.getShareTotal()), "金额", TextUtil.amount(p.getAmountCurr()), EMPTY, EMPTY),
+                new ProfitView("操作次数", "买入", p.getTimesBuy() + EMPTY, "卖出", p.getTimesSell() + EMPTY, EMPTY, EMPTY),
+                new ProfitView("投入金额", "最大", TextUtil.amount(p.getPaidMax()), "剩余", TextUtil.amount(p.getPaidLeft()), "总额", TextUtil.amount(p.getPaidTotal())),
+                new ProfitView("回收金额", EMPTY, EMPTY, EMPTY, EMPTY, "总额", TextUtil.amount(p.getReturned())),
+                new ProfitView("盈利金额", "卖出", TextUtil.amount(p.getProfitSold()), "持有", TextUtil.amount(p.getProfitHold()), "总额", TextUtil.amount(p.getProfitTotal())),
+                new ProfitView("收益率", "卖出/最大", TextUtil.hundred(p.getProfitRatio()), EMPTY, EMPTY, EMPTY, EMPTY)
+        );
     }
 
     /**

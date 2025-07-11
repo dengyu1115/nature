@@ -148,16 +148,7 @@ public class ProfitListPage extends ListPage<Profit> {
     private List<Profit> merge(List<Profit> profits) {
         boolean itemFlag = StringUtils.isNotBlank((String) this.item.getTag());
         boolean ruleFlag = StringUtils.isNotBlank((String) this.rule.getTag());
-        Function<Profit, String> groupKey;
-        if (!itemFlag && !ruleFlag) {
-            groupKey = i -> String.join(Const.DELIMITER, i.getDate(), i.getCode(), i.getType(), i.getRule(), this.getItemName(i));
-        } else if (itemFlag && ruleFlag) {
-            groupKey = i -> String.join(Const.DELIMITER, i.getDate(), Const.EMPTY, Const.EMPTY, Const.TOTAL, Const.TOTAL);
-        } else if (itemFlag) {
-            groupKey = i -> String.join(Const.DELIMITER, i.getDate(), Const.EMPTY, Const.EMPTY, i.getRule(), Const.TOTAL);
-        } else {
-            groupKey = i -> String.join(Const.DELIMITER, i.getDate(), i.getCode(), i.getType(), Const.TOTAL, this.getItemName(i));
-        }
+        Function<Profit, String> groupKey = this.buildGroupKey(itemFlag, ruleFlag);
         Map<String, List<Profit>> group = profits.stream().collect(Collectors.groupingBy(groupKey));
         return group.entrySet().stream().map(i -> {
                     String[] split = i.getKey().split(Const.DELIMITER, 5);
@@ -170,6 +161,19 @@ public class ProfitListPage extends ListPage<Profit> {
                     return profit;
                 }).sorted(Comparator.comparing(Profit::getDate).reversed().thenComparing(Profit::getCode))
                 .collect(Collectors.toList());
+    }
+
+    private Function<Profit, String> buildGroupKey(boolean itemFlag, boolean ruleFlag) {
+        if (!itemFlag && !ruleFlag) {
+            return i -> String.join(Const.DELIMITER, i.getDate(), i.getCode(), i.getType(), i.getRule(), this.getItemName(i));
+        }
+        if (itemFlag && ruleFlag) {
+            return i -> String.join(Const.DELIMITER, i.getDate(), Const.EMPTY, Const.EMPTY, Const.TOTAL, Const.TOTAL);
+        }
+        if (itemFlag) {
+            return i -> String.join(Const.DELIMITER, i.getDate(), Const.EMPTY, Const.EMPTY, i.getRule(), Const.TOTAL);
+        }
+        return i -> String.join(Const.DELIMITER, i.getDate(), i.getCode(), i.getType(), Const.TOTAL, this.getItemName(i));
     }
 
     private List<String> buildDates(String dateRule) {
