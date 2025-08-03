@@ -9,12 +9,10 @@ import org.nature.common.page.ListPage;
 import org.nature.common.util.TextUtil;
 import org.nature.common.view.Selector;
 import org.nature.common.view.Table;
+import org.nature.common.view.Table.Header;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -26,7 +24,7 @@ import java.util.stream.Collectors;
 public abstract class BaseBsPage extends ListPage<Hold> {
 
     private final Map<String, String> itemNameMap = new HashMap<>();
-    private final List<Table.Header<Hold>> headers = Arrays.asList(
+    private final List<Header<Hold>> headers = Arrays.asList(
             Table.header("项目", d -> TextUtil.text(this.getItem(d)), C, S, this::getItem),
             Table.header("规则", d -> TextUtil.text(d.getRule()), C, S, Hold::getRule),
             Table.header("操作", d -> TextUtil.text(this.getHandle(d)), C, C, this::getHandle),
@@ -48,12 +46,14 @@ public abstract class BaseBsPage extends ListPage<Hold> {
     );
     @Injection
     private ItemMapper itemMapper;
+
+    private Selector<String> itemSel;
     private Selector<String> handleSel;
 
     protected abstract List<Hold> data();
 
     @Override
-    protected List<Table.Header<Hold>> headers() {
+    protected List<Header<Hold>> headers() {
         return headers;
     }
 
@@ -61,21 +61,46 @@ public abstract class BaseBsPage extends ListPage<Hold> {
     protected List<Hold> listData() {
         List<Hold> list = this.data();
         String handle = this.handleSel.getValue();
+        String item = this.itemSel.getValue();
         list = list.stream().filter(i -> {
-            if ("0".equals(handle)) {
-                return true;
-            }
             if ("1".equals(handle)) {
                 return i.getDateSell() == null;
             }
-            return i.getDateSell() != null;
+            if ("2".equals(handle)) {
+                return i.getDateSell() != null;
+            }
+            return true;
+        }).filter(i -> {
+            if (item == null) {
+                return true;
+            }
+            return String.join(":", i.getCode(), i.getType()).equals(item);
         }).collect(Collectors.toList());
         return list;
     }
 
     @Override
     protected void initHeaderViews(LinearLayout condition) {
+        condition.addView(itemSel = template.selector(10, 7));
         condition.addView(handleSel = template.selector(9, 7));
+    }
+
+    @Override
+    protected void initHeaderBehaviours() {
+        List<Item> items = itemMapper.listAll();
+        itemNameMap.clear();
+        itemNameMap.putAll(items.stream()
+                .collect(Collectors.toMap(i -> String.join(":", i.getCode(), i.getType()), Item::getName)));
+        itemSel.mapper(i -> {
+            String name = itemNameMap.get(i);
+            if (name == null) {
+                return "请选择";
+            }
+            return name;
+        });
+        List<String> itemKeys = new ArrayList<>(itemNameMap.keySet());
+        itemKeys.add(0, null);
+        itemSel.setData(itemKeys);
         handleSel.mapper(i -> {
             if ("1".equals(i)) {
                 return "买";
@@ -86,14 +111,7 @@ public abstract class BaseBsPage extends ListPage<Hold> {
             return "请选择";
         });
         handleSel.setData(Arrays.asList("0", "1", "2"));
-    }
 
-    @Override
-    protected void initHeaderBehaviours() {
-        List<Item> items = itemMapper.listAll();
-        itemNameMap.clear();
-        itemNameMap.putAll(items.stream()
-                .collect(Collectors.toMap(i -> String.join(":", i.getCode(), i.getType()), Item::getName)));
     }
 
     @Override
