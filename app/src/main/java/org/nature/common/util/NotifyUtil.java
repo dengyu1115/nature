@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.speech.tts.TextToSpeech;
 import androidx.core.app.NotificationCompat;
+import lombok.Getter;
 import org.nature.R;
 
 import java.util.Locale;
@@ -39,6 +40,7 @@ public class NotifyUtil {
      * 安卓上下文对象
      */
     @SuppressLint("StaticFieldLeak")
+    @Getter
     private static Context context;
     /**
      * 消息发送管理器

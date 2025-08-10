@@ -62,7 +62,7 @@ public class JobService extends Service {
                 return;
             }
         }
-        this.getService().scheduleAtFixedRate(this::task, this.calculateDelay(), PERIOD, TimeUnit.MILLISECONDS);
+        this.getService().scheduleWithFixedDelay(this::task, this.calculateDelay(), PERIOD, TimeUnit.MILLISECONDS);
     }
 
     @Nullable

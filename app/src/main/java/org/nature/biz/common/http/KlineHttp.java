@@ -27,9 +27,8 @@ public class KlineHttp {
     /**
      * 链接地址：K线列表
      */
-    private static final String URL_KLINE = "http://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s.%s" +
+    private static final String URL_KLINE = "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s.%s" +
             "&fields1=f1,f2,f3,f4,f5&fields2=f51,f52,f53,f54,f55,f56,f57&klt=101&fqt=1&beg=%s&end=%s";
-
 
     /**
      * 获取k线数据
@@ -43,7 +42,11 @@ public class KlineHttp {
         // 填充参数生成完整URL
         String uri = String.format(URL_KLINE, type, code, start, end);
         // 发起请求调用得到返回
-        String response = HttpUtil.doGet(uri, lines -> lines.collect(Collectors.toList()).get(0));
+        String response = HttpUtil.doGet(uri, lines -> lines.collect(Collectors.joining()));
+        return this.buildKlineList(code, type, response);
+    }
+
+    private List<Kline> buildKlineList(String code, String type, String response) {
         // 解析返回数据，转换为json对象
         JSONObject jo = JSON.parseObject(response);
         // 获取所需字段
@@ -51,12 +54,13 @@ public class KlineHttp {
         if (data == null) {
             throw new Warn("历史K线数据缺失：" + code + ":" + type);
         }
+
         JSONArray ks = data.getJSONArray("klines");
         if (ks == null) {
             throw new Warn("历史K线数据缺失：" + code + ":" + type);
         }
         // 转换为Kline对象
-        return ks.stream().map(i -> this.genKline(code, type, (String) i)).collect(Collectors.toList());
+        return ks.stream().map(i -> this.buildKline(code, type, (String) i)).collect(Collectors.toList());
     }
 
     /**
@@ -66,7 +70,7 @@ public class KlineHttp {
      * @param line K线String数据
      * @return Kline
      */
-    private Kline genKline(String code, String type, String line) {
+    private Kline buildKline(String code, String type, String line) {
         String[] s = line.split(",");
         Kline kline = new Kline();
         kline.setCode(code);
