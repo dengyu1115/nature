@@ -171,40 +171,44 @@ public class RuleManager implements KlineItems {
         return ruleMapper.listAll().stream().filter(i -> "1".equals(i.getStatus())).collect(Collectors.toList());
     }
 
+    /**
+     * 最新条件
+     * @return list
+     */
     public List<String> latestConditions() {
         List<Rule> rules = this.listValid();
-        // 无规则数据直接返回
-        if (rules.isEmpty()) {
-            return new ArrayList<>();
-        }
-        // 按项目分组
-        Map<String, List<Rule>> map = rules.stream()
-                .collect(Collectors.groupingBy(i -> String.join(":", i.getCode(), i.getType())));
         // 当前日期
         String date = DateFormatUtils.format(new Date(), "yyyyMMdd");
-        List<String> conditions = new ArrayList<>();
-        for (Map.Entry<String, List<Rule>> i : map.entrySet()) {
-            String[] split = i.getKey().split(":");
-            String code = split[0];
-            String type = split[1];
-            String start = this.latestStartDate(code, type, date);
-            conditions.add(String.format("%s:%s:%s:%s", code, type, start, date));
-        }
-        return conditions;
+        // 按项目分组
+        return rules.stream().map(i -> String.join(":", i.getCode(), i.getType()))
+                .distinct().map(i -> {
+                    String[] split = i.split(":");
+                    String code = split[0];
+                    String type = split[1];
+                    String start = this.latestStartDate(code, type, date);
+                    return String.format("%s:%s:%s:%s", code, type, start, date);
+                }).collect(Collectors.toList());
     }
 
+    /**
+     * 计算开始日期
+     * @param code code
+     * @param type 类型
+     * @param date 日期
+     * @return string
+     */
     private String latestStartDate(String code, String type, String date) {
         // 查询K线数据
-        List<Kline> kList = klineMapper.listByItem(code, type);
+        List<Kline> list = klineMapper.listByItem(code, type);
         // 移除比当前日期大的数据
-        kList.removeIf(i -> i.getDate().compareTo(date) >= 0);
+        list.removeIf(i -> i.getDate().compareTo(date) >= 0);
         // 按日期排序
-        kList.sort(Comparator.comparing(Kline::getDate));
+        list.sort(Comparator.comparing(Kline::getDate));
         // 计算开始日期
         String start = "";
-        if (!kList.isEmpty()) {
-            int index = kList.size() - 1;
-            Kline kline = kList.get(index);
+        if (!list.isEmpty()) {
+            int index = list.size() - 1;
+            Kline kline = list.get(index);
             String lastDate = kline.getDate();
             start = DateUtil.addDays(lastDate, 1);
         }

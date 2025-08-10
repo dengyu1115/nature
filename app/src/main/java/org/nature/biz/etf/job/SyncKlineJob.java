@@ -94,6 +94,10 @@ public class SyncKlineJob implements Job {
         }
     }
 
+    /**
+     * 处理数据
+     * @param conditions 条件列表
+     */
     @SuppressLint("SetJavaScriptEnabled")
     private void handle(List<String> conditions) {
         Set<String> keys = conditions.stream().map(i -> {
@@ -104,13 +108,15 @@ public class SyncKlineJob implements Job {
         viewMap.keySet().removeIf(k -> !keys.contains(k));
         for (String i : conditions) {
             String[] arr = i.split(":");
-            handler.post(() -> {
-                viewMap.computeIfAbsent(String.join(":", arr[1], arr[0]),
-                        k -> this.buildWebView()).loadUrl(String.format(URL, arr[1], arr[0], arr[2], arr[3]));
-            });
+            handler.post(() -> viewMap.computeIfAbsent(String.join(":", arr[1], arr[0]),
+                    k -> this.buildWebView()).loadUrl(String.format(URL, arr[1], arr[0], arr[2], arr[3])));
         }
     }
 
+    /**
+     * 构建webview实例
+     * @return WebView
+     */
     @SuppressLint("SetJavaScriptEnabled")
     private WebView buildWebView() {
         WebView webView = new WebView(NotifyUtil.getContext());
@@ -119,6 +125,10 @@ public class SyncKlineJob implements Job {
         return webView;
     }
 
+    /**
+     * 构建webview客户端
+     * @return WebViewClient
+     */
     private WebViewClient buildClient() {
         return new WebViewClient() {
             @Override
@@ -142,6 +152,10 @@ public class SyncKlineJob implements Job {
         };
     }
 
+    /**
+     * 处理html数据
+     * @param html html数据
+     */
     private void handleHtml(String html) {
         // 解析返回数据，转换为json对象
         JSONObject json = JSON.parseObject(html);
