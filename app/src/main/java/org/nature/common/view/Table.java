@@ -32,7 +32,7 @@ import static org.nature.common.constant.Const.PAD;
 @SuppressLint({"DefaultLocale", "ClickableViewAccessibility", "ViewConstructor"})
 public class Table<T> extends LinearLayout {
 
-    private static final int PADDING = 10, SCROLL_BAR_SIZE = 1;
+    private static final int PADDING = 8, SCROLL_BAR_SIZE = 1;
     /**
      * 水平滚动的view集合
      */

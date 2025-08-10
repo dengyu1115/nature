@@ -30,7 +30,7 @@ public abstract class BaseBsPage extends ListPage<Hold> {
             Table.header("操作", d -> TextUtil.text(this.getHandle(d)), C, C, this::getHandle),
             Table.header("日期", C, Arrays.asList(
                     Table.header("买入", d -> TextUtil.text(d.getDateBuy()), C, S, Hold::getDateBuy),
-                    Table.header("卖出", d -> TextUtil.text(d.getDateSell()), C, E, Hold::getDateSell))
+                    Table.header("卖出", d -> TextUtil.text(d.getDateSell()), C, S, Hold::getDateSell))
             ),
             Table.header("价格", C, Arrays.asList(
                     Table.header("标记", d -> TextUtil.price(d.getMark()), C, E, Hold::getMark),
