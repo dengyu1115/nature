@@ -28,15 +28,6 @@ public interface KlineMapper extends BatchSave<Kline>, BatchMerge<Kline>, ListBy
     Kline findLatest(@Param("code") String code, @Param("type") String type);
 
     /**
-     * 查询第一条数据
-     * @param code 项目编号
-     * @param type 项目类型
-     * @return Kline
-     */
-    @QueryOne(where = "code=#{code} and type=#{type} order by date limit 1")
-    Kline findFirst(@Param("code") String code, @Param("type") String type);
-
-    /**
      * 按项目查询
      * @param code 项目编号
      * @param type 项目类型
