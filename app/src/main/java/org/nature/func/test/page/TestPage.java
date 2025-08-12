@@ -1,19 +1,16 @@
 package org.nature.func.test.page;
 
 import android.annotation.SuppressLint;
-import android.os.Handler;
-import android.os.Looper;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import org.nature.common.ioc.annotation.PageView;
 import org.nature.common.page.Page;
 import org.nature.common.util.ClickUtil;
 import org.nature.common.util.NotifyUtil;
 import org.nature.common.view.Button;
 import org.nature.common.view.Input;
+import org.nature.common.view.ViewTemplate;
 
 /**
  * 测试功能
@@ -24,6 +21,21 @@ import org.nature.common.view.Input;
 @PageView(name = "测试功能", group = "基础", col = 2, row = 2)
 public class TestPage extends Page {
 
+    private static final String URL = "'https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s.%s&fields1=f1,f2,f3,f4,f5&fields2=f51,f52,f53,f54,f55,f56,f57&klt=101&fqt=1&beg=20250807&end=20250811'";
+    public static final String SCRIPT = "(function() { " +
+            "const url = " + URL + ";\n" +
+            "        fetch(url).then(response => {\n" +
+            "            if (!response.ok) {\n" +
+            "              throw new Error(`HTTP error! Status: ${response.status}`);\n" +
+            "            }\n" +
+            "            return response.json();\n" +
+            "          }).then(data => {\n" +
+            "            console.log('调用成功，返回结果：',JSON.stringify(data));\n" +
+            "            native.callback(JSON.stringify(data));\n" +
+            "          }).catch(error => {\n" +
+            "            console.error('调用失败：', error.message);\n" +
+            "          });" +
+            " })();";
     private Button ttsBtn;
 
     private Button webBtn;
@@ -35,8 +47,8 @@ public class TestPage extends Page {
         page.addView(webBtn = template.button("web", 10, 7));
     }
 
-    private final Handler uiHandler = new Handler(Looper.getMainLooper());
 
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onShow() {
         ClickUtil.onClick(ttsBtn, () -> {
@@ -48,52 +60,26 @@ public class TestPage extends Page {
             });
         });
         ClickUtil.onClick(webBtn, () -> {
-
-            System.out.println(Thread.currentThread().getName() + ":1");
-
-            Thread thread = new Thread(() -> {
-                System.out.println(Thread.currentThread().getName() + ":5");
-                System.out.println(handle());
-                System.out.println(Thread.currentThread().getName() + ":6");
-            });
-            thread.start();
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            System.out.println(Thread.currentThread().getName() + ":2");
+            WebView webView = new WebView(this.context);
+            webView.getSettings().setJavaScriptEnabled(true);
+            webView.addJavascriptInterface(new Callback(template), "native");
+            webView.evaluateJavascript(String.format(SCRIPT, "0", "159941"), null);
+            webView.evaluateJavascript(String.format(SCRIPT, "0", "000001"), null);
         });
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
-    private String handle() {
-        System.out.println(Thread.currentThread().getName() + ":3");
-        StringBuilder builder = new StringBuilder();
-        uiHandler.post(() -> {
-            WebView webView = new WebView(this.context);
-            webView.getSettings().setJavaScriptEnabled(true);
-            webView.setWebViewClient(new WebViewClient() {
-                @Override
-                public void onPageFinished(WebView view, String url) {
-                    webView.evaluateJavascript(
-                            "(function() { return document.body.innerText; })();",
-                            html -> {
-                                html = html.replaceAll("^\"|\"$", "") // 去除首尾双引号
-                                        .replace("\\\\n", "\n")    // 恢复换行符
-                                        .replace("\\\\t", "\t")    // 恢复制表符
-                                        .replace("\\\"", "\"")
-                                        .replace("\\'", "'");
-                                System.out.println(Thread.currentThread().getName() + ":4");
-                                JSONObject json = JSON.parseObject(html);
-                                builder.append(json);
-                            }
-                    );
-                }
-            });
-            webView.loadUrl("https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=0.159941&fields1=f1,f2,f3,f4,f5&fields2=f51,f52,f53,f54,f55,f56,f57&klt=101&fqt=1&beg=20250807&end=20250807");
-        });
-        return builder.toString();
+    public static class Callback {
+
+        private final ViewTemplate template;
+
+        public Callback(ViewTemplate template) {
+            this.template = template;
+        }
+
+        @JavascriptInterface
+        public void callback(String html) {
+            this.template.alert("html: " + html);
+        }
     }
 
 }

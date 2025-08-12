@@ -3,8 +3,8 @@ package org.nature.biz.etf.job;
 import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Looper;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -19,7 +19,8 @@ import org.nature.common.util.TextUtil;
 import org.nature.func.job.protocol.Job;
 import org.nature.func.workday.manager.WorkdayManager;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.nature.common.constant.Const.EMPTY;
@@ -34,13 +35,26 @@ import static org.nature.common.constant.Const.HYPHEN;
 @JobExec(code = "sync_kline_job", name = "同步K线")
 public class SyncKlineJob implements Job {
 
-    public static final String URL = "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s.%s&fields1=f1,f2,f3,f4,f5&fields2=f51,f52,f53,f54,f55,f56,f57&klt=101&fqt=1&beg=%s&end=%s";
-
+    private static final String URL = "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s.%s&fields1=f1,f2,f3,f4,f5&fields2=f51,f52,f53,f54,f55,f56,f57&klt=101&fqt=1&beg=%s&end=%s";
+    private static final String SCRIPT = "(function() { " +
+            "const url = '" + URL + "';\n" +
+            "        // 使用fetch API调用URL\n" +
+            "        fetch(url).then(response => {\n" +
+            "            if (!response.ok) {\n" +
+            "              throw new Error(`HTTP error! Status: ${response.status}`);\n" +
+            "            }\n" +
+            "            return response.json();\n" +
+            "          }).then(data => {\n" +
+            "            native.callSuccess(JSON.stringify(data));\n" +
+            "          }).catch(error => {\n" +
+            "            native.callFailure('调用失败：' + error.message);\n" +
+            "          });" +
+            " })();";
     private static boolean running;
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 
-    private final Map<String, WebView> viewMap = new HashMap<>();
+    private WebView webView;
 
     @Injection
     private RuleManager ruleManager;
@@ -100,81 +114,64 @@ public class SyncKlineJob implements Job {
      */
     @SuppressLint("SetJavaScriptEnabled")
     private void handle(List<String> conditions) {
-        Set<String> keys = conditions.stream().map(i -> {
-            String[] arr = i.split(":");
-            return String.join(":", arr[1], arr[0]);
-        }).collect(Collectors.toSet());
-        // 清理无需处理的webview实例
-        viewMap.keySet().removeIf(k -> !keys.contains(k));
-        for (String i : conditions) {
-            String[] arr = i.split(":");
-            handler.post(() -> viewMap.computeIfAbsent(String.join(":", arr[1], arr[0]),
-                    k -> this.buildWebView()).loadUrl(String.format(URL, arr[1], arr[0], arr[2], arr[3])));
-        }
+        handler.post(() -> {
+            this.buildWebView();
+            for (String i : conditions) {
+                String[] arr = i.split(":");
+                webView.evaluateJavascript(String.format(SCRIPT, arr[1], arr[0], arr[2], arr[3]), null);
+            }
+        });
     }
 
     /**
      * 构建webview实例
-     * @return WebView
      */
     @SuppressLint("SetJavaScriptEnabled")
-    private WebView buildWebView() {
-        WebView webView = new WebView(NotifyUtil.getContext());
+    private void buildWebView() {
+        if (webView != null) {
+            return;
+        }
+        this.webView = new WebView(NotifyUtil.getContext());
         webView.getSettings().setJavaScriptEnabled(true);
-        webView.setWebViewClient(this.buildClient());
-        return webView;
-    }
-
-    /**
-     * 构建webview客户端
-     * @return WebViewClient
-     */
-    private WebViewClient buildClient() {
-        return new WebViewClient() {
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                view.evaluateJavascript(
-                        "(function() { return document.body.innerText; })();",
-                        html -> {
-                            html = html.replaceAll("^\"|\"$", "") // 去除首尾双引号
-                                    .replace("\\\\n", "\n")    // 恢复换行符
-                                    .replace("\\\\t", "\t")    // 恢复制表符
-                                    .replace("\\\"", "\"")
-                                    .replace("\\'", "'");
-                            try {
-                                SyncKlineJob.this.handleHtml(html);
-                            } catch (Exception e) {
-                                NotifyUtil.notifyOne("数据解析异常", e.getMessage());
-                            }
-                        }
-                );
-            }
-        };
+        webView.addJavascriptInterface(this, "native");
     }
 
     /**
      * 处理html数据
      * @param html html数据
      */
-    private void handleHtml(String html) {
-        // 解析返回数据，转换为json对象
-        JSONObject json = JSON.parseObject(html);
-        // 获取所需字段
-        JSONObject data = json.getJSONObject("data");
-        if (data == null) {
-            throw new Warn("历史K线数据缺失");
+    @JavascriptInterface
+    public void callSuccess(String html) {
+        try {
+            // 解析返回数据，转换为json对象
+            JSONObject json = JSON.parseObject(html);
+            // 获取所需字段
+            JSONObject data = json.getJSONObject("data");
+            if (data == null) {
+                throw new Warn("历史K线数据缺失");
+            }
+            String type = data.getString("market");
+            String code = data.getString("code");
+            JSONArray ks = data.getJSONArray("klines");
+            if (ks == null) {
+                throw new Warn("历史K线数据缺失：" + code + ":" + type);
+            }
+            // 转换为Kline对象
+            List<Kline> list = ks.stream().map(i -> this.buildKline(code, type, (String) i))
+                    .collect(Collectors.toList());
+            klineMapper.batchMerge(list);
+        } catch (Warn e) {
+            NotifyUtil.notifyOne("同步K线数据异常", e.getMessage());
         }
-        String type = data.getString("market");
-        String code = data.getString("code");
-        JSONArray ks = data.getJSONArray("klines");
-        if (ks == null) {
-            throw new Warn("历史K线数据缺失：" + code + ":" + type);
-        }
-        // 转换为Kline对象
-        List<Kline> list = ks.stream().map(i -> this.buildKline(code, type, (String) i))
-                .collect(Collectors.toList());
-        klineMapper.batchMerge(list);
+    }
 
+    /**
+     * 处理异常
+     * @param message 异常信息
+     */
+    @JavascriptInterface
+    public void callFailure(String message) {
+        NotifyUtil.notifyOne("同步K线数据异常", message);
     }
 
     /**
