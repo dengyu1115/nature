@@ -49,6 +49,7 @@ public class JobService extends Service {
     /**
      * 创建服务
      */
+    @SuppressLint("DiscouragedApi")
     @Override
     public void onCreate() {
         super.onCreate();
@@ -62,7 +63,7 @@ public class JobService extends Service {
                 return;
             }
         }
-        this.getService().scheduleWithFixedDelay(this::task, this.calculateDelay(), PERIOD, TimeUnit.MILLISECONDS);
+        this.getService().scheduleAtFixedRate(this::task, this.calculateDelay(), PERIOD, TimeUnit.MILLISECONDS);
     }
 
     @Nullable
@@ -134,7 +135,7 @@ public class JobService extends Service {
                 execManager.exec(now);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            NotifyUtil.notifyOne("NATURE异常", e.getMessage());
         }
     }
 
