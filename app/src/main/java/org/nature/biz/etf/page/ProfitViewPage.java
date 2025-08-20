@@ -72,7 +72,7 @@ public class ProfitViewPage extends ListPage<ProfitView> {
 
     @Override
     protected int getTotalRows() {
-        return 8;
+        return 7;
     }
 
     @Override

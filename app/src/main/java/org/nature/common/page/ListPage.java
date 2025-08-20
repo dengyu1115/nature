@@ -83,10 +83,10 @@ public abstract class ListPage<T> extends Page {
      * 刷新数据
      */
     protected void refreshData() {
-        ClickUtil.asyncExec(this.query, () -> {
-            this.table.data(this.listData());
-            return null;
-        }, () -> this.total.setText(String.valueOf(this.table.getDataSize())));
+        ClickUtil.asyncExec(this.query, this::listData, list -> {
+            this.table.data(list);
+            this.total.setText(String.valueOf(this.table.getDataSize()));
+        });
     }
 
     /**

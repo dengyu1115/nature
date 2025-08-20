@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Toast;
 import org.nature.common.exception.Warn;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -48,7 +49,8 @@ public class ClickUtil {
      * @param supplier 执行逻辑
      */
     public static void onAsyncClick(View view, Supplier<String> supplier) {
-        view.setOnClickListener(v -> ClickUtil.asyncExec(v, supplier, () -> {
+        view.setOnClickListener(v -> ClickUtil.asyncExec(v, supplier, i -> {
+            Toast.makeText(view.getContext(), i, Toast.LENGTH_LONG).show();
         }));
     }
 
@@ -59,7 +61,10 @@ public class ClickUtil {
      * @param handled  执行完毕后下一步执行
      */
     public static void onAsyncClick(View view, Supplier<String> supplier, Runnable handled) {
-        view.setOnClickListener(v -> ClickUtil.asyncExec(v, supplier, handled));
+        view.setOnClickListener(v -> ClickUtil.asyncExec(v, supplier, i -> {
+            Toast.makeText(view.getContext(), i, Toast.LENGTH_LONG).show();
+            handled.run();
+        }));
     }
 
 
@@ -98,16 +103,46 @@ public class ClickUtil {
      * @param supplier 执行逻辑
      * @param handled  执行完毕后下一步执行
      */
-    public static void asyncExec(View view, Supplier<String> supplier, Runnable handled) {
+    @SuppressWarnings("unchecked")
+    public static <T> void asyncExec(View view, Supplier<T> supplier, Consumer<T> handled) {
         // 异步事件处理器
         Handler handler = new Handler(Looper.myLooper(), msg -> {
-            ClickUtil.exec(view, supplier, handled);
+            if (msg.what == 0) {
+                handled.accept((T) msg.obj);
+            } else if (msg.what == 1) {
+                Toast.makeText(view.getContext(), (String) msg.obj, Toast.LENGTH_LONG).show();
+            } else {
+                view.setClickable(true);
+            }
             return false;
         });
+        view.setClickable(false);
         new Thread(() -> {
             Looper.prepare();
-            handler.sendMessage(new Message());
+            try {
+                T t = supplier.get();
+                handler.sendMessage(build(0, t));
+            } catch (Warn e) {
+                handler.sendMessage(build(1, e.getMessage()));
+            } catch (Exception e) {
+                handler.sendMessage(build(1, "系统错误:" + e.getMessage()));
+            } finally {
+                handler.sendMessage(build(2, null));
+            }
         }).start();
+    }
+
+    /**
+     * 消息构建
+     * @param what 类型
+     * @param obj  数据
+     * @return Message
+     */
+    private static Message build(int what, Object obj) {
+        Message msg = new Message();
+        msg.what = what;
+        msg.obj = obj;
+        return msg;
     }
 
 }
