@@ -99,8 +99,8 @@ public class Calc<T> {
         int ex = (int) (all.sx * 1f / 20f + all.ex * 19f / 20f + 0.5f);
         float diff = (ex - sx) / 5f;
         for (int i = 0; i < 5; i++) {
-            sxs[i] = (int) (sx / 5 * (5 - i) + ex / 5 * i + 3.5f);
-            exs[i] = (int) (sx / 5 * (5 - i) + ex / 5 * i + diff - 3.5f);
+            sxs[i] = (int) ((float) sx / 5 * (5 - i) + (float) ex / 5 * i + 3.5f);
+            exs[i] = (int) ((float) sx / 5 * (5 - i) + (float) ex / 5 * i + diff - 3.5f);
         }
         int sy = (int) (all.sy / 10f * 8f + rect.sy / 10f * 2f + 0.5f);
         int ey = (int) (all.sy / 10f + rect.sy / 10f * 9f + 0.5f);

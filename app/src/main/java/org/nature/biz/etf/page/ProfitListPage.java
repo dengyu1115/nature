@@ -73,7 +73,7 @@ public class ProfitListPage extends ListPage<Profit> {
     @Injection
     private ItemMapper itemMapper;
     private DateSelector dateStart, dateEnd;
-    private Button item, rule, total;
+    private Button item, rule, total, chart;
     private Selector<String> dateRule;
     private Map<String, String> nameMap;
 
@@ -95,6 +95,7 @@ public class ProfitListPage extends ListPage<Profit> {
     @Override
     protected void initHeaderViews(LinearLayout condition) {
         condition.addView(total = template.button("总览", 4, 7));
+        condition.addView(chart = template.button("图", 4, 7));
         condition.addView(dateRule = template.selector(12, 7));
         condition.addView(dateStart = template.datePiker(10, 7));
         condition.addView(dateEnd = template.datePiker(10, 7));
@@ -105,6 +106,7 @@ public class ProfitListPage extends ListPage<Profit> {
     @Override
     protected void initHeaderBehaviours() {
         ClickUtil.onClick(total, () -> this.show(ProfitViewPage.class, this.getParam()));
+        ClickUtil.onClick(chart, () -> this.show(ProfitChartPage.class, this.listData()));
         dateRule.mapper(dateRuleMap::get);
         dateRule.onChangeRun(this::toggleDateBtn);
         dateRule.setData(dateRuleList);

@@ -49,9 +49,8 @@ public class ClickUtil {
      * @param supplier 执行逻辑
      */
     public static void onAsyncClick(View view, Supplier<String> supplier) {
-        view.setOnClickListener(v -> ClickUtil.asyncExec(v, supplier, i -> {
-            Toast.makeText(view.getContext(), i, Toast.LENGTH_LONG).show();
-        }));
+        view.setOnClickListener(v -> ClickUtil.asyncExec(v, supplier,
+                i -> Toast.makeText(view.getContext(), i, Toast.LENGTH_LONG).show()));
     }
 
     /**

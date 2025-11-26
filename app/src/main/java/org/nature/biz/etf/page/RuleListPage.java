@@ -105,6 +105,7 @@ public class RuleListPage extends ListPage<Rule> {
         this.base.setValue(d.getBase().toPlainString());
         this.ratio.setValue(d.getRatio().toPlainString());
         this.expansion.setValue(d.getExpansion().toPlainString());
+        this.typeSel.setValue(d.getRuleType());
         this.statusSel.setValue(d.getStatus());
         template.confirm("编辑-" + d.getName(), page, () -> this.doEdit(ruleMapper::merge));
     }
@@ -200,7 +201,7 @@ public class RuleListPage extends ListPage<Rule> {
         statusSel.mapper(this::statusName);
         statusSel.setData(Arrays.asList("1", "0"));
         typeSel.mapper(this::typeName);
-        typeSel.setData(Arrays.asList("0", "1", "2"));
+        typeSel.setData(Arrays.asList("0", "1", "2", "3"));
     }
 
     /**
@@ -218,7 +219,7 @@ public class RuleListPage extends ListPage<Rule> {
      * @return String
      */
     private String typeName(String i) {
-        return Map.of("0", "网格", "1", "网格定投", "2", "复利").get(i);
+        return Map.of("0", "网格", "1", "网格定投", "3", "网格加投", "2", "复利").get(i);
     }
 
     private void save(Rule rule) {

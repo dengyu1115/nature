@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import lombok.Getter;
+import lombok.Setter;
 import org.nature.common.exception.Warn;
 
 import java.util.ArrayList;
@@ -35,7 +37,9 @@ public class Tab<T> extends LinearLayout {
     private final LinearLayout row;
     private final List<LinearLayout> tabs;
     private Consumer<T> onChange;
+    @Setter
     private Function<T, String> mapper;
+    @Getter
     private T value;
 
     public Tab(Context context, int width, int height, int columns) {
@@ -49,10 +53,6 @@ public class Tab<T> extends LinearLayout {
         this.addView(hsv = this.buildHorizontalscrollview());
         hsv.addView(this.row = this.buildRowView());
         this.tabs = new ArrayList<>();
-    }
-
-    public void setMapper(Function<T, String> mapper) {
-        this.mapper = mapper;
     }
 
     public void setData(List<T> data) {
@@ -69,10 +69,6 @@ public class Tab<T> extends LinearLayout {
                 this.doSelectItem(datum, tab);
             }
         }
-    }
-
-    public T getValue() {
-        return value;
     }
 
     public void onChange(Consumer<T> consumer) {

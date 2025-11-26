@@ -13,7 +13,9 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class CompoundSimulator implements Simulator {
+import static java.math.RoundingMode.CEILING;
+
+public class GridDtSimulator implements Simulator {
 
     public static final int SCALE = 3;
     public static final int SCALE_PROFIT = SCALE + 1;
@@ -37,7 +39,7 @@ public class CompoundSimulator implements Simulator {
     private BigDecimal returned;
     private BigDecimal shareTotal;
     private BigDecimal last;
-    private BigDecimal max, min, profitRatio, unitPrice;
+    private BigDecimal max, min, profitRatio;
 
     private int timesBuy, timesSell, level;
 
@@ -45,8 +47,8 @@ public class CompoundSimulator implements Simulator {
     private List<String> dates;
     private String date, start, dateStart, dateEnd;
 
-    public CompoundSimulator(List<Kline> list, String date, List<String> dates,
-                             BigDecimal amountBase, BigDecimal percent, BigDecimal expansion) {
+    public GridDtSimulator(List<Kline> list, String date, List<String> dates,
+                           BigDecimal amountBase, BigDecimal percent, BigDecimal expansion) {
         if (dates == null) {
             throw new Warn("日期数据为null");
         }
@@ -68,7 +70,6 @@ public class CompoundSimulator implements Simulator {
         this.returned = BigDecimal.ZERO;
         this.shareTotal = BigDecimal.ZERO;
         this.amountBase = amountBase;
-        this.unitPrice = amountBase;
         this.percentBuy = BigDecimal.ONE.subtract(percent);
         this.percentSell = BigDecimal.ONE.add(percent);
         this.expansion = expansion;
@@ -138,7 +139,9 @@ public class CompoundSimulator implements Simulator {
         int i = Math.min(holds.size(), count);
         for (Hold hold : holds.subList(0, i)) {
             hold.setDateSell(DateUtil.today());
-            hold.setPriceSell(hold.getPriceMark().multiply(percentSell).setScale(SCALE, RoundingMode.CEILING));
+            BigDecimal priceSell = hold.getPriceMark().multiply(percentSell).setScale(SCALE, CEILING);
+            hold.setPriceSell(priceSell);
+            hold.setShareSell(this.calcShare(priceSell));
             hold.setProfit(hold.getPriceSell().subtract(hold.getPriceBuy()).multiply(hold.getShareBuy()));
             results.add(hold);
         }
@@ -186,9 +189,10 @@ public class CompoundSimulator implements Simulator {
         profit.setPaidLeft(paidLeft);
         profit.setReturned(returned);
         profit.setShareTotal(shareTotal);
-        profit.setProfitTotal(profitSold.add(profitHold));
         profit.setProfitHold(profitHold);
         profit.setProfitSold(profitSold);
+        BigDecimal profitTotal = profitHold.add(profitSold);
+        profit.setProfitTotal(profitTotal);
         profit.setProfitRatio(paidMax.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO
                 : profitSold.divide(paidMax, SCALE_PROFIT, RoundingMode.HALF_UP));
         return profit;
@@ -235,7 +239,8 @@ public class CompoundSimulator implements Simulator {
         }
         BigDecimal open = curr.getOpen();
         BigDecimal price = target.compareTo(open) > 0 ? open : target;
-        BigDecimal share = this.calcShare(price);
+        BigDecimal shareBuy = this.calcShare(price);
+        BigDecimal shareMark = this.calcShare(target);
         Hold hold = new Hold();
         hold.setCode(curr.getCode());
         hold.setType(curr.getType());
@@ -243,12 +248,13 @@ public class CompoundSimulator implements Simulator {
         hold.setLevel(level);
         hold.setPriceMark(target);
         hold.setPriceBuy(price);
-        hold.setShareBuy(share);
+        hold.setShareBuy(shareBuy);
+        hold.setShareMark(shareMark);
         hold.setReason(holds.isEmpty() ? "empty" : "compare");
         holdsTemp.add(hold);
         holdList.add(hold);
-        BigDecimal money = price.multiply(share);
-        shareTotal = shareTotal.add(share);
+        BigDecimal money = price.multiply(shareBuy);
+        shareTotal = shareTotal.add(shareBuy);
         paidTotal = paidTotal.add(money);
         paidLeft = paidLeft.add(money);
         if (paidLeft.compareTo(paidMax) > 0) {
@@ -263,34 +269,33 @@ public class CompoundSimulator implements Simulator {
             return false;
         }
         Hold first = holds.first();
-        BigDecimal mark = first.getPriceMark();
+        BigDecimal priceMark = first.getPriceMark();
         BigDecimal priceBuy = first.getPriceBuy();
-        BigDecimal share = first.getShareBuy();
-        BigDecimal target = mark.multiply(percentSell).setScale(SCALE, RoundingMode.CEILING);
+        BigDecimal target = priceMark.multiply(percentSell).setScale(SCALE, RoundingMode.CEILING);
         BigDecimal high = curr.getHigh();
         if (target.compareTo(high) > 0) {
             return false;
         }
         BigDecimal open = curr.getOpen();
         BigDecimal priceSell = target.compareTo(open) < 0 ? open : target;
-        BigDecimal profit = priceSell.subtract(priceBuy).multiply(share);
+        BigDecimal shareSell = this.calcShare(priceSell);
+        // 计算已卖出利润
+        BigDecimal profit = priceSell.subtract(priceBuy).multiply(shareSell);
         first.setDateSell(curr.getDate());
-        first.setShareSell(first.getShareBuy());
+        first.setShareSell(shareSell);
         first.setPriceSell(priceSell);
         first.setProfit(profit);
+        // 已卖出利润累计
         this.profitSold = this.profitSold.add(profit);
         if (holds.size() == 1) {
             this.last = holds.first().getPriceMark();
         }
         this.holds.remove(first);
-        BigDecimal money = priceBuy.multiply(share);
-        shareTotal = shareTotal.subtract(share);
+        // 计算回收金额
+        BigDecimal money = priceBuy.multiply(shareSell);
+        shareTotal = shareTotal.subtract(shareSell);
         paidLeft = paidLeft.subtract(money);
         returned = returned.add(money);
-        BigDecimal moneySell = priceSell.multiply(share);
-        if (moneySell.compareTo(unitPrice) > 0) {
-            unitPrice = moneySell;
-        }
         timesSell++;
         return true;
     }
@@ -315,7 +320,7 @@ public class CompoundSimulator implements Simulator {
             ratio = BigDecimal.ZERO;
         }
         BigDecimal expansionRatio = BigDecimal.ONE.add(BigDecimal.ONE.subtract(ratio).multiply(expansion));
-        return unitPrice.multiply(expansionRatio)
+        return amountBase.multiply(BigDecimal.ONE.add(profitRatio)).multiply(expansionRatio)
                 .divide(price.multiply(HUNDRED), 0, RoundingMode.CEILING).multiply(HUNDRED);
     }
 
@@ -344,7 +349,9 @@ public class CompoundSimulator implements Simulator {
         hold.setPriceMark(price);
         hold.setPriceBuy(price);
         hold.setDateBuy(DateUtil.today());
-        hold.setShareBuy(this.calcShare(price));
+        BigDecimal shareMark = this.calcShare(price);
+        hold.setShareMark(shareMark);
+        hold.setShareBuy(shareMark);
         return hold;
     }
 

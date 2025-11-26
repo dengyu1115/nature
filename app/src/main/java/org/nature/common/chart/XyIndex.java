@@ -3,7 +3,7 @@ package org.nature.common.chart;
 /**
  * 坐标类
  */
-class XyIndex {
+public class XyIndex {
     /**
      * x起始位置
      */

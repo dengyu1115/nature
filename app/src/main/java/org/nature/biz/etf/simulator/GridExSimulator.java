@@ -1,5 +1,6 @@
 package org.nature.biz.etf.simulator;
 
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 import org.nature.biz.common.model.Kline;
 import org.nature.biz.etf.model.Hold;
@@ -27,6 +28,7 @@ public class GridExSimulator implements Simulator {
     private final List<Kline> list;
     private final SortedSet<Hold> holds;
     private final SortedSet<Hold> holdsTemp;
+    @Getter
     private final List<Hold> holdList;
     private final List<Profit> profits;
 
@@ -34,8 +36,6 @@ public class GridExSimulator implements Simulator {
     private BigDecimal paidTotal;
     private BigDecimal paidLeft;
     private BigDecimal paidMax;
-    private BigDecimal markLeft;
-    private BigDecimal markMax;
     private BigDecimal returned;
     private BigDecimal shareTotal;
     private BigDecimal last;
@@ -60,15 +60,13 @@ public class GridExSimulator implements Simulator {
         this.dateStart = date;
         this.dateEnd = dates.get(dates.size() - 1);
         this.dates = dates;
-        this.holds = new TreeSet<>(Comparator.comparing(Hold::getMark));
-        this.holdsTemp = new TreeSet<>(Comparator.comparing(Hold::getMark));
+        this.holds = new TreeSet<>(Comparator.comparing(Hold::getPriceMark));
+        this.holdsTemp = new TreeSet<>(Comparator.comparing(Hold::getPriceMark));
         this.holdList = new ArrayList<>();
         this.profitSold = BigDecimal.ZERO;
         this.paidTotal = BigDecimal.ZERO;
         this.paidLeft = BigDecimal.ZERO;
         this.paidMax = BigDecimal.ZERO;
-        this.markLeft = BigDecimal.ZERO;
-        this.markMax = BigDecimal.ZERO;
         this.returned = BigDecimal.ZERO;
         this.shareTotal = BigDecimal.ZERO;
         this.amountBase = amountBase;
@@ -119,10 +117,6 @@ public class GridExSimulator implements Simulator {
         }
     }
 
-    public List<Hold> getHoldList() {
-        return this.holdList;
-    }
-
     public List<Hold> latestHandle() {
         String date = this.curr.getDate();
         return holdList.stream().filter(i -> date.equals(i.getDateBuy()) || date.equals(i.getDateSell()))
@@ -131,13 +125,13 @@ public class GridExSimulator implements Simulator {
 
     public List<Hold> nextHandle(int count) {
         List<Hold> holds = holdList.stream().filter(i -> i.getDateSell() == null)
-                .sorted(Comparator.comparing(Hold::getDateBuy).reversed().thenComparing(Hold::getMark))
+                .sorted(Comparator.comparing(Hold::getDateBuy).reversed().thenComparing(Hold::getPriceMark))
                 .collect(Collectors.toList());
         Hold latest = holds.stream().findFirst().orElse(null);
         if (latest == null && last == null) {
             return new ArrayList<>();
         }
-        BigDecimal mark = last == null ? latest.getMark() : last;
+        BigDecimal mark = last == null ? latest.getPriceMark() : last;
         List<Hold> results = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             results.add(this.build(mark = mark.multiply(percentBuy).setScale(SCALE, RoundingMode.FLOOR)));
@@ -145,7 +139,7 @@ public class GridExSimulator implements Simulator {
         int i = Math.min(holds.size(), count);
         for (Hold hold : holds.subList(0, i)) {
             hold.setDateSell(DateUtil.today());
-            BigDecimal priceSell = hold.getMark().multiply(percentSell).setScale(SCALE, CEILING);
+            BigDecimal priceSell = hold.getPriceMark().multiply(percentSell).setScale(SCALE, CEILING);
             hold.setPriceSell(priceSell);
             hold.setShareSell(this.calcShare(priceSell));
             hold.setProfit(hold.getPriceSell().subtract(hold.getPriceBuy()).multiply(hold.getShareBuy()));
@@ -195,11 +189,12 @@ public class GridExSimulator implements Simulator {
         profit.setPaidLeft(paidLeft);
         profit.setReturned(returned);
         profit.setShareTotal(shareTotal);
-        profit.setProfitTotal(profitHold);
         profit.setProfitHold(profitHold);
         profit.setProfitSold(profitSold);
-        profit.setProfitRatio(markMax.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO
-                : profitSold.divide(markMax, SCALE_PROFIT, RoundingMode.HALF_UP));
+        BigDecimal profitTotal = profitHold.add(profitSold);
+        profit.setProfitTotal(profitTotal);
+        profit.setProfitRatio(paidMax.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO
+                : profitSold.divide(paidMax, SCALE_PROFIT, RoundingMode.HALF_UP));
         return profit;
     }
 
@@ -226,7 +221,7 @@ public class GridExSimulator implements Simulator {
             while (!holdsTemp.isEmpty()) {
                 Hold hold = holdsTemp.last();
                 holdsTemp.remove(hold);
-                hold.setMark(holds.first().getMark().multiply(percentBuy).setScale(SCALE, RoundingMode.FLOOR));
+                hold.setPriceMark(holds.first().getPriceMark().multiply(percentBuy).setScale(SCALE, RoundingMode.FLOOR));
                 holds.add(hold);
             }
         }
@@ -237,35 +232,33 @@ public class GridExSimulator implements Simulator {
             return false;
         }
         BigDecimal low = curr.getLow();
-        BigDecimal mark = holdsTemp.isEmpty() ? last : holdsTemp.first().getMark();
+        BigDecimal mark = holdsTemp.isEmpty() ? last : holdsTemp.first().getPriceMark();
         BigDecimal target = mark.multiply(percentBuy).setScale(SCALE, RoundingMode.FLOOR);
         if (low.compareTo(target) > 0) {
             return false;
         }
         BigDecimal open = curr.getOpen();
         BigDecimal price = target.compareTo(open) > 0 ? open : target;
-        BigDecimal share = this.calcShare(price);
+        BigDecimal shareBuy = this.calcShare(price);
+        BigDecimal shareMark = this.calcShare(target);
         Hold hold = new Hold();
         hold.setCode(curr.getCode());
         hold.setType(curr.getType());
         hold.setDateBuy(curr.getDate());
         hold.setLevel(level);
-        hold.setMark(target);
+        hold.setPriceMark(target);
         hold.setPriceBuy(price);
-        hold.setShareBuy(share);
+        hold.setShareBuy(shareBuy);
+        hold.setShareMark(shareMark);
         hold.setReason(holds.isEmpty() ? "empty" : "compare");
         holdsTemp.add(hold);
         holdList.add(hold);
-        BigDecimal money = price.multiply(share);
-        shareTotal = shareTotal.add(share);
+        BigDecimal money = price.multiply(shareBuy);
+        shareTotal = shareTotal.add(shareBuy);
         paidTotal = paidTotal.add(money);
         paidLeft = paidLeft.add(money);
         if (paidLeft.compareTo(paidMax) > 0) {
             paidMax = paidLeft;
-        }
-        markLeft = markLeft.add(money);
-        if (markLeft.compareTo(markMax) > 0) {
-            markMax = markLeft;
         }
         timesBuy++;
         return true;
@@ -276,40 +269,40 @@ public class GridExSimulator implements Simulator {
             return false;
         }
         Hold first = holds.first();
-        BigDecimal mark = first.getMark();
+        BigDecimal priceMark = first.getPriceMark();
         BigDecimal priceBuy = first.getPriceBuy();
-        BigDecimal share = first.getShareBuy();
-        BigDecimal target = mark.multiply(percentSell).setScale(SCALE, RoundingMode.CEILING);
+        BigDecimal shareSell = first.getShareMark();
+        BigDecimal target = priceMark.multiply(percentSell).setScale(SCALE, RoundingMode.CEILING);
         BigDecimal high = curr.getHigh();
         if (target.compareTo(high) > 0) {
             return false;
         }
         BigDecimal open = curr.getOpen();
         BigDecimal priceSell = target.compareTo(open) < 0 ? open : target;
-        BigDecimal profit = priceSell.subtract(priceBuy).multiply(share);
+        // 计算已卖出利润
+        BigDecimal profit = priceSell.subtract(priceBuy).multiply(shareSell);
         first.setDateSell(curr.getDate());
-        BigDecimal shareSell = this.calcShare(priceSell);
         first.setShareSell(shareSell);
         first.setPriceSell(priceSell);
         first.setProfit(profit);
+        // 已卖出利润累计
         this.profitSold = this.profitSold.add(profit);
         if (holds.size() == 1) {
-            this.last = holds.first().getMark();
+            this.last = holds.first().getPriceMark();
         }
         this.holds.remove(first);
+        // 计算回收金额
         BigDecimal money = priceBuy.multiply(shareSell);
-        BigDecimal moneyMark = priceBuy.multiply(share);
         shareTotal = shareTotal.subtract(shareSell);
         paidLeft = paidLeft.subtract(money);
         returned = returned.add(money);
-        markLeft = markLeft.subtract(moneyMark);
         timesSell++;
         return true;
     }
 
     private void calcLast() {
         if (!this.holds.isEmpty()) {
-            this.last = holds.first().getMark();
+            this.last = holds.first().getPriceMark();
             return;
         }
         BigDecimal latest = curr.getLatest();
@@ -339,11 +332,11 @@ public class GridExSimulator implements Simulator {
         if (this.min == null || this.min.compareTo(latest) > 0) {
             this.min = latest;
         }
-        if (markMax.compareTo(BigDecimal.ZERO) == 0) {
+        if (paidMax.compareTo(BigDecimal.ZERO) == 0) {
             this.profitRatio = BigDecimal.ZERO;
             return;
         }
-        BigDecimal ratio = profitSold.divide(markMax, SCALE_PROFIT, RoundingMode.HALF_UP);
+        BigDecimal ratio = profitSold.divide(paidMax, SCALE_PROFIT, RoundingMode.HALF_UP);
         if (ratio.compareTo(profitRatio) > 0) {
             this.profitRatio = ratio;
         }
@@ -353,10 +346,12 @@ public class GridExSimulator implements Simulator {
         Hold hold = new Hold();
         hold.setCode(curr.getCode());
         hold.setType(curr.getType());
-        hold.setMark(price);
+        hold.setPriceMark(price);
         hold.setPriceBuy(price);
         hold.setDateBuy(DateUtil.today());
-        hold.setShareBuy(this.calcShare(price));
+        BigDecimal shareMark = this.calcShare(price);
+        hold.setShareMark(shareMark);
+        hold.setShareBuy(shareMark);
         return hold;
     }
 

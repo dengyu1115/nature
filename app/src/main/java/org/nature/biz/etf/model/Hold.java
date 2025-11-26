@@ -54,7 +54,7 @@ public class Hold extends BaseModel {
     /**
      * 标记价格
      */
-    private BigDecimal mark;
+    private BigDecimal priceMark;
     /**
      * 买入价格
      */
@@ -63,6 +63,10 @@ public class Hold extends BaseModel {
      * 卖出价格
      */
     private BigDecimal priceSell;
+    /**
+     * 标记份额
+     */
+    private BigDecimal shareMark;
     /**
      * 买入份额
      */

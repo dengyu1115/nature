@@ -33,11 +33,15 @@ public abstract class BaseBsPage extends ListPage<Hold> {
                     Table.header("卖出", d -> TextUtil.text(d.getDateSell()), C, S, Hold::getDateSell))
             ),
             Table.header("价格", C, Arrays.asList(
-                    Table.header("标记", d -> TextUtil.price(d.getMark()), C, E, Hold::getMark),
+                    Table.header("标记", d -> TextUtil.price(d.getPriceMark()), C, E, Hold::getPriceMark),
                     Table.header("买入", d -> TextUtil.price(d.getPriceBuy()), C, E, Hold::getPriceBuy),
                     Table.header("卖出", d -> TextUtil.price(d.getPriceSell()), C, E, Hold::getPriceSell))
             ),
-            Table.header("份额", d -> TextUtil.text(d.getShareBuy()), C, E, Hold::getShareBuy),
+            Table.header("份额", C, Arrays.asList(
+                    Table.header("标记", d -> TextUtil.text(d.getShareMark()), C, E, Hold::getShareMark),
+                    Table.header("买入", d -> TextUtil.text(d.getShareBuy()), C, E, Hold::getShareBuy),
+                    Table.header("卖出", d -> TextUtil.text(d.getShareSell()), C, E, Hold::getShareSell))
+            ),
             Table.header("金额", C, Arrays.asList(
                     Table.header("买入", d -> TextUtil.amount(this.getAmountBuy(d)), C, E, this::getAmountBuy),
                     Table.header("卖出", d -> TextUtil.amount(this.getAmountSell(d)), C, E, this::getAmountSell),

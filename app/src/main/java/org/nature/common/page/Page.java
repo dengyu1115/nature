@@ -74,6 +74,10 @@ public abstract class Page {
         this.basic.show(clz, param);
     }
 
+    protected boolean canGoBack(){
+        return true;
+    }
+
     /**
      * 页面布局创建
      */

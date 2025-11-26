@@ -14,7 +14,10 @@ public class SimulatorBuilder {
             return new GridSimulator(list, date, dates, rule.getBase(), rule.getRatio(), rule.getExpansion());
         }
         if ("1".equals(ruleType)) {
-            return new GridSimulator(list, date, dates, rule.getBase(), rule.getRatio(), rule.getExpansion());
+            return new GridExSimulator(list, date, dates, rule.getBase(), rule.getRatio(), rule.getExpansion());
+        }
+        if ("3".equals(ruleType)) {
+            return new GridDtSimulator(list, date, dates, rule.getBase(), rule.getRatio(), rule.getExpansion());
         }
         return new CompoundSimulator(list, date, dates, rule.getBase(), rule.getRatio(), rule.getExpansion());
     }

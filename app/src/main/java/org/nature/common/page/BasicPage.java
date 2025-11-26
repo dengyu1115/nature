@@ -103,7 +103,11 @@ public class BasicPage extends LinearLayout {
      * 推出页面
      */
     public void dispose() {
-        Page page = pages.pop();
+        Page page = pages.peek();
+        if (!page.canGoBack()) {
+            return;
+        }
+        page = pages.pop();
         View view = page.get();
         if (pages.contains(page)) {
             view.setVisibility(GONE);
