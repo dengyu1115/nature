@@ -1,0 +1,18 @@
+package org.nature.html.model;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Res {
+
+    private String code;
+    private String message;
+    private Object data;
+
+}

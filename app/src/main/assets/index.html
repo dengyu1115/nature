@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0" />
+    <title>DSL布局测试</title>
+    <link rel="stylesheet" href="render/css/render.css" />
+    <style>
+      body {
+        width: 100vw;
+        height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <script type="module">
+        import DslParser from "./render/DslParser.js";
+        import Invoke from "./util/Invoker.js";
+        import message from "./util/Message.js";
+        window.invoke = new Invoke().invoke;
+        // 应用启动函数
+        function startApp() {
+          // 获取地址栏页面ID参数
+          const urlParams = new URLSearchParams(window.location.search);
+          const pageId = urlParams.get('id');
+          if (!pageId) {
+            message.error("页面ID不能为空");
+            return;
+          }
+          const config = invoke("page", pageId);
+          if (!config) {
+            message.error("页面不存在");
+            return;
+          }
+          const width = document.body.clientWidth;
+          const height = document.body.clientHeight;
+          config.styles.width = width + "px";
+          config.styles.height = height + "px";
+          new DslParser(config).parse().mount(document.body);
+        }
+        // 页面加载完成后启动应用
+        document.addEventListener("DOMContentLoaded", startApp);
+    </script>
+  </body>
+</html>
