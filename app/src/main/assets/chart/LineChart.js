@@ -3,15 +3,22 @@ import ChartBase from "./ChartBase.js";
 export default class LineChart extends ChartBase {
   constructor(canvas, config) {
     super(canvas, config);
-    this.config = config;
     this.hoverData = null;
     this.mouseX = 0;
     this.mouseY = 0;
+    this.formatters = Object.fromEntries(
+      Object.entries(this.config.yAxis).flatMap(([key, arr]) =>
+        arr
+          .filter((i) => i.formatter)
+          .map((i, idx) => [key + "_" + idx, i.formatter])
+      )
+    );
   }
 
   // 初始化图表
   init() {
     this.calcPositions();
+    this.initTransX();
     this.draw();
     this.setupEventListeners();
   }
@@ -19,10 +26,10 @@ export default class LineChart extends ChartBase {
   calcPositions() {
     const { width, height } = this.canvas;
     // 初始化 横纵 起止值
-    let xs = (this.config.paddingLeft || 0) * this.dpr;
-    let xe = (this.config.paddingRight || 0) * this.dpr;
-    let ys = (this.config.paddingTop || 0) * this.dpr;
-    let ye = (this.config.paddingBottom || 0) * this.dpr;
+    let xs = 0;
+    let xe = 0;
+    let ys = 0;
+    let ye = 0;
     if (this.config.title) {
       ys += 50 * this.dpr;
     }
@@ -150,7 +157,7 @@ export default class LineChart extends ChartBase {
   // 绘制网格线
   drawGridlines() {
     const count = 5;
-    const { x, y, width, height } = this.chartArea;
+    const { y, height } = this.chartArea;
 
     // 水平网格线
     super.drawHorizontalGridlines(y, height, count);
@@ -203,7 +210,7 @@ export default class LineChart extends ChartBase {
       if (i % Math.max(1, Math.floor(5 / scale)) === 0) {
         const xi = this.calcDatumIndex(i);
         const yi = y + height + 20 * this.dpr;
-        super.drawAxisLabel(xi, yi, labels[i] || `数据${i + 1}`);
+        super.drawAxisLabel(xi, yi, labels[i] || "");
       }
     }
     // Y轴标签 - 根据配置绘制
@@ -216,8 +223,12 @@ export default class LineChart extends ChartBase {
           const step = (max - min) / 5;
           const unit = axis.unit ? axis.unit : "";
           const aw = axis.width || 60;
+          const formatter = axis.formatter;
           for (let i = 0; i <= 5; i++) {
-            const text = (min + i * step).toFixed(1) + unit;
+            const text =
+              (formatter
+                ? formatter(min + i * step)
+                : (min + i * step).toFixed(1)) + unit;
             const xi =
               x +
               index * aw +
@@ -434,9 +445,11 @@ export default class LineChart extends ChartBase {
       if (!super.isLegendItemVisible(seriesIndex)) return;
       const value = datum[series.prop];
       if (value === undefined) return;
+      const axisKey = `${series.yAxis}_${series.yAxisIndex || 0}`;
+      const formatter = this.formatters[axisKey];
       points.push({
         seriesName: series.name,
-        value: value,
+        value: formatter ? formatter(value) : value,
         color: series.color,
       });
     });

@@ -131,20 +131,6 @@ public class TextUtil {
         return new BigDecimal(s);
     }
 
-    public static String string(EditText et) {
-        return et.getText().toString().trim();
-    }
-
-    public static BigDecimal decimal(EditText et) {
-        String val = et.getText().toString().trim();
-        if (val.isEmpty()) {
-            return null;
-        }
-        if (!NumberUtils.isCreatable(val)) {
-            throw new Warn("decimal format error:" + val);
-        }
-        return new BigDecimal(val);
-    }
 
     public static String join(String... arr) {
         return String.join(":", arr);

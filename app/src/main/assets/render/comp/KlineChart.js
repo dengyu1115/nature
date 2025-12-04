@@ -19,6 +19,11 @@ export default class KlineChart extends Base {
       spacing: 20,
       scale: 1,
       transX: 0,
+      formatter: {
+        kline: this.buildFormatter(this.props.klineFormatter),
+        share: this.buildFormatter(this.props.shareFormatter),
+        amount: this.buildFormatter(this.props.amountFormatter),
+      },
     };
     this.config.maList = this.props.maList.map((item) => {
       return {
@@ -62,5 +67,12 @@ export default class KlineChart extends Base {
       this.config.data = [];
       this.config.labels = [];
     }
+  }
+
+  buildFormatter(formatter) {
+    if (!formatter) {
+      return null;
+    }
+    return new Function(["value", "datum"], formatter);
   }
 }

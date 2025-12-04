@@ -3,20 +3,14 @@ import ChartBase from "./ChartBase.js";
 export default class KlineChart extends ChartBase {
   constructor(canvas, config) {
     super(canvas, config);
-    this.config = {
-      spacing: 20,
-      scale: 1,
-      transX: 0,
-      ...config,
-      colors: {
-        rising: "#ff0000",
-        falling: "#00ff00",
-        share: "#999999",
-        amount: "#0000ff",
-        axis: "#333",
-        grid: "#eee",
-        hidden: "#999",
-      },
+    this.config.colors = {
+      rising: "#ff0000",
+      falling: "#00ff00",
+      share: "#999999",
+      amount: "#0000ff",
+      axis: "#333",
+      grid: "#eee",
+      hidden: "#999",
     };
     config.maList.forEach((i) => {
       this.config.colors[i.key] = i.color;
@@ -26,6 +20,7 @@ export default class KlineChart extends ChartBase {
   // 初始化图表
   init() {
     this.calcPositions();
+    this.initTransX();
     this.draw();
     this.setupEventListeners();
   }
@@ -34,8 +29,8 @@ export default class KlineChart extends ChartBase {
     const { width, height } = this.canvas;
     const ys = (this.config.title ? 40 * this.dpr : 0) + 30 * this.dpr; // 标题+图例高度
     const ye = 50 * this.dpr; // X轴标签高度
-    const xs = 80 * this.dpr; // Y轴宽度
-    const xe = 80 * this.dpr;
+    const xs = 100 * this.dpr; // Y轴宽度
+    const xe = 100 * this.dpr;
 
     // 计算上下两个图表区域
     const chartHeight = height - ye - ys;
@@ -43,21 +38,13 @@ export default class KlineChart extends ChartBase {
     const shareHeight = chartHeight * 0.3;
     const gap = 20 * this.dpr;
 
-    this.chartAreas = {
+    this.chartArea = {
       x: xs,
       ky: ys,
       vy: ys + klineHeight + gap,
       width: width - xe - xs,
       kHeight: klineHeight,
       vHeight: shareHeight,
-    };
-
-    // 为基类提供chartArea属性以确保兼容性
-    this.chartArea = {
-      x: xs,
-      y: ys,
-      width: width - xe - xs,
-      height: chartHeight,
     };
   }
 
@@ -74,8 +61,8 @@ export default class KlineChart extends ChartBase {
     this.drawAxes();
     this.drawAxisLabels(yAxisRanges);
     // 设置裁剪区域，确保图形不超出坐标轴范围
-    const { x, ky, width, kHeight } = this.chartAreas;
-    const { vy, vHeight } = this.chartAreas;
+    const { x, ky, width, kHeight } = this.chartArea;
+    const { vy, vHeight } = this.chartArea;
     super.setClipArea(x, ky, width, kHeight);
     this.drawKLineArea(yAxisRanges);
     super.restoreClipArea();
@@ -149,7 +136,7 @@ export default class KlineChart extends ChartBase {
 
   // 绘制网格线
   drawGridlines() {
-    const { ky, vy, kHeight, vHeight } = this.chartAreas;
+    const { ky, vy, kHeight, vHeight } = this.chartArea;
     // 水平网格线
     super.drawHorizontalGridlines(ky, kHeight, 5, this.config.colors.grid);
     super.drawHorizontalGridlines(vy, vHeight, 3, this.config.colors.grid);
@@ -157,16 +144,16 @@ export default class KlineChart extends ChartBase {
     super.drawVerticalGridlines(
       (i) => this.calcDatumIndex(i),
       () => ({
-        start: this.chartAreas.ky,
-        end: this.chartAreas.ky + this.chartAreas.kHeight,
+        start: this.chartArea.ky,
+        end: this.chartArea.ky + this.chartArea.kHeight,
       }),
       this.config.colors.grid
     );
     super.drawVerticalGridlines(
       (i) => this.calcDatumIndex(i),
       () => ({
-        start: this.chartAreas.vy,
-        end: this.chartAreas.vy + this.chartAreas.vHeight,
+        start: this.chartArea.vy,
+        end: this.chartArea.vy + this.chartArea.vHeight,
       }),
       this.config.colors.grid
     );
@@ -181,7 +168,7 @@ export default class KlineChart extends ChartBase {
 
   // 绘制X轴
   drawXAxis() {
-    const { x, vy, vHeight, width } = this.chartAreas;
+    const { x, vy, vHeight, width } = this.chartArea;
     super.drawAxisLine(
       x - 25 * this.dpr,
       vy + vHeight,
@@ -192,7 +179,7 @@ export default class KlineChart extends ChartBase {
 
   // 绘制Y轴
   drawYAxes() {
-    const { x, ky, vy, width, kHeight, vHeight } = this.chartAreas;
+    const { x, ky, vy, width, kHeight, vHeight } = this.chartArea;
     const lx = x - 25 * this.dpr;
     const rx = x + width + 25 * this.dpr;
     // K线图区域Y轴
@@ -215,7 +202,7 @@ export default class KlineChart extends ChartBase {
   drawXAxisLabels() {
     const { scale } = this.config;
     const { start, end } = this.dataRangeIndices;
-    const { vy, vHeight } = this.chartAreas;
+    const { vy, vHeight } = this.chartArea;
     const labels = this.config.labels || [];
     for (let i = start; i <= end; i++) {
       if (i % Math.max(1, Math.floor((5 * this.dpr) / scale)) === 0) {
@@ -228,12 +215,15 @@ export default class KlineChart extends ChartBase {
 
   // 绘制Y轴标签
   drawYAxisLabels(yAxisRanges) {
-    const { x, ky, vy, width, kHeight, vHeight } = this.chartAreas;
+    const { x, ky, vy, width, kHeight, vHeight } = this.chartArea;
     // K线图区域Y轴标签
     const { max: kMax, min: kMin } = yAxisRanges["kline"];
+    const kFormatter = this.config.formatter?.kline;
     const kStep = (kMax - kMin) / 5;
     for (let i = 0; i <= 5; i++) {
-      const text = (kMin + i * kStep).toFixed(3);
+      const text = kFormatter
+        ? kFormatter(kMin + i * kStep)
+        : (kMin + i * kStep).toFixed(3);
       const xi = x - 30 * this.dpr;
       const yi = ky + kHeight - (i * kHeight) / 5 + 4 * this.dpr;
       super.drawAxisLabel(xi, yi, text, "right", this.config.colors.axis);
@@ -248,12 +238,18 @@ export default class KlineChart extends ChartBase {
     // 交易量区域Y轴标签 (合并左右两侧)
     const shareData = yAxisRanges["share"];
     const amountData = yAxisRanges["amount"];
+    const sFormatter = this.config.formatter?.share;
+    const aFormatter = this.config.formatter?.amount;
     const sStep = (shareData.max - shareData.min) / 3;
     const aStep = (amountData.max - amountData.min) / 3;
     for (let i = 0; i <= 3; i++) {
       // 左侧标签
-      const sText = Math.round(shareData.min + i * sStep);
-      const aText = Math.round(amountData.min + i * aStep);
+      const sText = sFormatter
+        ? sFormatter(shareData.min + i * sStep)
+        : Math.round(shareData.min + i * sStep);
+      const aText = aFormatter
+        ? aFormatter(amountData.min + i * aStep)
+        : Math.round(amountData.min + i * aStep);
       const xi = x - 30 * this.dpr;
       const yi = vy + vHeight - (i * vHeight) / 3 + 4 * this.dpr;
       super.drawAxisLabel(xi, yi, sText, "right", this.config.colors.axis);
@@ -274,7 +270,7 @@ export default class KlineChart extends ChartBase {
     const klineData = this.config.data;
     const { min, max } = yAxisRange;
     const { start, end } = this.dataRangeIndices;
-    const { ky, kHeight } = this.chartAreas;
+    const { ky, kHeight } = this.chartArea;
     const candleWidth = Math.max(
       1,
       Math.min(10 * this.dpr, spacing * scale * 0.8)
@@ -329,7 +325,7 @@ export default class KlineChart extends ChartBase {
     const klineData = this.config.data;
     const { min, max } = yAxisRange;
     const { start, end } = this.dataRangeIndices;
-    const { ky, kHeight } = this.chartAreas;
+    const { ky, kHeight } = this.chartArea;
     this.ctx.beginPath();
     this.ctx.strokeStyle = color;
     this.ctx.lineWidth = 1 * this.dpr;
@@ -358,7 +354,7 @@ export default class KlineChart extends ChartBase {
     const klineData = this.config.data;
     const { min, max } = yAxisRanges[type];
     const { start, end } = this.dataRangeIndices;
-    const { vy, vHeight } = this.chartAreas;
+    const { vy, vHeight } = this.chartArea;
     const barWidth = Math.max(
       1 * this.dpr,
       Math.min(10 * this.dpr, spacing * scale * 0.4)
@@ -518,27 +514,27 @@ export default class KlineChart extends ChartBase {
     const datum = data[index];
 
     if (!datum) return points;
-
+    const kFormatter = this.config.formatter?.kline;
     // 收集K线数据
     if (super.isLegendItemVisible("kline")) {
       points.push({
         seriesName: "开盘价",
-        value: datum.open,
+        value: kFormatter ? kFormatter(datum.open) : datum.open,
         color: this.config.colors.rising,
       });
       points.push({
         seriesName: "最高价",
-        value: datum.high,
+        value: kFormatter ? kFormatter(datum.high) : datum.high,
         color: this.config.colors.rising,
       });
       points.push({
         seriesName: "最低价",
-        value: datum.low,
+        value: kFormatter ? kFormatter(datum.low) : datum.low,
         color: this.config.colors.falling,
       });
       points.push({
         seriesName: "收盘价",
-        value: datum.latest,
+        value: kFormatter ? kFormatter(datum.latest) : datum.latest,
         color: this.config.colors.falling,
       });
     }
@@ -551,24 +547,28 @@ export default class KlineChart extends ChartBase {
         const color = this.config.colors[config.key] || "#0000ff";
         points.push({
           seriesName: config.name,
-          value: datum[config.key].toFixed(3),
+          value: kFormatter
+            ? kFormatter(datum[config.key])
+            : datum[config.key].toFixed(3),
           color: color,
         });
       }
     });
     // 收集交易量数据
     if (super.isLegendItemVisible("share") && datum.share !== undefined) {
+      const sFormatter = this.config.formatter?.share;
       points.push({
         seriesName: "交易量",
-        value: datum.share,
+        value: sFormatter ? sFormatter(datum.share) : datum.share,
         color: this.config.colors.share,
       });
     }
     // 收集交易金额数据
     if (super.isLegendItemVisible("amount") && datum.amount !== undefined) {
+      const aFormatter = this.config.formatter?.amount;
       points.push({
         seriesName: "交易金额",
-        value: datum.amount,
+        value: aFormatter ? aFormatter(datum.amount) : datum.amount,
         color: this.config.colors.amount,
       });
     }

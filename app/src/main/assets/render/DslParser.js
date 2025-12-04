@@ -15,6 +15,7 @@ import Table from "./comp/Table.js";
 import Text from "./comp/Text.js";
 import Tree from "./comp/Tree.js";
 import Modal from "./comp/Modal.js";
+import TextUtil from "../util/TextUtil.js";
 
 // DSL解析器
 export default class DslParser {
@@ -22,6 +23,7 @@ export default class DslParser {
     // 创建一个Designer实例
     this.dsl = dsl;
     window.mountedCompMap = {};
+    window.TextUtil = TextUtil;
   }
 
   create(type, props, styles, events, data) {

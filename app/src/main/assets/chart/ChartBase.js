@@ -28,6 +28,14 @@ export default class ChartBase {
     this.hiddenLegendItems = new Set();
   }
 
+  initTransX() {
+    // 设置默认显示末端数据
+    const width = this.chartArea.width || 0;
+    const maxIndex = (this.config.data?.length || 0) - 1;
+    const spacing = this.config.spacing * this.config.scale;
+    this.config.transX = width - maxIndex * spacing;
+  }
+
   // 计算可见数据下标范围的通用方法
   calcDataRangeIndices(length) {
     const { spacing, transX, scale } = this.config;

@@ -8,10 +8,12 @@ import com.alibaba.fastjson.TypeReference;
 import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
+import org.nature.common.util.Md5Util;
 import org.nature.html.mapper.PageConfigMapper;
 import org.nature.html.model.PageConfig;
 import org.nature.html.model.Res;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,6 +57,8 @@ public class NativeManager {
         switch (name) {
             case "page":
                 return this.page(param);
+            case "md5":
+                return this.md5(param);
             case "http":
                 return this.http(param);
             case "list":
@@ -72,6 +76,11 @@ public class NativeManager {
         String id = JSON.parseObject(param, String.class);
         PageConfig config = pageConfigMapper.findById(id);
         return config == null ? null : JSON.parseObject(config.getConfig());
+    }
+
+    private Object md5(String param) {
+        List<String> list = JSON.parseArray(param, String.class);
+        return Md5Util.md5(list.toArray(new String[0]));
     }
 
     private Object http(String param) {

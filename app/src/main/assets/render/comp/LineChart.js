@@ -33,6 +33,7 @@ export default class LineChart extends Base {
         label: i.title,
         unit: i.unit,
         width: this.getVal(i.width, 80),
+        formatter: this.buildFormatter(i.formatter),
       });
       return map;
     }, {});
@@ -83,6 +84,13 @@ export default class LineChart extends Base {
       this.config.data = [];
       this.config.labels = [];
     }
+  }
+
+  buildFormatter(formatter) {
+    if (!formatter) {
+      return null;
+    }
+    return new Function(["value", "datum"], formatter);
   }
 
   /**
