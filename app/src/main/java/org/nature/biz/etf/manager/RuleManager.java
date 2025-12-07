@@ -2,9 +2,7 @@ package org.nature.biz.etf.manager;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.nature.biz.common.mapper.KlineMapper;
-import org.nature.biz.common.model.KInfo;
 import org.nature.biz.common.model.Kline;
-import org.nature.biz.common.protocol.KlineItems;
 import org.nature.biz.etf.mapper.HoldMapper;
 import org.nature.biz.etf.mapper.ItemMapper;
 import org.nature.biz.etf.mapper.RuleMapper;
@@ -27,7 +25,7 @@ import java.util.stream.Collectors;
  * @since 2024/1/8
  */
 @Component
-public class RuleManager implements KlineItems {
+public class RuleManager {
 
     @Injection
     private RuleMapper ruleMapper;
@@ -37,17 +35,6 @@ public class RuleManager implements KlineItems {
     private KlineMapper klineMapper;
     @Injection
     private HoldMapper holdMapper;
-
-    @Override
-    public List<KInfo> kItems() {
-        return itemMapper.listAll().stream().map(i -> {
-            KInfo info = new KInfo();
-            info.setCode(i.getCode());
-            info.setType(i.getType());
-            info.setName(i.getName());
-            return info;
-        }).collect(Collectors.toList());
-    }
 
     /**
      * 删除

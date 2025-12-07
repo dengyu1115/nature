@@ -6,14 +6,14 @@ export default class Reactive {
    * @returns
    */
   static proxy(obj, pk = "") {
-    if (typeof obj != "object") {
+    if (obj == null || typeof obj != "object") {
       return obj;
     }
     if (pk) {
       pk = pk + ".";
     }
     for (let k in obj) {
-      if (typeof obj[k] == "object") {
+      if (obj[k] == null || typeof obj[k] == "object") {
         obj[k] = Reactive.proxy(obj[k], pk + k);
       }
     }

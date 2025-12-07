@@ -132,8 +132,8 @@ export default class Select extends Base {
   }
 
   updateOptions() {
-    this.options = this.data?.options?.data || this.props.options || [];
-    const path = this.data?.options?.path;
+    this.options = this.data.options?.data || this.props.options || [];
+    const path = this.data.options?.path;
     // 如果有数据属性绑定input事件
     if (path) {
       const value = Reactive.get(data, path);
@@ -147,7 +147,7 @@ export default class Select extends Base {
   updateValue() {
     // 初始化为数组
     const multiple = this.props.multiple === "true";
-    const path = this.data?.value?.path;
+    const path = this.data.value?.path;
     // 如果有数据属性绑定input事件
     if (path) {
       const value = Reactive.get(data, path);
@@ -178,7 +178,7 @@ export default class Select extends Base {
       }
       val.push(value);
     }
-    const path = this.data?.value?.path;
+    const path = this.data.value?.path;
     if (path) {
       const v = multiple ? val : val.length > 0 ? val[0] : null;
       Reactive.set(data, path, v, this);

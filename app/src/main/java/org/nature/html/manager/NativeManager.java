@@ -5,6 +5,7 @@ import android.webkit.JavascriptInterface;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
@@ -50,7 +51,7 @@ public class NativeManager {
     }
 
     private String buildRes(String code, String message, Object data) {
-        return JSON.toJSONString(new Res(code, message, data));
+        return JSON.toJSONString(new Res(code, message, data), SerializerFeature.WriteMapNullValue);
     }
 
     private Object doInvoke(String name, String param) {

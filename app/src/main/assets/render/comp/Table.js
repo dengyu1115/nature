@@ -13,6 +13,7 @@ export default class Table extends Base {
    */
   render() {
     const element = this.createElement("div");
+    this.element = element;
     element.style.gridAutoFlow = "column";
     element.style.border = "none";
     // 添加滚动事件监听器
@@ -46,6 +47,7 @@ export default class Table extends Base {
 
   refreshTbody() {
     this.updateRows();
+    this.element.scrollTop = 0;
     this.updateTbody();
   }
 
