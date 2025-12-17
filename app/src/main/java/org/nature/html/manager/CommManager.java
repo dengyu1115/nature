@@ -3,7 +3,9 @@ package org.nature.html.manager;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.PropertyNamingStrategy;
+import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializeConfig;
+import org.nature.biz.etf.manager.ProfitManager;
 import org.nature.biz.etf.manager.RuleManager;
 import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Component;
@@ -18,8 +20,12 @@ import java.util.stream.Collectors;
 @Component
 public class CommManager {
 
+    private static final TypeReference<List<String>> TYPE_LIST = new TypeReference<>() {
+    };
     @Injection
     private RuleManager ruleManager;
+    @Injection
+    private ProfitManager profitManager;
 
     public Object handle(String name, String param) {
         switch (name) {
@@ -32,9 +38,23 @@ public class CommManager {
             case "etf_left_handle":
                 return this.etfLeftHandle();
             case "etf_profit_list":
-                return this.convert(ruleManager.listValid());
+                return this.etfProfitList(param);
+            case "etf_profit_overview":
+                return this.etfProfitOverview(param);
         }
         throw new Warn("调用方法不支持：" + name);
+    }
+
+    private Object etfProfitOverview(String param) {
+        JSONObject json = JSON.parseObject(param);
+        String date = json.getString("date");
+        return this.convert(profitManager.overview(date));
+    }
+
+    private Object etfProfitList(String param) {
+        JSONObject json = JSON.parseObject(param);
+        List<String> dates = json.getObject("dates", TYPE_LIST);
+        return this.convert(profitManager.list(dates));
     }
 
     private Object etfLeftHandle() {
@@ -51,11 +71,17 @@ public class CommManager {
         return this.convert(ruleManager.latestHandle());
     }
 
-    private Object convert(List<?> holds){
+    private Object convert(List<?> holds) {
         SerializeConfig config = new SerializeConfig();
         config.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;
         return holds.stream().map(i -> JSON.parseObject(JSON.toJSONString(i, config)))
                 .collect(Collectors.toList());
+    }
+
+    private Object convert(Object obj) {
+        SerializeConfig config = new SerializeConfig();
+        config.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;
+        return JSON.parseObject(JSON.toJSONString(obj, config));
     }
 
     private Object jobs() {

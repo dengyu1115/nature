@@ -38,7 +38,7 @@ public class ProfitManager {
      * @param dateEnd 截至日期
      * @return list
      */
-    public List<ProfitView> view(String dateEnd) {
+    public Profit overview(String dateEnd) {
         // 查询全部有效规则数据，生成总览数据
         return this.buildView(ruleManager.listValid(), dateEnd);
     }
@@ -49,7 +49,7 @@ public class ProfitManager {
      * @param dateEnd 截止日期
      * @return list
      */
-    public List<ProfitView> view(Rule rule, String dateEnd) {
+    public Profit overview(Rule rule, String dateEnd) {
         return this.buildView(Collections.singletonList(rule), dateEnd);
     }
 
@@ -105,20 +105,10 @@ public class ProfitManager {
      * @param dateEnd 结束日期
      * @return list
      */
-    private List<ProfitView> buildView(List<Rule> rules, String dateEnd) {
+    private Profit buildView(List<Rule> rules, String dateEnd) {
         // 计算收益
-        Profit p = rules.stream().map(i -> this.calc(i, dateEnd)).filter(Objects::nonNull)
+        return rules.stream().map(i -> this.calc(i, dateEnd)).filter(Objects::nonNull)
                 .reduce(new Profit(), this::merge);
-        // 构建总览数据
-        return List.of(
-                new ProfitView("日期", "开始", p.getDateStart(), "结束", p.getDateEnd(), EMPTY, EMPTY),
-                new ProfitView("当前持有", "份额", TextUtil.text(p.getShareTotal()), "金额", TextUtil.amount(p.getAmountCurr()), EMPTY, EMPTY),
-                new ProfitView("操作次数", "买入", p.getTimesBuy() + EMPTY, "卖出", p.getTimesSell() + EMPTY, EMPTY, EMPTY),
-                new ProfitView("投入金额", "最大", TextUtil.amount(p.getPaidMax()), "剩余", TextUtil.amount(p.getPaidLeft()), "总额", TextUtil.amount(p.getPaidTotal())),
-                new ProfitView("回收金额", EMPTY, EMPTY, EMPTY, EMPTY, "总额", TextUtil.amount(p.getReturned())),
-                new ProfitView("盈利金额", "卖出", TextUtil.amount(p.getProfitSold()), "持有", TextUtil.amount(p.getProfitHold()), "总额", TextUtil.amount(p.getProfitTotal())),
-                new ProfitView("收益率", "卖出/最大", TextUtil.hundred(p.getProfitRatio()), EMPTY, EMPTY, EMPTY, EMPTY)
-        );
     }
 
     /**

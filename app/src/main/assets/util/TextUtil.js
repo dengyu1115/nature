@@ -32,6 +32,26 @@ export default class TextUtil {
   }
 
   /**
+   * 格式化份额数值为带单位的字符串（万/亿/万亿）
+   * @param {number|null} o 份额数值
+   * @returns {string} 格式化后的份额字符串
+   */
+  static share(o) {
+    return TextUtil._text(o, (i) => {
+      const val = Math.abs(i);
+      if (val < 10000 * 100) {
+        return (i / 100).toFixed(0) + "手";
+      } else if (val < 100000000 * 100) {
+        return (i / 10000 / 100).toFixed(2) + "万手";
+      } else if (val < 1000000000000 * 100) {
+        return (i / 10000 / 10000 / 100).toFixed(4) + "亿手";
+      } else {
+        return (i / 10000 / 10000 / 10000 / 100).toFixed(4) + "万亿手";
+      }
+    });
+  }
+
+  /**
    * 将小数转换为百分比格式的字符串
    * @param {number|null} o 小数值
    * @returns {string} 百分比格式的字符串
