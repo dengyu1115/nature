@@ -5,6 +5,7 @@ export default class Button extends Base {
   render() {
     const element = this.createElement("button");
     this.element = element;
+    this.setClickEvent();
     this.refreshDisabled();
     this.refreshShow();
     this.refreshText();
@@ -40,5 +41,27 @@ export default class Button extends Base {
       this[prop] = this.props[prop];
     }
     this.element[prop] = this[prop];
+  }
+
+  setClickEvent() {
+    const click = this.events.click;
+    if (!click) {
+      return;
+    }
+    try {
+      const func = new Function(click);
+      this.element.addEventListener("click", (e) => {
+        try {
+          this.element.disabled = true;
+          func.call(this);
+        } catch (err) {
+          this.message.error(err.message);
+        } finally {
+          this.element.disabled = false;
+        }
+      });
+    } catch (err) {
+      this.message.error("事件编译出错:" + err.message);
+    }
   }
 }

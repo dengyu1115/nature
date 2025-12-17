@@ -6,6 +6,7 @@ export default class Text extends Base {
   render() {
     const element = this.createElement(this.props.tag);
     this.element = element;
+    this.refreshShow();
     this.refreshText();
     return element;
   }
@@ -17,6 +18,13 @@ export default class Text extends Base {
       this.element.textContent = text;
     } else {
       this.element.textContent = this.props.text;
+    }
+  }
+
+  refreshShow() {
+    const path = this.data.show?.path;
+    if (path) {
+      this.element.style.display = Reactive.get(data, path) ? "grid" : "none";
     }
   }
 }

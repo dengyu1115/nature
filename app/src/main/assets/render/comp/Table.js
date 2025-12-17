@@ -58,8 +58,16 @@ export default class Table extends Base {
     // 相关属性计算
     this.level = this.calcHeadLevel(this.props.columns, 0);
     this.bodyRows = parseInt(this.props.bodyRows);
-    this.rowCount = this.level + this.bodyRows;
-    this.rowHeight = Val.extract(this.styles.height)[1] / this.rowCount;
+    const rowCount = this.bodyRows + 1;
+    const tableHeight = Val.extract(this.styles.height)[1];
+    this.rowHeight = tableHeight / rowCount;
+    this.headerRh = Val.extract(this.props.fontSize || "14px")[1];
+    const headerHeight = this.headerRh * this.level + this.level + 1;
+    if (headerHeight > this.rowHeight) {
+      this.rowHeight = (tableHeight - headerHeight) / this.bodyRows;
+    } else {
+      this.headerRh = this.rowHeight / this.level;
+    }
     this.buttonMap = this.buildButtonMap();
     this.bindingMap = this.buildBindingMap();
     this.calcColWidth(this.props.columns);
@@ -167,15 +175,15 @@ export default class Table extends Base {
    * 设置单元格通用样式
    * @param {HTMLElement} cell - 单元格元素
    * @param {Object} styles - 样式配置对象
+   * @param {number} height - 元素高度
    */
-  setCellCommonStyle(cell, styles) {
+  setCellCommonStyle(cell, styles, height) {
     if (styles.width) {
       cell.style.width = styles.width;
       cell.style.maxWidth = styles.width;
       cell.style.minWidth = styles.width;
-      cell.style.height = this.rowHeight + "px";
+      cell.style.height = height + "px";
       cell.style.lineHeight = 1;
-      cell.style.overflow = "auto";
       cell.style.whiteSpace = "nowrap";
     }
   }
@@ -229,14 +237,10 @@ export default class Table extends Base {
    * @param {string} prop - 定位属性 (top/bottom/left/right)
    * @param {string} value - 定位值
    */
-  setCellSticky(cell, prop, value) {
+  setCellSticky(cell, prop, value, zIndex) {
     if (prop) {
       cell.style.position = "sticky";
-      if (cell.style.zIndex) {
-        cell.style.zIndex += 1;
-      } else {
-        cell.style.zIndex = 1;
-      }
+      cell.style.zIndex = zIndex;
       cell.style[prop] = value;
     }
   }
@@ -291,6 +295,11 @@ export default class Table extends Base {
       const tr = document.createElement("tr");
       this.thead.appendChild(tr);
     }
+    if (this.props.stickyHeader === "true") {
+      this.thead.style.position = "sticky";
+      this.thead.style.top = "0px";
+      this.thead.style.zIndex = "101";
+    }
     this.buildThs(this.props.columns, 0, 0);
   }
 
@@ -315,10 +324,7 @@ export default class Table extends Base {
           th.setAttribute("rowspan", rowspan);
         }
       }
-      const sticky = this.props.stickyHeader === "true" ? "top" : null;
-      const top = level * this.rowHeight + "px";
-      this.setCellSticky(th, sticky, top);
-      this.setCellSticky(th, column.sticky, column[column.sticky]);
+      this.setCellSticky(th, column.sticky, column[column.sticky], "101");
       this.thead.children[level].appendChild(th);
       index++;
     });
@@ -350,11 +356,11 @@ export default class Table extends Base {
       columns.forEach((column, idxCol) => {
         const td = document.createElement("td");
         this.setBorderStyle(td, this.styles, false, idxCol === 0);
-        this.setCellCommonStyle(td, column);
+        this.setCellCommonStyle(td, column, this.rowHeight);
         td.style.textAlign = column.alignTd;
         td.style.backgroundColor = this.props.bodyColor;
         this.setCellContent(td, column, datum);
-        this.setCellSticky(td, column.sticky, column[column.sticky]);
+        this.setCellSticky(td, column.sticky, column[column.sticky], "100");
         this.setCellClick(td, column, datum);
         tr.appendChild(td);
       });
@@ -382,7 +388,7 @@ export default class Table extends Base {
     if (colspan > 1) {
       th.setAttribute("colspan", colspan);
     }
-    this.setCellCommonStyle(th, column);
+    this.setCellCommonStyle(th, column, this.headerRh);
     th.textContent = column.label;
     th.style.textAlign = column.alignTh;
     this.addSort(column, th);

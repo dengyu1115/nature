@@ -5,6 +5,7 @@ body {
   font-family: sans-serif-thin;
   box-sizing: border-box;
   overscroll-behavior: none; /* 禁用整个页面的过度滚动弹性效果 */
+  font-size: 14px;
 }
 
 *,

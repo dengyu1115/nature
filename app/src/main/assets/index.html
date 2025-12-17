@@ -36,7 +36,7 @@
           const height = document.body.clientHeight;
           config.styles.width = width + "px";
           config.styles.height = height + "px";
-          new DslParser(config).parse().mount(document.body);
+          document.body.appendChild(new DslParser(config).parse().render());
         }
         // 页面加载完成后启动应用
         document.addEventListener("DOMContentLoaded", startApp);

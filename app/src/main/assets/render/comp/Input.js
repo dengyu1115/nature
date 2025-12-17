@@ -15,21 +15,35 @@ export default class Input extends Base {
     this.refreshDisabled();
     this.refreshShow();
     this.refreshValue();
-    // 首次创建同步一次数据
-    this.setValue();
     return element;
   }
 
   refreshReadOnly() {
-    this.update("readOnly");
+    const path = this.data.readOnly?.path;
+    if (path) {
+      this.element.readOnly = Reactive.get(data, path);
+    } else {
+      this.element.readOnly = this.props.readOnly === "true";
+    }
   }
 
   refreshDisabled() {
-    this.update("disabled");
+    const path = this.data.disabled?.path;
+    if (path) {
+      this.element.disabled = Reactive.get(data, path);
+    } else {
+      this.element.disabled = this.props.disabled === "true";
+    }
   }
 
   refreshValue() {
-    this.update("value");
+    const path = this.data.value?.path;
+    if (path) {
+      this.value = Reactive.get(data, path);
+    } else {
+      this.value = this.props.value;
+    }
+    this.element.value = this.value;
   }
 
   refreshShow() {
