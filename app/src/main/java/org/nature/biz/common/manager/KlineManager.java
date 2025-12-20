@@ -4,20 +4,14 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.nature.biz.common.http.KlineHttp;
 import org.nature.biz.common.mapper.KlineMapper;
-import org.nature.biz.common.model.KInfo;
 import org.nature.biz.common.model.Kline;
-import org.nature.biz.common.protocol.KlineItems;
-import org.nature.common.constant.Const;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
-import org.nature.common.ioc.holder.InstanceHolder;
 import org.nature.common.util.DateUtil;
 import org.nature.common.util.ExecUtil;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * K线
@@ -33,22 +27,12 @@ public class KlineManager {
     @Injection
     private KlineHttp klineHttp;
 
-    /**
-     * 获取所有K线项目
-     * @return list
-     */
-    public List<KInfo> kItems() {
-        List<KlineItems> list = InstanceHolder.list(KlineItems.class);
-        return new ArrayList<>(list.stream().map(KlineItems::kItems).flatMap(List::stream)
-                .collect(Collectors.toMap(this::itemKey, i -> i, (o, n) -> o)).values());
+    public int load(List<Kline> list) {
+        return ExecUtil.batch(() -> list, this::load).stream().mapToInt(i -> i).sum();
     }
 
-    public int loadAll() {
-        return ExecUtil.batch(this::kItems, this::load).stream().mapToInt(i -> i).sum();
-    }
-
-    public int reloadAll() {
-        return ExecUtil.batch(this::kItems, this::reload).stream().mapToInt(i -> i).sum();
+    public int reload(List<Kline> list) {
+        return ExecUtil.batch(() -> list, this::reload).stream().mapToInt(i -> i).sum();
     }
 
     /**
@@ -56,7 +40,7 @@ public class KlineManager {
      * @param info 项目
      * @return int
      */
-    public int load(KInfo info) {
+    public int load(Kline info) {
         String code = info.getCode();
         String type = info.getType();
         // 查询项目最新K线数据
@@ -77,7 +61,7 @@ public class KlineManager {
      * @param info 项目
      * @return int
      */
-    public int reload(KInfo info) {
+    public int reload(Kline info) {
         klineMapper.deleteByItem(info.getCode(), info.getType());
         return this.load(info);
     }
@@ -89,15 +73,6 @@ public class KlineManager {
      */
     private String getLastDate(Kline kline) {
         return kline == null ? "" : DateUtil.addDays(kline.getDate(), 1);
-    }
-
-    /**
-     * 项目key
-     * @param i 项目
-     * @return String
-     */
-    private String itemKey(KInfo i) {
-        return String.join(Const.DELIMITER, i.getCode(), i.getType());
     }
 
 }

@@ -49,6 +49,12 @@ export default class LineChart extends ChartBase {
           }
         });
     });
+    if (xs == 0) {
+      xs += 20 * this.dpr;
+    }
+    if (xe == 0) {
+      xe += 20 * this.dpr;
+    }
     this.chartArea = {
       x: xs,
       y: ys,

@@ -2,18 +2,13 @@ package org.nature.biz.common.manager;
 
 import org.nature.biz.common.http.NetHttp;
 import org.nature.biz.common.mapper.NetMapper;
-import org.nature.biz.common.model.NInfo;
 import org.nature.biz.common.model.Net;
-import org.nature.biz.common.protocol.NetItems;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
-import org.nature.common.ioc.holder.InstanceHolder;
 import org.nature.common.util.DateUtil;
 import org.nature.common.util.ExecUtil;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 净值
@@ -29,19 +24,13 @@ public class NetManager {
     @Injection
     private NetHttp netHttp;
 
-    public List<NInfo> nItems() {
-        List<NetItems> list = InstanceHolder.list(NetItems.class);
-        return new ArrayList<>(list.stream().map(NetItems::nItems).flatMap(List::stream)
-                .collect(Collectors.toMap(NInfo::getCode, i -> i, (o, n) -> o)).values());
+
+    public int load(List<Net> list) {
+        return ExecUtil.batch(() -> list, i -> this.load(i.getCode())).stream().mapToInt(i -> i).sum();
     }
 
-
-    public int loadAll() {
-        return ExecUtil.batch(this::nItems, i -> this.load(i.getCode())).stream().mapToInt(i -> i).sum();
-    }
-
-    public int reloadAll() {
-        return ExecUtil.batch(this::nItems, i -> this.reload(i.getCode())).stream().mapToInt(i -> i).sum();
+    public int reload(List<Net> list) {
+        return ExecUtil.batch(() -> list, i -> this.reload(i.getCode())).stream().mapToInt(i -> i).sum();
     }
 
     public int load(String code) {
