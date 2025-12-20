@@ -16,6 +16,8 @@ import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.holder.JobHolder;
+import org.nature.common.util.CtxUtil;
+import org.nature.func.job.service.JobService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +46,12 @@ public class CommManager {
         switch (name) {
             case "jobs":
                 return this.jobs();
+            case "job_service_status":
+                return this.jobServiceStatus();
+            case "job_service_start":
+                return this.jobServiceStart();
+            case "job_service_stop":
+                return this.jobServiceStop();
             case "kline_load":
                 return this.klineLoad(param);
             case "kline_reload":
@@ -154,6 +162,20 @@ public class CommManager {
             map.put("name", JobHolder.getName(i));
             return map;
         }).collect(Collectors.toList());
+    }
+
+    private Object jobServiceStatus() {
+        return CtxUtil.isServiceRunning(JobService.class);
+    }
+
+    private Object jobServiceStart() {
+        CtxUtil.startService(JobService.class);
+        return true;
+    }
+
+    private Object jobServiceStop() {
+        CtxUtil.stopService(JobService.class);
+        return false;
     }
 
 }

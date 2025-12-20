@@ -85,14 +85,6 @@ public class JobService extends Service {
     }
 
     /**
-     * 计算延迟执行时间
-     * @return int
-     */
-    private long calculateDelay() {
-        return 0;
-    }
-
-    /**
      * 服务终止调用
      */
     @Override
@@ -102,6 +94,10 @@ public class JobService extends Service {
         this.releaseWakeLock();
         service.shutdown();
         service = null;
+    }
+
+    public static boolean isRunning() {
+        return service != null;
     }
 
     /**
@@ -156,6 +152,14 @@ public class JobService extends Service {
     private void releaseWakeLock() {
         wl.release();
         wl = null;
+    }
+
+    /**
+     * 计算延迟执行时间
+     * @return int
+     */
+    private long calculateDelay() {
+        return 0;
     }
 
 }

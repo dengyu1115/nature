@@ -17,17 +17,18 @@ public class FileUtil {
      */
     @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void createIfNotExists(File file) {
-        if (!file.exists()) {
-            try {
-                File parent = file.getParentFile();
-                assert parent != null;
-                if (!parent.exists()) {
-                    parent.mkdirs();
-                }
-                file.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+        if (file.exists()) {
+            return;
+        }
+        try {
+            File parent = file.getParentFile();
+            assert parent != null;
+            if (!parent.exists()) {
+                parent.mkdirs();
             }
+            file.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
