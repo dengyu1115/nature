@@ -95,6 +95,10 @@ body {
   vertical-align: middle;
 }
 
+table td {
+    padding: 0 2px;
+}
+
 .menu {
   background-color: transparent;
 }
