@@ -4,7 +4,7 @@ android {
     compileSdkVersion 34
 
     defaultConfig {
-        applicationId "org.nature.test"
+        applicationId "org.nature"
         minSdkVersion 29
         targetSdkVersion 34
         versionCode 1

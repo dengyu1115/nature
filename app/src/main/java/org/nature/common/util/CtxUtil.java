@@ -43,6 +43,7 @@ public class CtxUtil {
         context.stopService(new Intent(context, clazz));
     }
 
+    @SuppressWarnings("deprecation")
     public static boolean isServiceRunning(Class<?> clazz) {
         ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         if (manager == null) {

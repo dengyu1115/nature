@@ -5,10 +5,13 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.PropertyNamingStrategy;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializeConfig;
+import org.nature.biz.bound.manager.DiffManager;
+import org.nature.biz.bound.manager.RateManager;
 import org.nature.biz.common.manager.KlineManager;
 import org.nature.biz.common.manager.NetManager;
 import org.nature.biz.common.model.Kline;
 import org.nature.biz.common.model.Net;
+import org.nature.biz.etf.manager.HoldManager;
 import org.nature.biz.etf.manager.ProfitManager;
 import org.nature.biz.etf.manager.RuleManager;
 import org.nature.biz.etf.model.Rule;
@@ -41,6 +44,12 @@ public class CommManager {
     private NetManager netManager;
     @Injection
     private KlineManager klineManager;
+    @Injection
+    private HoldManager holdManager;
+    @Injection
+    private RateManager rateManager;
+    @Injection
+    private DiffManager diffManager;
 
     public Object handle(String name, String param) {
         switch (name) {
@@ -72,8 +81,16 @@ public class CommManager {
                 return this.etfRuleProfitList(param);
             case "etf_profit_overview":
                 return this.etfProfitOverview(param);
+            case "etf_hold_calc":
+                return this.etfHoldCalc(param);
+            case "etf_hold_calc_batch":
+                return this.etfHoldCalcBatch();
             case "etf_rule_profit_overview":
                 return this.etfRuleProfitOverview(param);
+            case "bound_rate_list":
+                return this.boundRateList(param);
+            case "bound_diff_list":
+                return this.boundDiffList(param);
         }
         throw new Warn("调用方法不支持：" + name);
     }
@@ -140,6 +157,30 @@ public class CommManager {
 
     private Object etfLatestHandle() {
         return this.convert(ruleManager.latestHandle());
+    }
+
+    private Object etfHoldCalc(String param) {
+        JSONObject json = JSON.parseObject(param);
+        Rule rule = json.getObject("rule", Rule.class);
+        return holdManager.calc(rule);
+    }
+
+    private Object etfHoldCalcBatch() {
+        return holdManager.calc();
+    }
+
+    private Object boundRateList(String param) {
+        JSONObject json = JSON.parseObject(param);
+        String rule = json.getString("rule");
+        String date = json.getString("date");
+        return this.convert(rateManager.list(rule, date));
+    }
+
+    private Object boundDiffList(String param) {
+        JSONObject json = JSON.parseObject(param);
+        String rule = json.getString("rule");
+        String date = json.getString("date");
+        return this.convert(diffManager.listCompare(rule, date));
     }
 
     private Object convert(List<?> holds) {

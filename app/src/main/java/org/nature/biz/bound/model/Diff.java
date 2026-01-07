@@ -14,7 +14,7 @@ import java.math.BigDecimal;
  */
 @Getter
 @Setter
-public class Rate extends BaseModel {
+public class Diff extends BaseModel {
     /**
      * 规则code
      */
@@ -24,35 +24,35 @@ public class Rate extends BaseModel {
      */
     private String ruleName;
     /**
+     * 日期
+     */
+    private String date;
+    /**
      * 比对方code
      */
-    private String etfCode;
+    private String code1;
     /**
      * 比对方name
      */
-    private String etfName;
-    /**
-     * 基金编号
-     */
-    private String fundCode;
-    /**
-     * 净值日期
-     */
-    private String dateNet;
-    /**
-     * 价格日期
-     */
-    private String datePrice;
-    /**
-     * 基金净值
-     */
-    private BigDecimal net;
+    private String name1;
     /**
      * 比对方价格
      */
-    private BigDecimal price;
+    private BigDecimal price1;
     /**
-     * 溢价率
+     * 对比方code
+     */
+    private String code2;
+    /**
+     * 对比方name
+     */
+    private String name2;
+    /**
+     * 对比方价格
+     */
+    private BigDecimal price2;
+    /**
+     * 涨幅
      */
     private BigDecimal ratio;
 

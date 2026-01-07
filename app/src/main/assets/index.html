@@ -17,7 +17,9 @@
         import DslParser from "./render/DslParser.js";
         import Invoke from "./util/Invoker.js";
         import message from "./util/Message.js";
+        import SqlBuilder from "./util/SqlBuilder.js";
         window.invoke = new Invoke().invoke;
+        window.SqlBuilder = SqlBuilder;
         // 应用启动函数
         function startApp() {
           // 获取地址栏页面ID参数

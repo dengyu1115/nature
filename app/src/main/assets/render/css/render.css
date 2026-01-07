@@ -92,6 +92,13 @@ body {
 
 .component.radio label {
   min-width: 45px;
+}
+
+.component.checkbox input {
+  vertical-align: middle;
+}
+
+.component.radio input {
   vertical-align: middle;
 }
 

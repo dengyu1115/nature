@@ -45,6 +45,7 @@ export default class DatePicker extends Base {
       // 显示清除按钮
       this.clearBtn.style.display = "flex";
     } else {
+      this.input.value = null;
       this.clearBtn.style.display = "none";
     }
     const today = this.value ? this.parseDate(this.value) : new Date();

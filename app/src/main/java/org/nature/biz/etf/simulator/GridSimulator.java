@@ -156,7 +156,7 @@ public class GridSimulator implements Simulator {
             return;
         }
         // 开始日期
-        if (dateStart == null) {
+        if (dateStart == null || dateStart.isBlank()) {
             dateStart = list.get(0).getDate();
         }
         // 结束日期
@@ -166,7 +166,8 @@ public class GridSimulator implements Simulator {
         // 开始日期
         start = dateStart;
         // 日期数据
-        dates = dates.stream().filter(i -> start.compareTo(i) <= 0).collect(Collectors.toList());
+        String startDate = DateUtil.addDays(start, -1);
+        dates = dates.stream().filter(i -> startDate.compareTo(i) <= 0).collect(Collectors.toList());
         if (dates.isEmpty()) {
             return;
         }
@@ -282,7 +283,7 @@ public class GridSimulator implements Simulator {
         if (date == null || i.getDate().compareTo(date) <= 0) {
             return;
         }
-        if (date.compareTo(dateStart) < 0) {
+        if (DateUtil.addDays(date, 1).compareTo(dateStart) < 0) {
             return;
         }
         // 计算收益数据

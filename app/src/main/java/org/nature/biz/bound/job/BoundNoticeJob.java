@@ -1,8 +1,8 @@
 package org.nature.biz.bound.job;
 
 import com.alibaba.fastjson.TypeReference;
-import org.nature.biz.bound.manager.RateManager;
-import org.nature.biz.bound.model.Rate;
+import org.nature.biz.bound.manager.DiffManager;
+import org.nature.biz.bound.model.Diff;
 import org.nature.biz.common.manager.RecordManager;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.annotation.JobExec;
@@ -33,7 +33,7 @@ public class BoundNoticeJob implements Job {
     @Injection
     private WorkdayManager workdayManager;
     @Injection
-    private RateManager rateManager;
+    private DiffManager rateManager;
     @Injection
     private RecordManager recordManager;
 
@@ -58,13 +58,13 @@ public class BoundNoticeJob implements Job {
      */
     private void exec() {
         String today = DateUtil.today();
-        List<Rate> rates = rateManager.listTrigger();
+        List<Diff> rates = rateManager.listTrigger();
         // 已通知数据set
         Set<String> recordSet = recordManager.get(RECORD_TYPE, today, new HashSet<>(), TYPE);
         // 记录需要通知的文案集合
         List<String> list = new ArrayList<>();
         // 遍历操作数据，进行通知操作
-        for (Rate i : rates) {
+        for (Diff i : rates) {
             String code1 = i.getCode1();
             String code2 = i.getCode2();
             BigDecimal ratio = i.getRatio();
