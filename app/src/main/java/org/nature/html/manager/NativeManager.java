@@ -10,6 +10,7 @@ import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.util.Md5Util;
+import org.nature.common.util.PythonUtil;
 import org.nature.html.mapper.PageConfigMapper;
 import org.nature.html.model.PageConfig;
 import org.nature.html.model.Res;
@@ -68,6 +69,8 @@ public class NativeManager {
                 return this.find(param);
             case "update":
                 return this.update(param);
+            case "exec_script":
+                return this.execScript(param);
             default:
                 return commManager.handle(name, param);
         }
@@ -112,6 +115,13 @@ public class NativeManager {
         String path = json.getString("path");
         String sql = json.getString("sql");
         return dbManager.update(path, sql);
+    }
+
+    private Object execScript(String param) {
+        JSONObject json = JSON.parseObject(param);
+        String script = json.getString("script");
+        JSONObject args = json.getJSONObject("args");
+        return PythonUtil.execScript(script, args);
     }
 
 

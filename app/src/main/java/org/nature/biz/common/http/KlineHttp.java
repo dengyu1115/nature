@@ -76,7 +76,6 @@ public class KlineHttp {
         if (data == null) {
             throw new Warn("历史K线数据缺失：" + code + ":" + type);
         }
-
         JSONArray ks = data.getJSONArray("klines");
         // 转换为Kline对象
         return ks.stream().map(i -> this.buildKline(code, type, (String) i)).collect(Collectors.toList());

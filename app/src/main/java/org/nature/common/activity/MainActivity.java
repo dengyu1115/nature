@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.nature.common.ioc.holder.InstanceHolder;
 import org.nature.common.ioc.starter.ComponentStarter;
 import org.nature.common.util.NotifyUtil;
+import org.nature.common.util.PythonUtil;
 import org.nature.html.manager.NativeManager;
 
 import java.util.Stack;
@@ -64,6 +65,8 @@ public class MainActivity extends AppCompatActivity {
         ComponentStarter.getInstance().start(this);
         // 通知工具初始化
         NotifyUtil.init(this);
+        // 初始化Python环境
+        PythonUtil.init(this);
         // 全局页面初始化
         nativeManager = InstanceHolder.get(NativeManager.class);
         view = new LinearLayout(this);

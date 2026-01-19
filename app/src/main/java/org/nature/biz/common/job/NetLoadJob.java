@@ -22,8 +22,8 @@ public class NetLoadJob implements Job {
 
     @Override
     public void exec(Date date) {
-        int load = netManager.loadAll();
-        NotifyUtil.notifyOne("净值加载", "净值加载完成，共加载" + load + "条数据");
+//        int load = netManager.loadAll();
+//        NotifyUtil.notifyOne("净值加载", "净值加载完成，共加载" + load + "条数据");
     }
 
 }

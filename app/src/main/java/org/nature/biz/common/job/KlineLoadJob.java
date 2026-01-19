@@ -22,8 +22,8 @@ public class KlineLoadJob implements Job {
 
     @Override
     public void exec(Date date) {
-        int load = klineManager.loadAll();
-        NotifyUtil.notifyOne("K线加载", "K线加载完成，共加载" + load + "条数据");
+//        int load = klineManager.loadAll();
+//        NotifyUtil.notifyOne("K线加载", "K线加载完成，共加载" + load + "条数据");
     }
 
 }

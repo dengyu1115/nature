@@ -19,7 +19,7 @@ export default class KlineChart extends Base {
       spacing: 20,
       scale: 1,
       transX: 0,
-      formatter: {
+      formatters: {
         kline: this.buildFormatter(this.props.klineFormatter),
         share: this.buildFormatter(this.props.shareFormatter),
         amount: this.buildFormatter(this.props.amountFormatter),
