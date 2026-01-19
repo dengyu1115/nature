@@ -58,11 +58,11 @@ export default class Table extends Base {
     // 相关属性计算
     this.level = this.calcHeadLevel(this.props.columns, 0);
     this.bodyRows = parseInt(this.props.bodyRows);
-    const rowCount = this.level + this.bodyRows;
+    const rowCount = this.bodyRows + 1;
     const tableHeight = Val.extract(this.styles.height)[1];
     this.rowHeight = tableHeight / rowCount;
     this.headerRh = Val.extract(this.props.fontSize || "14px")[1];
-    const headerHeight = this.headerRh * this.level + 1 + this.level;
+    const headerHeight = this.headerRh * this.level + this.level + 1;
     if (headerHeight > this.rowHeight) {
       this.rowHeight = (tableHeight - headerHeight) / this.bodyRows;
     } else {

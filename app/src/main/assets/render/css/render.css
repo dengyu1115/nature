@@ -5,7 +5,6 @@ body {
   font-family: sans-serif-thin;
   box-sizing: border-box;
   overscroll-behavior: none;
-  background: white;
   font-size: 14px;
 }
 
@@ -13,11 +12,6 @@ body {
 *::before,
 *::after {
   box-sizing: border-box;
-}
-
-button {
-  cursor: pointer;
-  font-family: inherit;
 }
 
 ::-webkit-scrollbar {
@@ -96,16 +90,29 @@ button {
   background-color: #ff7875;
 }
 
-td {
-  padding-left: 3px;
-  padding-right: 3px;
-}
-
 .component.radio label {
   min-width: 45px;
+}
+
+.component.checkbox input {
   vertical-align: middle;
+}
+
+.component.radio input {
+  vertical-align: middle;
+}
+
+table td {
+  padding: 0 2px;
 }
 
 .menu {
   background-color: transparent;
+}
+
+button{
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: normal;
 }

@@ -1,13 +1,11 @@
 package org.nature.common.util;
 
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.speech.tts.TextToSpeech;
 import androidx.core.app.NotificationCompat;
-import lombok.Getter;
 import org.nature.R;
 
 import java.util.Locale;
@@ -35,13 +33,6 @@ public class NotifyUtil {
      * 服务通道name
      */
     private final static String CHANNEL_NAME = "NATURE服务通道";
-
-    /**
-     * 安卓上下文对象
-     */
-    @SuppressLint("StaticFieldLeak")
-    @Getter
-    private static Context context;
     /**
      * 消息发送管理器
      */
@@ -53,11 +44,9 @@ public class NotifyUtil {
 
     /**
      * 初始化
-     * @param context 安卓上下文
      */
-    public static void init(Context context) {
-        NotifyUtil.context = context;
-        NotifyUtil.manager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
+    public static void init() {
+        NotifyUtil.manager = (NotificationManager) CtxUtil.get().getSystemService(NOTIFICATION_SERVICE);
         if (manager == null) {
             throw new RuntimeException("there is no notification manager");
         }
@@ -89,7 +78,7 @@ public class NotifyUtil {
      * @param text 文本
      */
     public static void speak(String text) {
-        new TTS(context, text);
+        new TTS(CtxUtil.get(), text);
     }
 
     /**
@@ -97,7 +86,7 @@ public class NotifyUtil {
      * @return Notification
      */
     public static Notification notification(String title, String content) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(CtxUtil.get(), CHANNEL_ID);
         builder.setSmallIcon(R.drawable.app_icon).setContentTitle(title).setContentText(content);
         return builder.build();
     }

@@ -25,7 +25,6 @@ export default class Base {
     const element = document.createElement(tag || defaultTag);
     this.setProps(element, this.props);
     this.setStyles(element, this.styles);
-    this.setEvents(element, this.events);
     this.renderred = true;
     return element;
   }
@@ -94,29 +93,6 @@ export default class Base {
     });
   }
 
-  setEvents(element, events) {
-    // 添加点击事件处理
-    if (events) {
-      for (const [k, v] of Object.entries(events)) {
-        if (!k || !v) {
-          continue;
-        }
-        try {
-          const func = new Function(v);
-          element.addEventListener(k, (e) => {
-            try {
-              func.call(this);
-            } catch (err) {
-              this.message.error(err.message);
-            }
-          });
-        } catch (e) {
-          this.message.error("事件代码执行出错:" + e.message);
-        }
-      }
-    }
-  }
-
   // 通用的渲染子组件方法
   renderChildren(element) {
     this.children.forEach((child) => {
@@ -149,10 +125,4 @@ export default class Base {
     }
   }
 
-  // 挂载到DOM元素
-  mount(element) {
-    element.innerHTML = "";
-    element.appendChild(this.render());
-    return this;
-  }
 }

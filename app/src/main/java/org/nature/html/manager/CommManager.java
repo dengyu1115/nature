@@ -5,16 +5,22 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.PropertyNamingStrategy;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializeConfig;
+import org.nature.biz.bound.manager.DiffManager;
+import org.nature.biz.bound.manager.RateManager;
 import org.nature.biz.common.manager.KlineManager;
 import org.nature.biz.common.manager.NetManager;
 import org.nature.biz.common.model.Kline;
 import org.nature.biz.common.model.Net;
+import org.nature.biz.etf.manager.HoldManager;
 import org.nature.biz.etf.manager.ProfitManager;
 import org.nature.biz.etf.manager.RuleManager;
+import org.nature.biz.etf.model.Rule;
 import org.nature.common.exception.Warn;
 import org.nature.common.ioc.annotation.Component;
 import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.ioc.holder.JobHolder;
+import org.nature.common.util.CtxUtil;
+import org.nature.func.job.service.JobService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,33 +32,35 @@ public class CommManager {
 
     private static final TypeReference<List<String>> TYPE_LIST = new TypeReference<>() {
     };
-    private static final TypeReference<List<Kline>> TYPE_KLINE_LIST = new TypeReference<>() {
+    private static final TypeReference<List<Net>> TYPE_LIST_NET = new TypeReference<>() {
     };
-    private static final TypeReference<List<Net>> TYPE_NET_LIST = new TypeReference<>() {
+    private static final TypeReference<List<Kline>> TYPE_LIST_KLINE = new TypeReference<>() {
     };
     @Injection
     private RuleManager ruleManager;
     @Injection
     private ProfitManager profitManager;
     @Injection
+    private NetManager netManager;
+    @Injection
     private KlineManager klineManager;
     @Injection
-    private NetManager netManager;
+    private HoldManager holdManager;
+    @Injection
+    private RateManager rateManager;
+    @Injection
+    private DiffManager diffManager;
 
     public Object handle(String name, String param) {
         switch (name) {
             case "jobs":
                 return this.jobs();
-            case "etf_latest_handle":
-                return this.etfLatestHandle();
-            case "etf_next_handle":
-                return this.etfNextHandle(param);
-            case "etf_left_handle":
-                return this.etfLeftHandle();
-            case "etf_profit_list":
-                return this.etfProfitList(param);
-            case "etf_profit_overview":
-                return this.etfProfitOverview(param);
+            case "job_service_status":
+                return this.jobServiceStatus();
+            case "job_service_start":
+                return this.jobServiceStart();
+            case "job_service_stop":
+                return this.jobServiceStop();
             case "kline_load":
                 return this.klineLoad(param);
             case "kline_reload":
@@ -61,32 +69,80 @@ public class CommManager {
                 return this.netLoad(param);
             case "net_reload":
                 return this.netReload(param);
+            case "etf_latest_handle":
+                return this.etfLatestHandle();
+            case "etf_next_handle":
+                return this.etfNextHandle(param);
+            case "etf_left_handle":
+                return this.etfLeftHandle();
+            case "etf_profit_list":
+                return this.etfProfitList(param);
+            case "etf_rule_profit_list":
+                return this.etfRuleProfitList(param);
+            case "etf_profit_overview":
+                return this.etfProfitOverview(param);
+            case "etf_hold_calc":
+                return this.etfHoldCalc(param);
+            case "etf_hold_calc_batch":
+                return this.etfHoldCalcBatch();
+            case "etf_rule_profit_overview":
+                return this.etfRuleProfitOverview(param);
+            case "bound_rate_list":
+                return this.boundRateList(param);
+            case "bound_diff_list":
+                return this.boundDiffList(param);
         }
         throw new Warn("调用方法不支持：" + name);
     }
 
-    private Object klineLoad(String param) {
+    private Object netReload(String param) {
         JSONObject json = JSON.parseObject(param);
-        List<Kline> list = json.getObject("list", TYPE_KLINE_LIST);
-        return klineManager.load(list);
-    }
-
-    private Object klineReload(String param) {
-        JSONObject json = JSON.parseObject(param);
-        List<Kline> list = json.getObject("list", TYPE_KLINE_LIST);
-        return klineManager.reload(list);
+        List<Net> list = json.getObject("list", TYPE_LIST_NET);
+        return netManager.reload(list);
     }
 
     private Object netLoad(String param) {
         JSONObject json = JSON.parseObject(param);
-        List<Net> list = json.getObject("list", TYPE_NET_LIST);
+        List<Net> list = json.getObject("list", TYPE_LIST_NET);
         return netManager.load(list);
     }
 
-    private Object netReload(String param) {
+    private Object klineReload(String param) {
         JSONObject json = JSON.parseObject(param);
-        List<Net> list = json.getObject("list", TYPE_NET_LIST);
-        return netManager.reload(list);
+        List<Kline> list = json.getObject("list", TYPE_LIST_KLINE);
+        return klineManager.reload(list);
+    }
+
+    private Object klineLoad(String param) {
+        JSONObject json = JSON.parseObject(param);
+        List<Kline> list = json.getObject("list", TYPE_LIST_KLINE);
+        return klineManager.load(list);
+    }
+
+    private Object etfProfitOverview(String param) {
+        JSONObject json = JSON.parseObject(param);
+        String date = json.getString("date");
+        return this.convert(profitManager.overview(date));
+    }
+
+    private Object etfRuleProfitOverview(String param) {
+        JSONObject json = JSON.parseObject(param);
+        String date = json.getString("date");
+        Rule rule = json.getObject("rule", Rule.class);
+        return this.convert(profitManager.overview(rule, date));
+    }
+
+    private Object etfProfitList(String param) {
+        JSONObject json = JSON.parseObject(param);
+        List<String> dates = json.getObject("dates", TYPE_LIST);
+        return this.convert(profitManager.list(dates));
+    }
+
+    private Object etfRuleProfitList(String param) {
+        JSONObject json = JSON.parseObject(param);
+        List<String> dates = json.getObject("dates", TYPE_LIST);
+        Rule rule = json.getObject("rule", Rule.class);
+        return this.convert(profitManager.list(rule, dates));
     }
 
     private Object etfLeftHandle() {
@@ -103,16 +159,28 @@ public class CommManager {
         return this.convert(ruleManager.latestHandle());
     }
 
-    private Object etfProfitList(String param) {
+    private Object etfHoldCalc(String param) {
         JSONObject json = JSON.parseObject(param);
-        List<String> dates = json.getObject("dates", TYPE_LIST);
-        return this.convert(profitManager.list(dates));
+        Rule rule = json.getObject("rule", Rule.class);
+        return holdManager.calc(rule);
     }
 
-    private Object etfProfitOverview(String param) {
+    private Object etfHoldCalcBatch() {
+        return holdManager.calc();
+    }
+
+    private Object boundRateList(String param) {
         JSONObject json = JSON.parseObject(param);
+        String rule = json.getString("rule");
         String date = json.getString("date");
-        return this.convert(profitManager.overview(date));
+        return this.convert(rateManager.list(rule, date));
+    }
+
+    private Object boundDiffList(String param) {
+        JSONObject json = JSON.parseObject(param);
+        String rule = json.getString("rule");
+        String date = json.getString("date");
+        return this.convert(diffManager.listCompare(rule, date));
     }
 
     private Object convert(List<?> holds) {
@@ -135,6 +203,20 @@ public class CommManager {
             map.put("name", JobHolder.getName(i));
             return map;
         }).collect(Collectors.toList());
+    }
+
+    private Object jobServiceStatus() {
+        return CtxUtil.isServiceRunning(JobService.class);
+    }
+
+    private Object jobServiceStart() {
+        CtxUtil.startService(JobService.class);
+        return true;
+    }
+
+    private Object jobServiceStop() {
+        CtxUtil.stopService(JobService.class);
+        return false;
     }
 
 }

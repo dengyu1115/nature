@@ -95,7 +95,7 @@ export default class ChartBase {
       this.ctx.fillStyle = item.visible !== false ? "#000" : "#999";
       this.ctx.textAlign = "left";
       this.ctx.textBaseline = "middle";
-      this.ctx.fillText(item.name, itemX + 20 * this.dpr, itemY);
+      this.ctx.fillText(item.name, itemX + 12 * this.dpr, itemY);
       // 记录图例位置信息
       this.legendPositions = this.legendPositions || [];
       this.legendPositions.push({

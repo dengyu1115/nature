@@ -20,6 +20,10 @@ export default class Select extends Base {
     this.selector = document.createElement("div");
     // 显示文本
     this.text = document.createElement("span");
+    // 清空按钮
+    this.clearBtn = document.createElement("span");
+    this.clearBtn.innerHTML = "×";
+    this.clearBtn.style.display = "none"; // 默认隐藏
     // 箭头图标
     this.arrow = document.createElement("span");
     // 使用回旋镖形状的 Unicode 字符
@@ -28,7 +32,7 @@ export default class Select extends Base {
     this.dropdown = document.createElement("div");
     // 创建选项列表
     this.opList = document.createElement("ul");
-    this.selector.append(this.text, this.arrow);
+    this.selector.append(this.text, this.clearBtn, this.arrow);
     this.dropdown.append(this.opList);
     this.text.textContent = this.opList.placeholder;
     Object.assign(this.selector.style, {
@@ -45,8 +49,13 @@ export default class Select extends Base {
       flex: "1",
       textAlign: "center",
     });
+    Object.assign(this.clearBtn.style, {
+      color: "#999",
+      cursor: "pointer",
+      fontWeight: "bold",
+      display: "none",
+    });
     Object.assign(this.arrow.style, {
-      fontSize: "12px",
       color: "#181717ff",
       transform: "rotate(180deg)",
     });
@@ -72,6 +81,11 @@ export default class Select extends Base {
     this.selector.addEventListener("click", (e) => {
       e.stopPropagation();
       this.toggle();
+    });
+    // 清空按钮点击事件
+    this.clearBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      this.clearValue();
     });
     document.addEventListener("click", (e) => {
       this.close();
@@ -198,6 +212,32 @@ export default class Select extends Base {
     }
   }
 
+  clearValue() {
+    const multiple = this.props.multiple === "true";
+    const path = this.data.value?.path;
+    
+    if (multiple) {
+      this.value = [];
+    } else {
+      this.value = [];
+    }
+    
+    if (path) {
+      const v = multiple ? [] : null;
+      Reactive.set(data, path, v, this);
+    }
+    
+    this.updateUI();
+    
+    if (this.events.change) {
+      try {
+        new Function(this.events.change).call(this);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+
   updateUI() {
     const options = this.options;
     const opList = this.opList.children;
@@ -217,5 +257,8 @@ export default class Select extends Base {
     this.text.textContent = labels.length
       ? labels.join(",")
       : this.props.placeholder;
+    
+    // 根据是否有选中值来控制清空按钮的显示/隐藏
+    this.clearBtn.style.display = labels.length ? "block" : "none";
   }
 }

@@ -17,7 +17,9 @@
         import DslParser from "./render/DslParser.js";
         import Invoke from "./util/Invoker.js";
         import message from "./util/Message.js";
+        import SqlBuilder from "./util/SqlBuilder.js";
         window.invoke = new Invoke().invoke;
+        window.SqlBuilder = SqlBuilder;
         // 应用启动函数
         function startApp() {
           // 获取地址栏页面ID参数
@@ -36,7 +38,7 @@
           const height = document.body.clientHeight;
           config.styles.width = width + "px";
           config.styles.height = height + "px";
-          new DslParser(config).parse().mount(document.body);
+          document.body.appendChild(new DslParser(config).parse().render());
         }
         // 页面加载完成后启动应用
         document.addEventListener("DOMContentLoaded", startApp);

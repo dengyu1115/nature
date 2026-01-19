@@ -49,7 +49,7 @@ public class ProfitManager {
      * @param dateEnd 截止日期
      * @return list
      */
-    public Profit view(Rule rule, String dateEnd) {
+    public Profit overview(Rule rule, String dateEnd) {
         return this.buildView(Collections.singletonList(rule), dateEnd);
     }
 

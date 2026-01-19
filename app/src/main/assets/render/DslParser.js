@@ -15,6 +15,8 @@ import Table from "./comp/Table.js";
 import Text from "./comp/Text.js";
 import Tree from "./comp/Tree.js";
 import Modal from "./comp/Modal.js";
+import DatePicker from "./comp/DatePicker.js";
+import TimePicker from "./comp/TimePicker.js";
 import TextUtil from "../util/TextUtil.js";
 
 // DSL解析器
@@ -44,6 +46,10 @@ export default class DslParser {
         return new Button(props, styles, events, data);
       case "select":
         return new Select(props, styles, events, data);
+      case "date":
+        return new DatePicker(props, styles, events, data);
+      case "time":
+        return new TimePicker(props, styles, events, data);
       case "table":
         return new Table(props, styles, events, data);
       case "radio":

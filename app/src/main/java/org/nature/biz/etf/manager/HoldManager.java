@@ -54,7 +54,7 @@ public class HoldManager {
         // 按时间正序排序
         list.sort(Comparator.comparing(Kline::getDate));
         // 创建模拟器
-        Simulator simulator = SimulatorBuilder.instance(rule, list, Collections.singletonList(DateUtil.today()));
+        Simulator simulator = SimulatorBuilder.instance(rule, list, List.of(DateUtil.today()));
         // 计算
         simulator.calc();
         // 获取持有数据

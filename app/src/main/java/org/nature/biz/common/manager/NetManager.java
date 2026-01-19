@@ -24,6 +24,7 @@ public class NetManager {
     @Injection
     private NetHttp netHttp;
 
+
     public int load(List<Net> list) {
         return ExecUtil.batch(() -> list, i -> this.load(i.getCode())).stream().mapToInt(i -> i).sum();
     }

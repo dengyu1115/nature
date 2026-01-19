@@ -80,14 +80,15 @@ public class GridDtSimulator implements Simulator {
         if (list.isEmpty()) {
             return;
         }
-        if (dateStart == null) {
+        if (dateStart == null || dateStart.isBlank()) {
             dateStart = list.get(0).getDate();
         }
         if (dateEnd == null) {
             dateEnd = list.get(list.size() - 1).getDate();
         }
         start = dateStart;
-        dates = dates.stream().filter(i -> start.compareTo(i) <= 0).collect(Collectors.toList());
+        String startDate = DateUtil.addDays(start, -1);
+        dates = dates.stream().filter(i -> startDate.compareTo(i) <= 0).collect(Collectors.toList());
         if (dates.isEmpty()) {
             return;
         }
@@ -163,7 +164,7 @@ public class GridDtSimulator implements Simulator {
         if (date == null || i.getDate().compareTo(date) <= 0) {
             return;
         }
-        if (date.compareTo(dateStart) < 0) {
+        if (DateUtil.addDays(date, 1).compareTo(dateStart) < 0) {
             return;
         }
         profits.add(this.calcProfit());
