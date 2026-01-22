@@ -26,8 +26,7 @@ public class PythonUtil {
         Python py = Python.getInstance();
         PyObject module = py.getModule("nature");
         PyObject method = module.get("dynamic_exec");
-        PyObject called = method.call(script, args);
-        return convert(called);
+        return convert(method.call(script, args));
     }
 
     private static Object convert(PyObject po) {

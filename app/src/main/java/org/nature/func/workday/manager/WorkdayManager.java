@@ -10,7 +10,6 @@ import org.nature.common.ioc.annotation.Injection;
 import org.nature.common.util.DateUtil;
 import org.nature.common.util.HttpUtil;
 import org.nature.func.workday.mapper.WorkdayMapper;
-import org.nature.func.workday.model.Month;
 import org.nature.func.workday.model.Workday;
 
 import java.util.*;
@@ -35,15 +34,6 @@ public class WorkdayManager {
     @Injection
     private WorkdayMapper workdayMapper;
 
-    /**
-     * 重载工作日数据
-     * @param year 年
-     * @return int
-     */
-    public int reload(String year) {
-        workdayMapper.deleteByYear(year);
-        return workdayMapper.batchSave(this.getYearWorkDays(year));
-    }
 
     /**
      * 加载工作日数据
@@ -75,19 +65,6 @@ public class WorkdayManager {
      * @param date 日期
      * @return String
      */
-    public String lastWorkday(String date) {
-        Workday workday = workdayMapper.findLastWorkday(date);
-        if (workday == null) {
-            return null;
-        }
-        return workday.getDate();
-    }
-
-    /**
-     * 上一工作日
-     * @param date 日期
-     * @return String
-     */
     public String lastWorkday(String date, int n) {
         List<Workday> workdays = workdayMapper.listLast(date, n);
         if (workdays.size() < n) {
@@ -109,32 +86,6 @@ public class WorkdayManager {
         return workday.getDate();
     }
 
-    /**
-     * 按年查询月份数据
-     * @param year 年
-     * @return list
-     */
-    public List<Month> listYearMonths(String year) {
-        // 查询数据
-        List<Workday> workdays = workdayMapper.listByYear(year);
-        // 按月分组
-        Map<String, List<Workday>> map = workdays.stream()
-                .collect(Collectors.groupingBy(i -> i.getDate().substring(0, 6)));
-        List<Month> results = new ArrayList<>();
-        // 遍历分组转换为月份对象
-        map.keySet().stream().sorted().forEach(i -> {
-            List<Workday> list = map.get(i);
-            if (list != null) {
-                Month month = new Month();
-                month.setMonth(i);
-                for (Workday w : list) {
-                    month.setDateType(w.getDate(), w.getType());
-                }
-                results.add(month);
-            }
-        });
-        return results;
-    }
 
     /**
      * 获取全年节假日
