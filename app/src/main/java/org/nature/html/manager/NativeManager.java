@@ -41,13 +41,13 @@ public class NativeManager {
 
     @JavascriptInterface
     public String invoke(String name, String param) {
-        System.out.println("invoke:" + name + ":" + param);
         try {
-            return this.buildRes("success", "", this.doInvoke(name, param));
+            Object data = this.doInvoke(name, param);
+            return this.buildRes("success", "", data);
         } catch (Warn e) {
             return this.buildRes("warn", e.getMessage(), "");
         } catch (Exception e) {
-            return this.buildRes("error", "系统异常" + e.getMessage(), "");
+            return this.buildRes("error", "系统异常：" + e.getMessage(), "");
         }
     }
 
@@ -121,6 +121,7 @@ public class NativeManager {
         JSONObject json = JSON.parseObject(param);
         String script = json.getString("script");
         JSONObject args = json.getJSONObject("args");
+        // 判断类型，分类型返回
         return PythonUtil.execScript(script, args);
     }
 
