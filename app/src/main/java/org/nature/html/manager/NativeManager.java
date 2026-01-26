@@ -6,14 +6,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializerFeature;
-import org.nature.common.exception.Warn;
-import org.nature.common.ioc.annotation.Component;
-import org.nature.common.ioc.annotation.Injection;
-import org.nature.common.util.Md5Util;
-import org.nature.common.util.PythonUtil;
-import org.nature.html.mapper.PageConfigMapper;
-import org.nature.html.model.PageConfig;
+import org.nature.exception.Warn;
 import org.nature.html.model.Res;
+import org.nature.util.DbUtil;
+import org.nature.util.HttpUtil;
+import org.nature.util.Md5Util;
+import org.nature.util.PythonUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -25,19 +23,10 @@ import java.util.Map;
  * @since 2025/11/06
  */
 @SuppressLint("DefaultLocale")
-@Component
 public class NativeManager {
 
     private static final TypeReference<Map<String, String>> TYPE_HEADERS = new TypeReference<>() {
     };
-    @Injection
-    private PageConfigMapper pageConfigMapper;
-    @Injection
-    private DbManager dbManager;
-    @Injection
-    private HttpManager httpManager;
-    @Injection
-    private CommManager commManager;
 
     @JavascriptInterface
     public String invoke(String name, String param) {
@@ -63,23 +52,20 @@ public class NativeManager {
                 return this.md5(param);
             case "http":
                 return this.http(param);
-            case "list":
-                return this.list(param);
-            case "find":
-                return this.find(param);
-            case "update":
-                return this.update(param);
-            case "exec_script":
-                return this.execScript(param);
+            case "sql":
+                return this.sql(param);
+            case "python":
+                return this.python(param);
             default:
-                return commManager.handle(name, param);
+                throw new Warn("未定义的接口：" + name);
         }
     }
 
     private Object page(String param) {
         String id = JSON.parseObject(param, String.class);
-        PageConfig config = pageConfigMapper.findById(id);
-        return config == null ? null : JSON.parseObject(config.getConfig());
+        String sql = "select config from page where id=" + id;
+        Map<String, Object> config = DbUtil.find("nature_test/html.db", sql);
+        return config == null ? null : JSON.toJSON(config.get("config"));
     }
 
     private Object md5(String param) {
@@ -93,37 +79,30 @@ public class NativeManager {
         String method = json.getString("method");
         String data = json.getString("data");
         Map<String, String> headers = json.getObject("headers", TYPE_HEADERS);
-        return httpManager.request(url, method, headers, data);
+        return HttpUtil.request(url, method, headers, data);
     }
 
-    private Object list(String param) {
+    private Object sql(String param) {
         JSONObject json = JSON.parseObject(param);
         String path = json.getString("path");
+        String type = json.getString("type");
         String sql = json.getString("sql");
-        return dbManager.list(path, sql);
+        switch (type) {
+            case "find":
+                return DbUtil.find(path, sql);
+            case "list":
+                return DbUtil.list(path, sql);
+            default:
+                return DbUtil.update(path, sql);
+        }
     }
 
-    private Object find(String param) {
-        JSONObject json = JSON.parseObject(param);
-        String path = json.getString("path");
-        String sql = json.getString("sql");
-        return dbManager.find(path, sql);
-    }
-
-    private Object update(String param) {
-        JSONObject json = JSON.parseObject(param);
-        String path = json.getString("path");
-        String sql = json.getString("sql");
-        return dbManager.update(path, sql);
-    }
-
-    private Object execScript(String param) {
+    private Object python(String param) {
         JSONObject json = JSON.parseObject(param);
         String script = json.getString("script");
         JSONObject args = json.getJSONObject("args");
         // 判断类型，分类型返回
         return PythonUtil.execScript(script, args);
     }
-
 
 }
