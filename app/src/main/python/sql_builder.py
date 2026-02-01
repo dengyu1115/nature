@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+from decimal import Decimal
 
 
 def sql_one(template, obj):
@@ -47,7 +48,7 @@ def sql_format_value(value):
         return "'" + value.replace("'", "''") + "'"
     if isinstance(value, bool):
         return "TRUE" if value else "FALSE"
-    if isinstance(value, (int, float)):
+    if isinstance(value, (int, float, Decimal)):
         return str(value)
     if isinstance(value, datetime):
         return f"'{value.strftime('%Y-%m-%d %H:%M:%S')}'"
