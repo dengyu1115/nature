@@ -12,6 +12,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import org.jetbrains.annotations.NotNull;
 import org.nature.html.manager.NativeManager;
 
@@ -117,7 +118,7 @@ public class CtxUtil {
     @SuppressWarnings("deprecation")
     private static WebView buildWebview() {
         WebView webView = new WebView(context);
-        webView.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
+        webView.setLayoutParams(new LayoutParams(MATCH_PARENT, MATCH_PARENT));
         webView.setBackgroundColor(Color.TRANSPARENT);
         webView.setWebViewClient(buildClient());
         webView.setWebChromeClient(new WebChromeClient());
