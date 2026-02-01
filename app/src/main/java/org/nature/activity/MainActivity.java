@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private LinearLayout view;
 
-    private NativeManager nativeManager = new NativeManager();
+    private final NativeManager manager = new NativeManager();
 
     private final Stack<WebView> viewStack = new Stack<>();
 
@@ -125,7 +125,7 @@ public class MainActivity extends AppCompatActivity {
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
         // 页面内容查询接口
-        webView.addJavascriptInterface(nativeManager, "native");
+        webView.addJavascriptInterface(manager, "native");
         return webView;
     }
 

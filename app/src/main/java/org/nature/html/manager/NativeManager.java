@@ -16,6 +16,9 @@ import org.nature.util.PythonUtil;
 import java.util.List;
 import java.util.Map;
 
+import static org.nature.config.Config.DB_PATH_HTML;
+import static org.nature.config.Config.SQL_HTML;
+
 /**
  * 页面配置
  * @author Nature
@@ -63,9 +66,9 @@ public class NativeManager {
 
     private Object page(String param) {
         String id = JSON.parseObject(param, String.class);
-        String sql = "select config from page where id=" + id;
-        Map<String, Object> config = DbUtil.find("nature_test/html.db", sql);
-        return config == null ? null : JSON.toJSON(config.get("config"));
+        String sql = SQL_HTML + "'" + id + "'";
+        Map<String, Object> config = DbUtil.find(DB_PATH_HTML, sql);
+        return config == null ? null : JSON.parseObject((String) config.get("config"));
     }
 
     private Object md5(String param) {
@@ -77,9 +80,13 @@ public class NativeManager {
         JSONObject json = JSON.parseObject(param);
         String url = json.getString("url");
         String method = json.getString("method");
-        String data = json.getString("data");
         Map<String, String> headers = json.getObject("headers", TYPE_HEADERS);
-        return HttpUtil.request(url, method, headers, data);
+        if("POST".equals( method)){
+            JSONObject data = json.getJSONObject("data");
+            return HttpUtil.post(url, headers, data);
+        }
+        Map<String, String>  data = json.getObject("data", TYPE_HEADERS);
+        return HttpUtil.get(url, headers, data);
     }
 
     private Object sql(String param) {
@@ -92,8 +99,10 @@ public class NativeManager {
                 return DbUtil.find(path, sql);
             case "list":
                 return DbUtil.list(path, sql);
-            default:
+            case "update":
                 return DbUtil.update(path, sql);
+            default:
+                return DbUtil.ddl(path, sql);
         }
     }
 

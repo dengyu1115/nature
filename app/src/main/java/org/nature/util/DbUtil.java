@@ -36,6 +36,10 @@ public class DbUtil {
         return map;
     };
 
+    public static void refresh() {
+        DB.refresh();
+    }
+
     public static List<Map<String, Object>> list(String path, String sql) {
         return DB.create(path).list(sql, new String[0], MAPPER);
     }
@@ -46,6 +50,10 @@ public class DbUtil {
 
     public static int update(String path, String sql) {
         return DB.create(path).executeUpdate(sql, new String[0]);
+    }
+
+    public static int ddl(String path, String sql) {
+        return DB.create(path).executeSql(sql);
     }
 
 }

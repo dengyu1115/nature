@@ -69,6 +69,13 @@ public class DB {
     }
 
     /**
+     * 刷新DB实例
+     */
+    public static void refresh() {
+        DB_MAP.clear();
+    }
+
+    /**
      * 获取int类型值
      * @param c   行
      * @param col 字段
@@ -185,7 +192,7 @@ public class DB {
             return statement.executeUpdateDelete();
         }
     }
-    
+
     /**
      * 执行SQL
      * @param sql  sql

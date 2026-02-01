@@ -1,5 +1,8 @@
 package org.nature.util;
 
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;

@@ -9,13 +9,19 @@ import android.os.IBinder;
 import android.os.PowerManager;
 import androidx.annotation.Nullable;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.nature.util.DbUtil;
 import org.nature.util.NotifyUtil;
 
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.nature.config.Config.DB_PATH_JOB;
+import static org.nature.config.Config.SQL_JOB;
 
 /**
  * 定时任务服务（运行于前台，可以在锁屏状态执行，定时器逻辑）
@@ -29,6 +35,7 @@ public class JobService extends Service {
      * 执行间隔
      */
     private static final int PERIOD = 1000;
+
     /**
      * 定时器
      */
@@ -159,6 +166,8 @@ public class JobService extends Service {
 
     private void exec(Date now) {
         // todo
+        List<Map<String, Object>> list = DbUtil.list(DB_PATH_JOB, SQL_JOB);
+
     }
 
 }

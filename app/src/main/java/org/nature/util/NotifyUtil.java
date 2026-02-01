@@ -12,6 +12,8 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static org.nature.config.Config.CHANNEL_ID;
+import static org.nature.config.Config.CHANNEL_NAME;
 
 /**
  * 提示消息工具
@@ -25,14 +27,6 @@ public class NotifyUtil {
      * 启动notification的id，两次启动应是同一个id
      */
     public final static int NOTIFICATION_ID = 1;
-    /**
-     * 服务通道id
-     */
-    private final static String CHANNEL_ID = "NATURE_CHANNEL";
-    /**
-     * 服务通道name
-     */
-    private final static String CHANNEL_NAME = "NATURE服务通道";
     /**
      * 消息发送管理器
      */

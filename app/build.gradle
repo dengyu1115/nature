@@ -1,6 +1,6 @@
 plugins {
-    id 'com.android.application'
-    id 'com.chaquo.python'
+    id('com.android.application')
+    id('com.chaquo.python')
 }
 
 android {
@@ -19,9 +19,6 @@ android {
             abiFilters 'arm64-v8a'
         }
 
-        python {
-            version '3.12'
-        }
     }
 
     compileOptions {
@@ -31,10 +28,14 @@ android {
 
     namespace 'org.nature'
 
-    sourceSets {
-        main {
-            python.srcDirs = ["src/main/python"]
-        }
+}
+
+chaquopy {
+    sourceSets.getByName("main") {
+        srcDirs = ["src/main/python"]
+    }
+    defaultConfig {
+        version = "3.14"
     }
 }
 
