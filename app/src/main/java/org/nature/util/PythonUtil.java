@@ -29,6 +29,11 @@ public class PythonUtil {
         }
     }
 
+    public static void refresh() {
+        DbUtil.refresh();
+        CtxUtil.refresh();
+    }
+
     public static Object execScript(String script, JSONObject args) {
         Python py = Python.getInstance();
         PyObject module = py.getModule("nature");
@@ -86,7 +91,6 @@ public class PythonUtil {
         if (po == null) {
             return null;
         }
-
         // 1. 获取Python原生类型名称（核心：替代isInstance的关键）
         String type = type(po);
         // 2. 基础类型（无嵌套，直接转换）
@@ -103,7 +107,6 @@ public class PythonUtil {
                 return new BigDecimal(po.toString());
             case "NoneType":
                 return null;
-
             // 3. 列表/元组（嵌套，递归解析每个元素）
             case "list":
             case "tuple":
@@ -112,7 +115,6 @@ public class PythonUtil {
                     javaList.add(toJava(item)); // 递归转换子元素
                 }
                 return javaList;
-
             // 4. 集合（嵌套，递归解析）
             case "set":
                 Set<Object> javaSet = new HashSet<>();
@@ -120,7 +122,6 @@ public class PythonUtil {
                     javaSet.add(toJava(item));
                 }
                 return javaSet;
-
             // 5. 字典（嵌套，递归解析键值对）
             case "dict":
                 Map<Object, Object> javaMap = new HashMap<>();
@@ -130,7 +131,6 @@ public class PythonUtil {
                     javaMap.put(key, value);
                 }
                 return javaMap;
-
             // 6. 其他类型（自定义处理，比如返回原始对象或字符串）
             default:
                 return po.toJava(Object.class);
@@ -152,17 +152,15 @@ public class PythonUtil {
         if (obj == null) {
             return null;
         }
-
         if (obj instanceof PyObject) {
             return (PyObject) obj;
         }
-
         // 基础类型直接转换
-        if (obj instanceof Integer || obj instanceof Double || obj instanceof String ||
-                obj instanceof Boolean || obj instanceof Long || obj instanceof Float) {
+        if (obj instanceof Integer || obj instanceof Long ||
+                obj instanceof Float || obj instanceof Double ||
+                obj instanceof Boolean || obj instanceof String) {
             return PyObject.fromJava(obj);
         }
-
         // BigDecimal转为python的Decimal
         if (obj instanceof BigDecimal) {
             Python python = Python.getInstance();
@@ -172,7 +170,6 @@ public class PythonUtil {
             PyObject decimalClass = decimalModule.get("Decimal");
             return decimalClass.call(((BigDecimal) obj).toPlainString());
         }
-
         // 处理列表和数组
         if (obj instanceof Collection) {
             Collection<?> collection = (Collection<?>) obj;
@@ -183,7 +180,6 @@ public class PythonUtil {
             }
             return pyList;
         }
-
         // 处理Map（字典）
         if (obj instanceof Map) {
             Map<?, ?> map = (Map<?, ?>) obj;
@@ -196,7 +192,6 @@ public class PythonUtil {
             }
             return pyDict;
         }
-
         // 其他类型尝试直接转换
         return PyObject.fromJava(obj);
     }

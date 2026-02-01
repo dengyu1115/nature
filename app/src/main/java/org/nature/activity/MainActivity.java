@@ -4,28 +4,17 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.LinearLayout;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import org.jetbrains.annotations.NotNull;
 import org.nature.util.CtxUtil;
 import org.nature.util.NotifyUtil;
 import org.nature.util.PythonUtil;
-import org.nature.html.manager.NativeManager;
-
-import java.util.Stack;
 
 import static android.Manifest.permission.*;
-import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
 
 /**
@@ -39,14 +28,6 @@ public class MainActivity extends AppCompatActivity {
      * 请求全局存储权限
      */
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    /**
-     * 全局页面对象
-     */
-    private LinearLayout view;
-
-    private final NativeManager manager = new NativeManager();
-
-    private final Stack<WebView> viewStack = new Stack<>();
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     @SuppressLint("ResourceAsColor")
@@ -67,10 +48,9 @@ public class MainActivity extends AppCompatActivity {
         // 通知工具初始化
         NotifyUtil.init();
         // 全局页面初始化
-        view = new LinearLayout(this);
         this.getWindow().setFlags(FLAG_LAYOUT_NO_LIMITS, FLAG_LAYOUT_NO_LIMITS);
-        this.setContentView(view);
-        this.show();
+        this.setContentView(CtxUtil.getView());
+        CtxUtil.show();
     }
 
 
@@ -78,14 +58,10 @@ public class MainActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // 控制按返回时候让应用后台运行或者执行关闭当前操作页面回上个页面
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
-            int size = viewStack.size();
-            if (size == 1) {
+            boolean back = CtxUtil.onBack();
+            if (back) {
                 return this.moveTaskToBack(true);
             }
-            ;
-            WebView view = viewStack.pop();
-            this.view.removeView(view);
-            this.view.addView(viewStack.peek());
             return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -102,47 +78,5 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void show() {
-        WebView view = this.buildWebview();
-        this.viewStack.push(view);
-        this.view.addView(view);
-        view.loadUrl("file:///android_asset/index.html?id=main");
-    }
-
-    @SuppressLint("SetJavaScriptEnabled")
-    @SuppressWarnings("deprecation")
-    private WebView buildWebview() {
-        WebView webView = new WebView(this);
-        webView.setLayoutParams(new LinearLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT));
-        webView.setBackgroundColor(Color.TRANSPARENT);
-        webView.setWebViewClient(this.buildClient());
-        webView.setWebChromeClient(new WebChromeClient());
-        WebSettings settings = webView.getSettings();
-        settings.setJavaScriptEnabled(true);
-        settings.setDomStorageEnabled(true);
-        settings.setAllowFileAccess(true);
-        settings.setAllowContentAccess(true);
-        settings.setAllowFileAccessFromFileURLs(true);
-        settings.setAllowUniversalAccessFromFileURLs(true);
-        // 页面内容查询接口
-        webView.addJavascriptInterface(manager, "native");
-        return webView;
-    }
-
-    @SuppressWarnings("deprecation")
-    @NotNull
-    private WebViewClient buildClient() {
-        return new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                WebView webview = MainActivity.this.buildWebview();
-                MainActivity.this.view.removeView(view);
-                MainActivity.this.view.addView(webview);
-                viewStack.push(webview);
-                webview.loadUrl(url);
-                return true;
-            }
-        };
-    }
 
 }

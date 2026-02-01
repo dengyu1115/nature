@@ -8,9 +8,12 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.PowerManager;
 import androidx.annotation.Nullable;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.nature.util.DbUtil;
+import org.nature.util.ExecUtil;
 import org.nature.util.NotifyUtil;
+import org.nature.util.PythonUtil;
 
 import java.util.Date;
 import java.util.List;
@@ -165,9 +168,13 @@ public class JobService extends Service {
 
 
     private void exec(Date now) {
-        // todo
         List<Map<String, Object>> list = DbUtil.list(DB_PATH_JOB, SQL_JOB);
-
+        for (Map<String, Object> i : list) {
+            String script = (String) i.get("script");
+            JSONObject args = new JSONObject();
+            args.put("date", now);
+            ExecUtil.submit(() -> PythonUtil.execScript(script, args));
+        }
     }
 
 }
