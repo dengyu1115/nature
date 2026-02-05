@@ -105,32 +105,34 @@ public class PythonUtil {
                 return po.toJava(Boolean.class);
             case "decimal.Decimal":
                 return new BigDecimal(po.toString());
+            case "datetime.datetime":
+                return po.toJava(Date.class);
             case "NoneType":
                 return null;
             // 3. 列表/元组（嵌套，递归解析每个元素）
             case "list":
             case "tuple":
-                List<Object> javaList = new ArrayList<>();
+                List<Object> list = new ArrayList<>();
                 for (PyObject item : po.asList()) {
-                    javaList.add(toJava(item)); // 递归转换子元素
+                    list.add(toJava(item)); // 递归转换子元素
                 }
-                return javaList;
+                return list;
             // 4. 集合（嵌套，递归解析）
             case "set":
-                Set<Object> javaSet = new HashSet<>();
+                Set<Object> set = new HashSet<>();
                 for (PyObject item : po.asSet()) {
-                    javaSet.add(toJava(item));
+                    set.add(toJava(item));
                 }
-                return javaSet;
+                return set;
             // 5. 字典（嵌套，递归解析键值对）
             case "dict":
-                Map<Object, Object> javaMap = new HashMap<>();
+                Map<Object, Object> map = new HashMap<>();
                 for (Map.Entry<PyObject, PyObject> entry : po.asMap().entrySet()) {
                     Object key = toJava(entry.getKey());
                     Object value = toJava(entry.getValue());
-                    javaMap.put(key, value);
+                    map.put(key, value);
                 }
-                return javaMap;
+                return map;
             // 6. 其他类型（自定义处理，比如返回原始对象或字符串）
             default:
                 return po.toJava(Object.class);
@@ -156,10 +158,16 @@ public class PythonUtil {
             return (PyObject) obj;
         }
         // 基础类型直接转换
-        if (obj instanceof Integer || obj instanceof Long ||
-                obj instanceof Float || obj instanceof Double ||
-                obj instanceof Boolean || obj instanceof String) {
-            return PyObject.fromJava(obj);
+        if (obj instanceof Double) {
+            Python python = Python.getInstance();
+            PyObject module = python.getModule("builtins");
+            return module.callAttr("float", obj);
+        }
+        if (obj instanceof Date) {
+            Python python = Python.getInstance();
+            PyObject module = python.getModule("datetime");
+            PyObject datetime = module.get("datetime");
+            return datetime.callAttr("fromtimestamp", ((Date) obj).getTime() / 1000d);
         }
         // BigDecimal转为python的Decimal
         if (obj instanceof BigDecimal) {

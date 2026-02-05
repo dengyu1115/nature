@@ -171,9 +171,16 @@ public class JobService extends Service {
         List<Map<String, Object>> list = DbUtil.list(DB_PATH_JOB, SQL_JOB);
         for (Map<String, Object> i : list) {
             String script = (String) i.get("script");
+            String name = (String) i.get("name");
             JSONObject args = new JSONObject();
             args.put("date", now);
-            ExecUtil.submit(() -> PythonUtil.execScript(script, args));
+            ExecUtil.submit(() -> {
+                try {
+                    PythonUtil.execScript(script, args);
+                } catch (Exception e) {
+                    NotifyUtil.notifyOne("任务执行失败：" + name, e.getMessage());
+                }
+            });
         }
     }
 

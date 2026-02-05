@@ -3,6 +3,7 @@ import Button from "./comp/Button.js";
 import Checkbox from "./comp/Checkbox.js";
 import Container from "./comp/Container.js";
 import Input from "./comp/Input.js";
+import TextArea from "./comp/TextArea.js";
 import KlineChart from "./comp/KlineChart.js";
 import LineChart from "./comp/LineChart.js";
 import Page from "./comp/Page.js";
@@ -42,6 +43,8 @@ export default class DslParser {
         return new Text(props, styles, events, data);
       case "input":
         return new Input(props, styles, events, data);
+      case "textarea":
+        return new TextArea(props, styles, events, data);
       case "button":
         return new Button(props, styles, events, data);
       case "select":
@@ -81,7 +84,7 @@ export default class DslParser {
       dslObj.props,
       dslObj.styles,
       dslObj.events,
-      dslObj.data
+      dslObj.data,
     );
     this.setPathCompMap(dslObj.data, comp);
     if (dslObj.children) {
