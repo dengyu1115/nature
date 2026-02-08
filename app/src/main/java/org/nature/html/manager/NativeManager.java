@@ -81,11 +81,11 @@ public class NativeManager {
         String url = json.getString("url");
         String method = json.getString("method");
         Map<String, String> headers = json.getObject("headers", TYPE_HEADERS);
-        if("POST".equals( method)){
+        if ("POST".equals(method)) {
             JSONObject data = json.getJSONObject("data");
             return HttpUtil.post(url, headers, data);
         }
-        Map<String, String>  data = json.getObject("data", TYPE_HEADERS);
+        Map<String, String> data = json.getObject("data", TYPE_HEADERS);
         return HttpUtil.get(url, headers, data);
     }
 

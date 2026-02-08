@@ -18,6 +18,7 @@ import org.nature.util.PythonUtil;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -47,6 +48,8 @@ public class JobService extends Service {
      * 计数器
      */
     private final AtomicInteger counter = new AtomicInteger();
+
+    private final Map<String, String> lockMap = new ConcurrentHashMap<>();
     private final long startTime = System.currentTimeMillis();
     /**
      * 唤醒锁
@@ -170,8 +173,12 @@ public class JobService extends Service {
     private void exec(Date now) {
         List<Map<String, Object>> list = DbUtil.list(DB_PATH_JOB, SQL_JOB);
         for (Map<String, Object> i : list) {
-            String script = (String) i.get("script");
             String name = (String) i.get("name");
+            String val = lockMap.computeIfAbsent(name, k -> name);
+            if (val == null) {
+                continue;
+            }
+            String script = (String) i.get("script");
             JSONObject args = new JSONObject();
             args.put("date", now);
             ExecUtil.submit(() -> {
@@ -179,6 +186,8 @@ public class JobService extends Service {
                     PythonUtil.execScript(script, args);
                 } catch (Exception e) {
                     NotifyUtil.notifyOne("任务执行失败：" + name, e.getMessage());
+                } finally {
+                    lockMap.remove(name);
                 }
             });
         }

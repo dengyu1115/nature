@@ -10,6 +10,8 @@ import android.view.KeyEvent;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.parser.Feature;
 import org.nature.util.CtxUtil;
 import org.nature.util.NotifyUtil;
 import org.nature.util.PythonUtil;
@@ -41,6 +43,8 @@ public class MainActivity extends AppCompatActivity {
         if ((this.getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
             return;
         }
+        // fastjson关闭默认小数转BigDecimal
+        JSON.DEFAULT_PARSER_FEATURE = JSON.DEFAULT_PARSER_FEATURE & ~Feature.UseBigDecimal.getMask();
         // 单例组件加载
         CtxUtil.init(this);
         // 初始化Python环境

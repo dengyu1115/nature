@@ -185,6 +185,8 @@ export default class Table extends Base {
       cell.style.height = height + "px";
       cell.style.lineHeight = 1;
       cell.style.whiteSpace = "nowrap";
+      cell.style.textOverflow = "ellipsis";
+      cell.style.overflow = "hidden";
     }
   }
 

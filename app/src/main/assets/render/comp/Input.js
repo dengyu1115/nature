@@ -64,7 +64,12 @@ export default class Input extends Base {
   }
 
   setValue() {
-    this.value = this.element.value;
+    const value = this.element.value;
+    if (this.props.type === "number") {
+      this.value = value ? +value : null;
+    } else {
+      this.value = value;
+    }
     const path = this.data.value?.path;
     if (path) {
       Reactive.set(data, path, this.value, this);
