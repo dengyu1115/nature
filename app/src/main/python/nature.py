@@ -1,26 +1,15 @@
 import inspect
 
 
-def dynamic_exec(code_str, params_dict):
+def dynamic_exec(code, params):
     scope = {}
-    exec(code_str, scope)
-
-    functions = {k: v for k, v in scope.items() if callable(v)}
+    exec(code, scope)
+    functions = [i for i in scope.values() if callable(i)]
 
     if functions:
-        func_name = list(functions.keys())[0]
-        func = functions[func_name]
-
-        try:
-            sig = inspect.signature(func)
-            func_params = list(sig.parameters.keys())
-
-            args_for_func = {}
-            for param in func_params:
-                args_for_func[param] = params_dict.get(param)
-
-            return func(**args_for_func)
-        except ValueError:
-            return func()
+        func = functions[0]
+        sig = inspect.signature(func)
+        args = {k: params.get(k) for k in sig.parameters.keys()}
+        return func(**args)
     else:
         raise ValueError("提供的代码字符串中没有可执行的函数")
