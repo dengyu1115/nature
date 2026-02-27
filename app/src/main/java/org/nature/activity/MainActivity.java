@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         // 单例组件加载
         CtxUtil.init(this);
         // 初始化Python环境
-        PythonUtil.init(this);
+        PythonUtil.init();
         // 通知工具初始化
         NotifyUtil.init();
         // 全局页面初始化

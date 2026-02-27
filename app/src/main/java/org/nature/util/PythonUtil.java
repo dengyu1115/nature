@@ -1,6 +1,5 @@
 package org.nature.util;
 
-import android.content.Context;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
@@ -20,10 +19,10 @@ public class PythonUtil {
     private static boolean initialized = false;
 
 
-    public static void init(Context context) {
+    public static void init() {
         if (!initialized) {
             if (!Python.isStarted()) {
-                Python.start(new AndroidPlatform(context));
+                Python.start(new AndroidPlatform(CtxUtil.get()));
             }
             initialized = true;
         }
