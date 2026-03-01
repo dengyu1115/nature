@@ -80,11 +80,17 @@ export default class Select extends Base {
     // 绑定事件
     this.selector.addEventListener("click", (e) => {
       e.stopPropagation();
+      if (this.props.readOnly === "true") {
+        return;
+      }
       this.toggle();
     });
     // 清空按钮点击事件
     this.clearBtn.addEventListener("click", (e) => {
       e.stopPropagation();
+      if (this.props.readOnly === "true") {
+        return;
+      }
       this.clearValue();
     });
     document.addEventListener("click", (e) => {
@@ -101,6 +107,13 @@ export default class Select extends Base {
   refreshValue() {
     this.updateValue();
     this.updateUI();
+  }
+
+  refreshReadOnly() {
+    const path = this.data.readOnly?.path;
+    if (path) {
+      this.props.readOnly = Reactive.get(data, path);
+    }
   }
 
   buildOptions() {
@@ -215,20 +228,20 @@ export default class Select extends Base {
   clearValue() {
     const multiple = this.props.multiple === "true";
     const path = this.data.value?.path;
-    
+
     if (multiple) {
       this.value = [];
     } else {
       this.value = [];
     }
-    
+
     if (path) {
       const v = multiple ? [] : null;
       Reactive.set(data, path, v, this);
     }
-    
+
     this.updateUI();
-    
+
     if (this.events.change) {
       try {
         new Function(this.events.change).call(this);
@@ -257,7 +270,7 @@ export default class Select extends Base {
     this.text.textContent = labels.length
       ? labels.join(",")
       : this.props.placeholder;
-    
+
     // 根据是否有选中值来控制清空按钮的显示/隐藏
     this.clearBtn.style.display = labels.length ? "block" : "none";
   }
