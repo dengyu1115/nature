@@ -205,7 +205,7 @@ export default class KlineChart extends ChartBase {
     const { vy, vHeight } = this.chartArea;
     const labels = this.config.labels || [];
     for (let i = start; i <= end; i++) {
-      if (i % Math.max(1, Math.floor((5 * this.dpr) / scale)) === 0) {
+      if (i % Math.max(1, Math.ceil((5 * this.dpr) / scale)) === 0) {
         const xi = this.calcDatumIndex(i);
         const yi = vy + vHeight + 20 * this.dpr;
         super.drawAxisLabel(xi, yi, labels[i] || `数据${i + 1}`);
@@ -216,51 +216,36 @@ export default class KlineChart extends ChartBase {
   // 绘制Y轴标签
   drawYAxisLabels(yAxisRanges) {
     const { x, ky, vy, width, kHeight, vHeight } = this.chartArea;
+    const color = this.config.colors.axis;
     // K线图区域Y轴标签
     const { max: kMax, min: kMin } = yAxisRanges["kline"];
-    const kFormatter = this.config.formatter?.kline;
+    const kf = this.config.formatter?.kline;
     const kStep = (kMax - kMin) / 5;
     for (let i = 0; i <= 5; i++) {
-      const text = kFormatter
-        ? kFormatter(kMin + i * kStep)
-        : (kMin + i * kStep).toFixed(3);
-      const xi = x - 30 * this.dpr;
+      const text = kf ? kf(kMin + i * kStep) : (kMin + i * kStep).toFixed(3);
+      const lx = x - 30 * this.dpr;
+      const rx = x + width + 30 * this.dpr;
       const yi = ky + kHeight - (i * kHeight) / 5 + 4 * this.dpr;
-      super.drawAxisLabel(xi, yi, text, "right", this.config.colors.axis);
-    }
-    // 右侧Y轴标签 (K线图区域)
-    for (let i = 0; i <= 5; i++) {
-      const text = (kMin + i * kStep).toFixed(3);
-      const xi = x + width + 30 * this.dpr;
-      const yi = ky + kHeight - (i * kHeight) / 5 + 4 * this.dpr;
-      super.drawAxisLabel(xi, yi, text, "left", this.config.colors.axis);
+      super.drawAxisLabel(lx, yi, text, "right", color);
+      super.drawAxisLabel(rx, yi, text, "left", color);
     }
     // 交易量区域Y轴标签 (合并左右两侧)
-    const shareData = yAxisRanges["share"];
-    const amountData = yAxisRanges["amount"];
-    const sFormatter = this.config.formatter?.share;
-    const aFormatter = this.config.formatter?.amount;
-    const sStep = (shareData.max - shareData.min) / 3;
-    const aStep = (amountData.max - amountData.min) / 3;
+    const { max: sMax, min: sMin } = yAxisRanges["share"];
+    const { max: aMax, min: aMin } = yAxisRanges["amount"];
+    const sf = this.config.formatter?.share;
+    const af = this.config.formatter?.amount;
+    const sStep = (sMax - sMin) / 3;
+    const aStep = (aMax - aMin) / 3;
     for (let i = 0; i <= 3; i++) {
-      // 左侧标签
-      const sText = sFormatter
-        ? sFormatter(shareData.min + i * sStep)
-        : Math.round(shareData.min + i * sStep);
-      const aText = aFormatter
-        ? aFormatter(amountData.min + i * aStep)
-        : Math.round(amountData.min + i * aStep);
-      const xi = x - 30 * this.dpr;
+      const sText = sf ? sf(sMin + i * sStep) : Math.round(sMin + i * sStep);
+      const aText = af ? af(aMin + i * aStep) : Math.round(aMin + i * aStep);
+      const lx = x - 30 * this.dpr;
+      const rx = x + width + 30 * this.dpr;
       const yi = vy + vHeight - (i * vHeight) / 3 + 4 * this.dpr;
-      super.drawAxisLabel(xi, yi, sText, "right", this.config.colors.axis);
+      // 左侧标签
+      super.drawAxisLabel(lx, yi, sText, "right", color);
       // 右侧标签
-      super.drawAxisLabel(
-        x + width + 30 * this.dpr,
-        yi,
-        aText,
-        "left",
-        this.config.colors.axis
-      );
+      super.drawAxisLabel(rx, yi, aText, "left", color);
     }
   }
 
@@ -289,8 +274,8 @@ export default class KlineChart extends ChartBase {
       const lowY = ky + kHeight - ((low - min) / (max - min)) * kHeight;
       // 绘制影线
       this.ctx.beginPath();
-      this.ctx.strokeStyle =
-        latest >= open ? this.config.colors.rising : this.config.colors.falling;
+      const color = this.config.colors[latest >= open ? "rising" : "falling"];
+      this.ctx.strokeStyle = color;
       this.ctx.lineWidth = 1 * this.dpr;
       this.ctx.moveTo(xi, highY);
       this.ctx.lineTo(xi, lowY);
@@ -301,20 +286,14 @@ export default class KlineChart extends ChartBase {
       if (rectHeight < 1) {
         // 当实体高度小于1像素时，绘制一条线
         this.ctx.beginPath();
-        this.ctx.strokeStyle =
-          latest >= open
-            ? this.config.colors.rising
-            : this.config.colors.falling;
+        this.ctx.strokeStyle = color;
         this.ctx.lineWidth = 1 * this.dpr;
         this.ctx.moveTo(candleX, rectY);
         this.ctx.lineTo(candleX + candleWidth, rectY);
         this.ctx.stroke();
       } else {
         // 绘制实体矩形
-        this.ctx.fillStyle =
-          latest >= open
-            ? this.config.colors.rising
-            : this.config.colors.falling;
+        this.ctx.fillStyle = color;
         this.ctx.fillRect(candleX, rectY, candleWidth, rectHeight);
       }
     }
@@ -404,33 +383,33 @@ export default class KlineChart extends ChartBase {
       x: legendX,
       y: legendY,
       visible: super.isLegendItemVisible("kline"),
-      drawIcon: (itemX, itemY) => {
+      drawIcon: (x, y) => {
         if (super.isLegendItemVisible("kline")) {
           this.drawLegendColorBox(
-            itemX,
-            itemY - 6 * this.dpr,
+            x,
+            y - 6 * this.dpr,
             5 * this.dpr,
             10 * this.dpr,
             this.config.colors.rising
           );
           this.drawLegendColorBox(
-            itemX + 5 * this.dpr,
-            itemY - 6 * this.dpr,
+            x + 5 * this.dpr,
+            y - 6 * this.dpr,
             5 * this.dpr,
             10 * this.dpr,
             this.config.colors.falling
           );
         } else {
           this.drawLegendBorder(
-            itemX,
-            itemY - 6 * this.dpr,
+            x,
+            y - 6 * this.dpr,
             5 * this.dpr,
             10 * this.dpr,
             this.config.colors.hidden
           );
           this.drawLegendBorder(
-            itemX + 5 * this.dpr,
-            itemY - 6 * this.dpr,
+            x + 5 * this.dpr,
+            y - 6 * this.dpr,
             5 * this.dpr,
             10 * this.dpr,
             this.config.colors.hidden
@@ -514,27 +493,27 @@ export default class KlineChart extends ChartBase {
     const datum = data[index];
 
     if (!datum) return points;
-    const kFormatter = this.config.formatter?.kline;
+    const kf = this.config.formatter?.kline;
     // 收集K线数据
     if (super.isLegendItemVisible("kline")) {
       points.push({
         seriesName: "开盘价",
-        value: kFormatter ? kFormatter(datum.open) : datum.open,
+        value: kf ? kf(datum.open) : datum.open,
         color: this.config.colors.rising,
       });
       points.push({
         seriesName: "最高价",
-        value: kFormatter ? kFormatter(datum.high) : datum.high,
+        value: kf ? kf(datum.high) : datum.high,
         color: this.config.colors.rising,
       });
       points.push({
         seriesName: "最低价",
-        value: kFormatter ? kFormatter(datum.low) : datum.low,
+        value: kf ? kf(datum.low) : datum.low,
         color: this.config.colors.falling,
       });
       points.push({
         seriesName: "收盘价",
-        value: kFormatter ? kFormatter(datum.latest) : datum.latest,
+        value: kf ? kf(datum.latest) : datum.latest,
         color: this.config.colors.falling,
       });
     }
@@ -547,28 +526,26 @@ export default class KlineChart extends ChartBase {
         const color = this.config.colors[config.key] || "#0000ff";
         points.push({
           seriesName: config.name,
-          value: kFormatter
-            ? kFormatter(datum[config.key])
-            : datum[config.key].toFixed(3),
+          value: kf ? kf(datum[config.key]) : datum[config.key].toFixed(3),
           color: color,
         });
       }
     });
     // 收集交易量数据
     if (super.isLegendItemVisible("share") && datum.share !== undefined) {
-      const sFormatter = this.config.formatter?.share;
+      const sf = this.config.formatter?.share;
       points.push({
         seriesName: "交易量",
-        value: sFormatter ? sFormatter(datum.share) : datum.share,
+        value: sf ? sf(datum.share) : datum.share,
         color: this.config.colors.share,
       });
     }
     // 收集交易金额数据
     if (super.isLegendItemVisible("amount") && datum.amount !== undefined) {
-      const aFormatter = this.config.formatter?.amount;
+      const af = this.config.formatter?.amount;
       points.push({
         seriesName: "交易金额",
-        value: aFormatter ? aFormatter(datum.amount) : datum.amount,
+        value: af ? af(datum.amount) : datum.amount,
         color: this.config.colors.amount,
       });
     }
