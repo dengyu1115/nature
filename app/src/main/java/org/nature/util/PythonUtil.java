@@ -44,9 +44,7 @@ public class PythonUtil {
         // 任务结果获取集合
         List<Future<PyObject>> cl = new LinkedList<>();
         // 提交任务
-        items.asList().forEach(i -> {
-            cl.add(ExecUtil.submit(() -> run.call(i)));
-        });
+        items.asList().forEach(i -> cl.add(ExecUtil.submit(() -> run.call(i))));
         PyObject builtins = Python.getInstance().getModule("builtins");
         PyObject list = builtins.callAttr("list");
         cl.forEach(i -> {
