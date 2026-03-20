@@ -1,4 +1,5 @@
 import inspect
+import json
 
 
 def dynamic_exec(code, params):
@@ -13,3 +14,7 @@ def dynamic_exec(code, params):
         return func(**args)
     else:
         raise ValueError("提供的代码字符串中没有可执行的函数")
+
+
+def to_json(obj):
+    return json.dumps(obj, ensure_ascii=False, default=lambda o: float(o))

@@ -8,8 +8,9 @@ import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
 
-import java.math.BigDecimal;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 
 public class PythonUtil {
@@ -22,7 +23,8 @@ public class PythonUtil {
     private static PyObject builtins_module;
 
     private static PyObject script_module;
-    private static PyObject json_module;
+    private static PyObject json_obj_module;
+    private static PyObject json_str_module;
 
     public static void init() {
         if (!initialized) {
@@ -30,8 +32,9 @@ public class PythonUtil {
                 Python.start(new AndroidPlatform(CtxUtil.get()));
                 Python instance = Python.getInstance();
                 builtins_module = instance.getModule("builtins");
-                json_module = Python.getInstance().getModule("json");
                 script_module = instance.getModule("nature").get("dynamic_exec");
+                json_str_module = instance.getModule("nature").get("to_json");
+                json_obj_module = Python.getInstance().getModule("json").get("loads");
             }
             initialized = true;
         }
@@ -94,52 +97,8 @@ public class PythonUtil {
         if (po == null) {
             return null;
         }
-        // 1. 获取Python原生类型名称（核心：替代isInstance的关键）
-        String type = type(po);
-        // 2. 基础类型（无嵌套，直接转换）
-        switch (type) {
-            case "decimal.Decimal":
-                return new BigDecimal(po.toString());
-            case "datetime.datetime":
-                return po.toJava(Date.class);
-            case "NoneType":
-                return null;
-            // 3. 列表/元组（嵌套，递归解析每个元素）
-            case "list":
-            case "tuple":
-                List<Object> list = new ArrayList<>();
-                for (PyObject item : po.asList()) {
-                    list.add(toJava(item)); // 递归转换子元素
-                }
-                return list;
-            // 4. 集合（嵌套，递归解析）
-            case "set":
-                Set<Object> set = new HashSet<>();
-                for (PyObject item : po.asSet()) {
-                    set.add(toJava(item));
-                }
-                return set;
-            // 5. 字典（嵌套，递归解析键值对）
-            case "dict":
-                Map<Object, Object> map = new HashMap<>();
-                for (Map.Entry<PyObject, PyObject> entry : po.asMap().entrySet()) {
-                    Object key = toJava(entry.getKey());
-                    Object value = toJava(entry.getValue());
-                    map.put(key, value);
-                }
-                return map;
-            // 6. 其他类型（自定义处理，比如返回原始对象或字符串）
-            default:
-                return po.toJava(Object.class);
-        }
-    }
-
-    private static String type(PyObject po) {
-        if (po == null) {
-            return "null";
-        }
-        PyObject pyType = po.type(); // 获取类型对象
-        return pyType.toString().replace("<class '", "").replace("'>", "");
+        PyObject json = json_str_module.call(po);
+        return JSON.parse(json.toString());
     }
 
     /**
@@ -147,6 +106,6 @@ public class PythonUtil {
      */
     public static PyObject toPython(Object obj) {
         String s = JSON.toJSONString(obj, SerializerFeature.WriteMapNullValue);
-        return json_module.callAttr("loads", s);
+        return json_obj_module.call(s);
     }
 }
