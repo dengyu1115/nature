@@ -72,6 +72,12 @@ public class DB {
      * 刷新DB实例
      */
     public static void refresh() {
+        DB_MAP.values().forEach(db -> {
+            db.writeDb.close();
+            for (SQLiteDatabase readDb : db.readDbs) {
+                readDb.close();
+            }
+        });
         DB_MAP.clear();
     }
 

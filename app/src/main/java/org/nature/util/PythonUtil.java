@@ -3,6 +3,7 @@ package org.nature.util;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
@@ -18,11 +19,19 @@ public class PythonUtil {
 
     private static boolean initialized = false;
 
+    private static PyObject builtins_module;
+
+    private static PyObject script_module;
+    private static PyObject json_module;
 
     public static void init() {
         if (!initialized) {
             if (!Python.isStarted()) {
                 Python.start(new AndroidPlatform(CtxUtil.get()));
+                Python instance = Python.getInstance();
+                builtins_module = instance.getModule("builtins");
+                json_module = Python.getInstance().getModule("json");
+                script_module = instance.getModule("nature").get("dynamic_exec");
             }
             initialized = true;
         }
@@ -34,10 +43,7 @@ public class PythonUtil {
     }
 
     public static Object execScript(String script, JSONObject args) {
-        Python py = Python.getInstance();
-        PyObject module = py.getModule("nature");
-        PyObject method = module.get("dynamic_exec");
-        return toJava(method.call(script, toPython(args)));
+        return toJava(script_module.call(script, toPython(args)));
     }
 
     public static PyObject multiThread(PyObject items, PyObject run) {
@@ -45,8 +51,7 @@ public class PythonUtil {
         List<Future<PyObject>> cl = new LinkedList<>();
         // 提交任务
         items.asList().forEach(i -> cl.add(ExecUtil.submit(() -> run.call(i))));
-        PyObject builtins = Python.getInstance().getModule("builtins");
-        PyObject list = builtins.callAttr("list");
+        PyObject list = builtins_module.callAttr("list");
         cl.forEach(i -> {
             try {
                 list.callAttr("append", i.get());
@@ -62,7 +67,8 @@ public class PythonUtil {
     }
 
     public static PyObject list(String path, String sql) {
-        return toPython(DbUtil.list(path, sql));
+        List<Map<String, Object>> list = DbUtil.list(path, sql);
+        return toPython(list);
     }
 
     public static PyObject update(String path, String sql) {
@@ -92,14 +98,6 @@ public class PythonUtil {
         String type = type(po);
         // 2. 基础类型（无嵌套，直接转换）
         switch (type) {
-            case "int":
-                return po.toJava(Integer.class);
-            case "float":
-                return po.toJava(Double.class);
-            case "str":
-                return po.toJava(String.class);
-            case "bool":
-                return po.toJava(Boolean.class);
             case "decimal.Decimal":
                 return new BigDecimal(po.toString());
             case "datetime.datetime":
@@ -148,56 +146,7 @@ public class PythonUtil {
      * 将Java对象转换为Python对象
      */
     public static PyObject toPython(Object obj) {
-        if (obj == null) {
-            return null;
-        }
-        if (obj instanceof PyObject) {
-            return (PyObject) obj;
-        }
-        // 基础类型直接转换
-        if (obj instanceof Double) {
-            Python python = Python.getInstance();
-            PyObject module = python.getModule("builtins");
-            return module.callAttr("float", obj);
-        }
-        if (obj instanceof Date) {
-            Python python = Python.getInstance();
-            PyObject module = python.getModule("datetime");
-            PyObject datetime = module.get("datetime");
-            return datetime.callAttr("fromtimestamp", ((Date) obj).getTime() / 1000d);
-        }
-        // BigDecimal转为python的Decimal
-        if (obj instanceof BigDecimal) {
-            Python python = Python.getInstance();
-            // 1. 获取Python的decimal模块
-            PyObject decimalModule = python.getModule("decimal");
-            // 2. 获取decimal模块中的Decimal类
-            PyObject decimalClass = decimalModule.get("Decimal");
-            return decimalClass.call(((BigDecimal) obj).toPlainString());
-        }
-        // 处理列表和数组
-        if (obj instanceof Collection) {
-            Collection<?> collection = (Collection<?>) obj;
-            PyObject builtins = Python.getInstance().getModule("builtins");
-            PyObject pyList = builtins.callAttr("list");
-            for (Object item : collection) {
-                pyList.callAttr("append", toPython(item));
-            }
-            return pyList;
-        }
-        // 处理Map（字典）
-        if (obj instanceof Map) {
-            Map<?, ?> map = (Map<?, ?>) obj;
-            PyObject builtins = Python.getInstance().getModule("builtins");
-            PyObject pyDict = builtins.callAttr("dict");
-            for (Map.Entry<?, ?> entry : map.entrySet()) {
-                PyObject key = toPython(entry.getKey());
-                PyObject value = toPython(entry.getValue());
-                pyDict.callAttr("__setitem__", key, value);
-            }
-            return pyDict;
-        }
-        // 其他类型尝试直接转换
-        return PyObject.fromJava(obj);
+        String s = JSON.toJSONString(obj, SerializerFeature.WriteMapNullValue);
+        return json_module.callAttr("loads", s);
     }
 }
