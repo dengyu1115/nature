@@ -4,9 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.chaquo.python.PyException;
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
+import org.nature.exception.Warn;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -46,7 +48,15 @@ public class PythonUtil {
     }
 
     public static Object execScript(String script, JSONObject args) {
-        return toJava(script_module.call(script, toPython(args)));
+        try {
+            return toJava(script_module.call(script, toPython(args)));
+        } catch (PyException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof Warn) {
+                throw (Warn) cause;
+            }
+            throw e;
+        }
     }
 
     public static PyObject multiThread(PyObject items, PyObject run) {
@@ -60,6 +70,7 @@ public class PythonUtil {
                 list.callAttr("append", i.get());
             } catch (Exception e) {
                 // ignore
+                e.printStackTrace(System.err);
             }
         });
         return list;
