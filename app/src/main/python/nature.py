@@ -18,3 +18,12 @@ def dynamic_exec(code, params):
 
 def to_json(obj):
     return json.dumps(obj, ensure_ascii=False, default=lambda o: float(o))
+
+
+def get_job_func(code):
+    scope = {}
+    exec(code, scope)
+    job_func = scope.get("do_exec")
+    if job_func:
+        return job_func
+    raise ValueError("函数不存在")

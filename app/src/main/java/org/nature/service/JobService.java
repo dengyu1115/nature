@@ -8,24 +8,20 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.PowerManager;
 import androidx.annotation.Nullable;
-import com.alibaba.fastjson.JSONObject;
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
 import org.apache.commons.lang3.time.DateFormatUtils;
-import org.nature.util.DbUtil;
 import org.nature.util.ExecUtil;
+import org.nature.util.JobUtil;
 import org.nature.util.NotifyUtil;
-import org.nature.util.PythonUtil;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.nature.config.Config.DB_PATH_JOB;
-import static org.nature.config.Config.SQL_JOB;
 
 /**
  * 定时任务服务（运行于前台，可以在锁屏状态执行，定时器逻辑）
@@ -106,10 +102,6 @@ public class JobService extends Service {
         service = null;
     }
 
-    public static boolean isRunning() {
-        return service != null;
-    }
-
     /**
      * 获取timer
      * @return timer
@@ -171,26 +163,25 @@ public class JobService extends Service {
 
 
     private void exec(Date now) {
-        List<Map<String, Object>> list = DbUtil.list(DB_PATH_JOB, SQL_JOB);
-        for (Map<String, Object> i : list) {
-            String name = (String) i.get("name");
+        Python instance = Python.getInstance();
+        PyObject module = instance.getModule("datetime").get("datetime");
+        PyObject date = module.callAttr("fromtimestamp", now.getTime() / 1000.0d);
+        Map<String, PyObject> jobMap = JobUtil.jobs();
+        jobMap.forEach((name, func) -> {
             String val = lockMap.computeIfAbsent(name, k -> name);
             if (val == null) {
-                continue;
+                return;
             }
-            String script = (String) i.get("script");
-            JSONObject args = new JSONObject();
-            args.put("date", now);
             ExecUtil.submit(() -> {
                 try {
-                    PythonUtil.execScript(script, args);
+                    func.call(date);
                 } catch (Exception e) {
                     NotifyUtil.notifyOne("任务执行失败：" + name, e.getMessage());
                 } finally {
                     lockMap.remove(name);
                 }
             });
-        }
+        });
     }
 
 }
