@@ -108,8 +108,13 @@ public class NativeManager {
 
     private Object python(String param) {
         JSONObject json = JSON.parseObject(param);
-        String script = json.getString("script");
+        String module = json.getString("module");
+        String func = json.getString("func");
         JSONObject args = json.getJSONObject("args");
+        if (module != null && func != null) {
+            return PythonUtil.execModule(module, func, args);
+        }
+        String script = json.getString("script");
         // 判断类型，分类型返回
         return PythonUtil.execScript(script, args);
     }

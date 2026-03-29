@@ -25,6 +25,7 @@ public class PythonUtil {
     private static PyObject builtins_module;
 
     private static PyObject script_module;
+    private static PyObject func_module;
     private static PyObject json_obj_module;
     private static PyObject json_str_module;
 
@@ -35,8 +36,10 @@ public class PythonUtil {
                 Python instance = Python.getInstance();
                 builtins_module = instance.getModule("builtins");
                 script_module = instance.getModule("nature").get("dynamic_exec");
+                func_module = instance.getModule("nature").get("module_func_exec");
                 json_str_module = instance.getModule("nature").get("to_json");
                 json_obj_module = Python.getInstance().getModule("json").get("loads");
+                instance.getModule("module_script");
             }
             initialized = true;
         }
@@ -50,6 +53,18 @@ public class PythonUtil {
     public static Object execScript(String script, JSONObject args) {
         try {
             return toJava(script_module.call(script, toPython(args)));
+        } catch (PyException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof Warn) {
+                throw (Warn) cause;
+            }
+            throw e;
+        }
+    }
+
+    public static Object execModule(String module, String func, JSONObject args) {
+        try {
+            return toJava(func_module.call(module, func, toPython(args)));
         } catch (PyException e) {
             Throwable cause = e.getCause();
             if (cause instanceof Warn) {

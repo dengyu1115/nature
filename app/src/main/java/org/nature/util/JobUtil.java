@@ -12,9 +12,10 @@ import static org.nature.config.Config.SQL_JOB;
 
 public class JobUtil {
 
-    private static Map<String, PyObject> jobMap = new HashMap<>();
+    private static final Map<String, PyObject> JOB_MAP = new HashMap<>();
 
     public static void init() {
+        JOB_MAP.clear();
         Python instance = Python.getInstance();
         PyObject module = instance.getModule("nature").get("get_job_func");
         List<Map<String, Object>> list = DbUtil.list(DB_PATH_JOB, SQL_JOB);
@@ -22,15 +23,15 @@ public class JobUtil {
             String name = (String) i.get("name");
             String script = (String) i.get("script");
             PyObject func = module.call(script);
-            jobMap.put(name, func);
+            JOB_MAP.put(name, func);
         }
     }
 
     public static void destroy() {
-        jobMap.clear();
+        JOB_MAP.clear();
     }
 
     public static Map<String, PyObject> jobs() {
-        return jobMap;
+        return JOB_MAP;
     }
 }

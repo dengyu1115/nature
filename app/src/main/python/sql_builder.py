@@ -11,16 +11,10 @@ def sql_one(template, obj):
     sql = template
 
     matches = re.findall(regex, template)
-    for field_name in matches:
-        placeholder = f"{{{field_name}}}"
-        if field_name in obj:
-            value = obj[field_name]
-            formatted_value = sql_format_value(value)
-            sql = sql.replace(placeholder, formatted_value)
-        else:
-            sql = sql.replace(placeholder, "NULL")
-
+    values = {i: do_format(obj[i]) if i in obj else "NULL" for i in matches}
+    sql = sql.format(**values)
     return sql
+
 
 def sql_each(template, items):
     if not template or not items or not isinstance(items, list) or len(items) == 0:
@@ -41,7 +35,8 @@ def sql_each(template, items):
     else:
         raise ValueError("模板格式错误")
 
-def sql_format_value(value):
+
+def do_format(value):
     if value is None:
         return "NULL"
     if isinstance(value, str):
