@@ -16,7 +16,7 @@ create table if not exists module_script(
 """
 
 PythonUtil.ddl(
-    "nature_test/common.db",
+    "nature/common.db",
     sql_ddl_create_table,
 )
 
@@ -44,7 +44,7 @@ def unload(module):
 
 def find_by_module(moduel):
     return PythonUtil.list(
-        "nature_test/common.db",
+        "nature/common.db",
         sql_one(
             "select module,script,status,seq from module_script where module={module}",
             {"module": moduel},
@@ -54,21 +54,21 @@ def find_by_module(moduel):
 
 def list_all():
     return PythonUtil.list(
-        "nature_test/common.db",
+        "nature/common.db",
         "select module,script,status,seq from module_script order by seq",
     )
 
 
 def list_valid():
     return PythonUtil.list(
-        "nature_test/common.db",
+        "nature/common.db",
         "select module,script,status,seq from module_script where status='1' order by seq",
     )
 
 
 def save_to_db(data):
     return PythonUtil.update(
-        "nature_test/common.db",
+        "nature/common.db",
         sql_each(
             "insert into module_script(module,script,status,seq) values[({module},{script},{status},{seq})]",
             data,
@@ -78,7 +78,7 @@ def save_to_db(data):
 
 def update_to_db(datum):
     return PythonUtil.update(
-        "nature_test/common.db",
+        "nature/common.db",
         sql_one(
             "update module_script set script={script},status={status},seq={seq} where module={module}",
             datum,
@@ -88,7 +88,7 @@ def update_to_db(datum):
 
 def delete_from_db(datum):
     return PythonUtil.update(
-        "nature_test/common.db",
+        "nature/common.db",
         sql_one(
             "delete from module_script where module={module}",
             datum,
