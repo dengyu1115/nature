@@ -112,7 +112,7 @@ export default class Select extends Base {
   refreshReadOnly() {
     const path = this.data.readOnly?.path;
     if (path) {
-      this.props.readOnly = Reactive.get(data, path);
+      this.props.readOnly = Reactive.get(data, path) ? "true" : "false";
     }
   }
 
