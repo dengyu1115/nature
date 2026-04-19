@@ -84,8 +84,7 @@ public class PythonUtil {
             try {
                 list.callAttr("append", i.get());
             } catch (Exception e) {
-                // ignore
-                e.printStackTrace(System.err);
+                throw new RuntimeException(e);
             }
         });
         return list;
