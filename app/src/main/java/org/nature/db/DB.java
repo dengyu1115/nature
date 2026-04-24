@@ -7,13 +7,11 @@ import android.os.Environment;
 import org.nature.util.FileUtil;
 
 import java.io.File;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 /**
@@ -79,36 +77,6 @@ public class DB {
             }
         });
         DB_MAP.clear();
-    }
-
-    /**
-     * 获取int类型值
-     * @param c   行
-     * @param col 字段
-     * @return Integer
-     */
-    public static Integer getInt(Cursor c, String col) {
-        return getVal(getString(c, col), Integer::valueOf);
-    }
-
-    /**
-     * 湖区double类型值
-     * @param c   行
-     * @param col 字段
-     * @return Double
-     */
-    public static Double getDouble(Cursor c, String col) {
-        return getVal(getString(c, col), Double::valueOf);
-    }
-
-    /**
-     * 获取BigDecimal类型值
-     * @param c   行
-     * @param col 字段
-     * @return BigDecimal
-     */
-    public static BigDecimal getDecimal(Cursor c, String col) {
-        return getVal(getString(c, col), BigDecimal::new);
     }
 
     /**
@@ -219,49 +187,6 @@ public class DB {
         }
     }
 
-    /**
-     * 批量执行SQL
-     * @param data      数据集
-     * @param batchSize 批量执行数量
-     * @param function  处理逻辑
-     * @return int
-     */
-    public <T> int batchExec(List<T> data, int batchSize, Function<List<T>, Integer> function) {
-        // 判断是否在事务中
-        boolean nt = !writeDb.inTransaction();
-        if (nt) {
-            // 不在事务中开启事务处理
-            AtomicInteger result = new AtomicInteger();
-            this.doInTransaction(() -> result.set(this.doBatch(data, batchSize, function)));
-            return result.get();
-        } else {
-            // 在事务中直接执行
-            return this.doBatch(data, batchSize, function);
-        }
-    }
-
-    /**
-     * 批量执行
-     * @param data      数据集
-     * @param batchSize 批量执行数量
-     * @param function  执行处理逻辑
-     * @return int
-     */
-    private <T> int doBatch(List<T> data, int batchSize, Function<List<T>, Integer> function) {
-        int size = data.size();
-        // 计算批处理数量
-        int batch = size % batchSize == 0 ? size / batchSize : size / batchSize + 1;
-        int updated = 0;
-        // 循环批处理
-        for (int i = 0; i < batch; i++) {
-            // 获取批处理数据
-            List<T> list = data.subList(batchSize * i, i == batch - 1 ? size : batchSize * (i + 1));
-            // 执行处理逻辑
-            updated += function.apply(list);
-        }
-        // 返回更新数量
-        return updated;
-    }
 
     /**
      * 在事务中执行逻辑
