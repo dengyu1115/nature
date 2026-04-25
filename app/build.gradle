@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace "org.nature"
-    compileSdk 35
+    compileSdkVersion 35
 
     defaultConfig {
         applicationId "org.nature"
-        minSdk 35
-        targetSdk 35
+        minSdkVersion 35
+        targetSdkVersion 35
         versionCode 1
         versionName "1.0"
 
@@ -30,7 +30,7 @@ android {
 }
 
 chaquopy {
-    sourceSets.getByName("main") {
+    sourceSets.named("main") {
         srcDirs = ["src/main/python"]
     }
     defaultConfig {
@@ -41,6 +41,4 @@ chaquopy {
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.alibaba:fastjson:1.2.83"
-    implementation "org.projectlombok:lombok:1.18.46"
-    annotationProcessor "org.projectlombok:lombok:1.18.46"
 }
