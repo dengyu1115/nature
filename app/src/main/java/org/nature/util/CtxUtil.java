@@ -128,6 +128,7 @@ public class CtxUtil {
         settings.setAllowContentAccess(true);
         settings.setAllowFileAccessFromFileURLs(true);
         settings.setAllowUniversalAccessFromFileURLs(true);
+        webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         // 页面内容查询接口
         webView.addJavascriptInterface(manager, "native");
         return webView;
@@ -142,7 +143,9 @@ public class CtxUtil {
                 CtxUtil.view.removeView(view);
                 CtxUtil.view.addView(webview);
                 viewStack.push(webview);
-                webview.loadUrl(url);
+                webview.post(() -> {
+                    webview.loadUrl(url);
+                });
                 return true;
             }
         };

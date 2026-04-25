@@ -20,6 +20,7 @@
                  android:launchMode="singleInstance"
                  android:usesCleartextTraffic="true"
                  android:requestLegacyExternalStorage="true"
+                 android:hardwareAccelerated="true"
                  tools:ignore="AllowBackup">
         <activity android:name=".activity.MainActivity"
                   android:screenOrientation="landscape"
