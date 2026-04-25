@@ -5,7 +5,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.speech.tts.TextToSpeech;
-import androidx.core.app.NotificationCompat;
 import org.nature.R;
 
 import java.util.Locale;
@@ -80,7 +79,7 @@ public class NotifyUtil {
      * @return Notification
      */
     public static Notification notification(String title, String content) {
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(CtxUtil.get(), CHANNEL_ID);
+        Notification.Builder builder = new Notification.Builder(CtxUtil.get(), CHANNEL_ID);
         builder.setSmallIcon(R.drawable.app_icon).setContentTitle(title).setContentText(content);
         return builder.build();
     }

@@ -13,7 +13,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import org.jetbrains.annotations.NotNull;
 import org.nature.html.manager.NativeManager;
 
 import java.util.List;
@@ -135,7 +134,6 @@ public class CtxUtil {
     }
 
     @SuppressWarnings("deprecation")
-    @NotNull
     private static WebViewClient buildClient() {
         return new WebViewClient() {
             @Override

@@ -1,21 +1,15 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
-
-    ext {
-        kotlin_version = '2.2.0'
-    }
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.12.0'
+        classpath "com.android.tools.build:gradle:8.12.0"
         classpath "com.chaquo.python:gradle:17.0.0"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
-tasks.register('clean', Delete) {
-    delete layout.buildDirectory
+task clean(type: Delete) {
+    delete rootProject.layout.buildDirectory
 }

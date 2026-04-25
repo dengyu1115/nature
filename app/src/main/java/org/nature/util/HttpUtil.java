@@ -2,8 +2,6 @@ package org.nature.util;
 
 
 import android.annotation.SuppressLint;
-import android.os.Build;
-import androidx.annotation.RequiresApi;
 import com.alibaba.fastjson.JSON;
 
 import java.io.*;
@@ -147,7 +145,6 @@ public class HttpUtil {
      * @param params 参数map
      * @return 查询字符串
      */
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     private static String buildQueryString(Map<String, String> params) {
         if (params == null || params.isEmpty()) {
             return "";

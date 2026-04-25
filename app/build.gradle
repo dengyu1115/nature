@@ -1,22 +1,23 @@
 plugins {
-    id('com.android.application')
-    id('com.chaquo.python')
+    id "com.android.application"
+    id "com.chaquo.python"
 }
 
 android {
-    compileSdkVersion 35
+    namespace "org.nature"
+    compileSdk 35
 
     defaultConfig {
         applicationId "org.nature"
-        minSdkVersion 29
-        targetSdkVersion 35
+        minSdk 35
+        targetSdk 35
         versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
-            abiFilters 'arm64-v8a'
+            abiFilters "arm64-v8a"
         }
 
     }
@@ -25,8 +26,6 @@ android {
         sourceCompatibility 17
         targetCompatibility 17
     }
-
-    namespace 'org.nature'
 
 }
 
@@ -40,15 +39,8 @@ chaquopy {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
-    implementation 'org.apache.commons:commons-lang3:3.20.0'
-    implementation 'commons-collections:commons-collections:20040616'
-    implementation 'com.alibaba:fastjson:1.2.83'
-    implementation 'org.projectlombok:lombok:1.18.46'
-    annotationProcessor 'org.projectlombok:lombok:1.18.46'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
-    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    testImplementation 'junit:junit:4.13.2'
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation "com.alibaba:fastjson:1.2.83"
+    implementation "org.projectlombok:lombok:1.18.46"
+    annotationProcessor "org.projectlombok:lombok:1.18.46"
 }

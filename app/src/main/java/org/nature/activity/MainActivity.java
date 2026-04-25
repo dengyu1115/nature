@@ -4,12 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.parser.Feature;
 import org.nature.util.CtxUtil;
@@ -25,13 +21,12 @@ import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
  * @version 1.0.0
  * @since 2024/1/5
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
     /**
      * 请求全局存储权限
      */
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
 
-    @RequiresApi(api = Build.VERSION_CODES.R)
     @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,14 +66,13 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.R)
     private void verifyStoragePermissions(Activity activity) {
         // 检测是否有写的权限
-        int permission = ActivityCompat.checkSelfPermission(activity, MANAGE_EXTERNAL_STORAGE);
+        int permission = activity.checkSelfPermission(MANAGE_EXTERNAL_STORAGE);
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // 没有写的权限，去申请写的权限，会弹出对话框
             String[] permissions = {MANAGE_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE};
-            ActivityCompat.requestPermissions(activity, permissions, REQUEST_EXTERNAL_STORAGE);
+            activity.requestPermissions(permissions, REQUEST_EXTERNAL_STORAGE);
         }
     }
 

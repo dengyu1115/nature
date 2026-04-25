@@ -7,15 +7,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.PowerManager;
-import androidx.annotation.Nullable;
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.nature.util.ExecUtil;
 import org.nature.util.JobUtil;
 import org.nature.util.NotifyUtil;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
@@ -34,7 +34,9 @@ public class JobService extends Service {
     /**
      * 执行间隔
      */
-    private static final int PERIOD = 1000;
+    private static final int PERIOD = 1000, DELAY = 0;
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd HH:mm:ss");
 
     /**
      * 定时器
@@ -52,6 +54,8 @@ public class JobService extends Service {
      */
     private PowerManager.WakeLock wl;
 
+    private PyObject date_module;
+
     /**
      * 创建服务
      */
@@ -68,11 +72,11 @@ public class JobService extends Service {
             if (service != null) {
                 return;
             }
+            date_module = Python.getInstance().getModule("datetime").get("datetime");
         }
-        this.getService().scheduleAtFixedRate(this::task, this.calculateDelay(), PERIOD, TimeUnit.MILLISECONDS);
+        this.getService().scheduleAtFixedRate(this::task, DELAY, PERIOD, TimeUnit.MILLISECONDS);
     }
 
-    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -122,13 +126,14 @@ public class JobService extends Service {
      */
     private void task() {
         try {
-            Date now = new Date();
-            String date = DateFormatUtils.format(now, "yyyyMMdd HH:mm:ss");
-            long times = (System.currentTimeMillis() - startTime) / 1000;
+            LocalDateTime now = LocalDateTime.now();
+            String date = now.format(DATE_FORMATTER);
+            long currTime = now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+            long times = (currTime - startTime) / 1000;
             int count = counter.getAndIncrement();
             String s = String.format("时间:%s 成功:%s 失败:%s", date, count, times - count);
             NotifyUtil.notify("NATURE正在运行", s);
-            this.exec(now);
+            this.exec(currTime);
         } catch (Exception e) {
             NotifyUtil.notifyOne("NATURE异常", e.getMessage());
         }
@@ -153,19 +158,9 @@ public class JobService extends Service {
         wl = null;
     }
 
-    /**
-     * 计算延迟执行时间
-     * @return int
-     */
-    private long calculateDelay() {
-        return 0;
-    }
 
-
-    private void exec(Date now) {
-        Python instance = Python.getInstance();
-        PyObject module = instance.getModule("datetime").get("datetime");
-        PyObject date = module.callAttr("fromtimestamp", now.getTime() / 1000.0d);
+    private void exec(Long currTime) {
+        PyObject date = date_module.callAttr("fromtimestamp", currTime / 1000.0d);
         Map<String, PyObject> jobMap = JobUtil.jobs();
         jobMap.forEach((name, func) -> {
             String val = lockMap.computeIfAbsent(name, k -> name);
