@@ -1,9 +1,9 @@
 package org.nature.util;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.TypeReference;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson2.JSONWriter;
+import com.alibaba.fastjson2.TypeReference;
 import com.chaquo.python.PyException;
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
@@ -130,7 +130,7 @@ public class PythonUtil {
      * 将Java对象转换为Python对象
      */
     public static PyObject toPython(Object obj) {
-        String s = JSON.toJSONString(obj, SerializerFeature.WriteMapNullValue);
+        String s = JSON.toJSONString(obj, JSONWriter.Feature.WriteMapNullValue);
         return json_obj_module.call(s);
     }
 }
