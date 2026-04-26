@@ -13,7 +13,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
-import org.nature.html.manager.NativeManager;
+import org.nature.html.NativeManager;
 
 import java.util.List;
 import java.util.Stack;

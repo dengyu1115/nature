@@ -1,4 +1,4 @@
-package org.nature.html.manager;
+package org.nature.html;
 
 import android.annotation.SuppressLint;
 import android.webkit.JavascriptInterface;
@@ -7,7 +7,6 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.TypeReference;
 import org.nature.exception.Warn;
-import org.nature.html.model.Res;
 import org.nature.util.DbUtil;
 import org.nature.util.HttpUtil;
 import org.nature.util.Md5Util;
@@ -33,35 +32,29 @@ public class NativeManager {
 
     @JavascriptInterface
     public String invoke(String name, String param) {
+        JSONObject res = new JSONObject();
         try {
-            Object data = this.doInvoke(name, param);
-            return this.buildRes("success", "", data);
+            res.put("code", "success");
+            res.put("data", this.doInvoke(name, param));
         } catch (Warn e) {
-            return this.buildRes("warn", e.getMessage(), "");
+            res.put("code", "warn");
+            res.put("message", e.getMessage());
         } catch (Exception e) {
-            return this.buildRes("error", "系统异常：" + e.getMessage(), "");
+            res.put("code", "error");
+            res.put("message", "系统异常：" + e.getMessage());
         }
-    }
-
-    private String buildRes(String code, String message, Object data) {
-        return JSON.toJSONString(new Res(code, message, data), JSONWriter.Feature.WriteMapNullValue);
+        return res.toString(JSONWriter.Feature.WriteMapNullValue);
     }
 
     private Object doInvoke(String name, String param) {
-        switch (name) {
-            case "page":
-                return this.page(param);
-            case "md5":
-                return this.md5(param);
-            case "http":
-                return this.http(param);
-            case "sql":
-                return this.sql(param);
-            case "python":
-                return this.python(param);
-            default:
-                throw new Warn("未定义的接口：" + name);
-        }
+        return switch (name) {
+            case "page" -> this.page(param);
+            case "md5" -> this.md5(param);
+            case "http" -> this.http(param);
+            case "sql" -> this.sql(param);
+            case "python" -> this.python(param);
+            default -> throw new Warn("未定义的接口：" + name);
+        };
     }
 
     private Object page(String param) {
@@ -94,16 +87,12 @@ public class NativeManager {
         String path = json.getString("path");
         String type = json.getString("type");
         String sql = json.getString("sql");
-        switch (type) {
-            case "find":
-                return DbUtil.find(path, sql);
-            case "list":
-                return DbUtil.list(path, sql);
-            case "update":
-                return DbUtil.update(path, sql);
-            default:
-                return DbUtil.ddl(path, sql);
-        }
+        return switch (type) {
+            case "find" -> DbUtil.find(path, sql);
+            case "list" -> DbUtil.list(path, sql);
+            case "update" -> DbUtil.update(path, sql);
+            default -> DbUtil.ddl(path, sql);
+        };
     }
 
     private Object python(String param) {
