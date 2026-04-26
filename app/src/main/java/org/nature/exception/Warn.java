@@ -1,7 +1,5 @@
 package org.nature.exception;
 
-import java.util.function.Supplier;
-
 /**
  * 自定义异常
  * @author Nature
