@@ -164,7 +164,7 @@ public class JobService extends Service {
         Map<String, PyObject> jobMap = JobUtil.jobs();
         jobMap.forEach((name, func) -> {
             String val = lockMap.putIfAbsent(name, name);
-            if (val == null) {
+            if (val != null) {
                 return;
             }
             ExecUtil.submit(() -> {
