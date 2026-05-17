@@ -1,37 +1,35 @@
-package org.nature.util;
+package org.nature.util
 
-import com.chaquo.python.PyObject;
-import com.chaquo.python.Python;
+import com.chaquo.python.PyObject
+import com.chaquo.python.Python
+import org.nature.config.Config.DB_PATH_JOB
+import org.nature.config.Config.SQL_JOB
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+object JobUtil {
 
-import static org.nature.config.Config.DB_PATH_JOB;
-import static org.nature.config.Config.SQL_JOB;
+    private val JOB_MAP = HashMap<String, PyObject>()
 
-public class JobUtil {
-
-    private static final Map<String, PyObject> JOB_MAP = new HashMap<>();
-
-    public static void init() {
-        JOB_MAP.clear();
-        Python instance = Python.getInstance();
-        PyObject module = instance.getModule("nature").get("get_job_func");
-        List<Map<String, Object>> list = DbUtil.list(DB_PATH_JOB, SQL_JOB);
-        for (Map<String, Object> i : list) {
-            String name = (String) i.get("name");
-            String script = (String) i.get("script");
-            PyObject func = module.call(script);
-            JOB_MAP.put(name, func);
+    @JvmStatic
+    fun init() {
+        JOB_MAP.clear()
+        val instance = Python.getInstance()
+        val module = instance.getModule("nature").get("get_job_func")
+        val list = DbUtil.list(DB_PATH_JOB, SQL_JOB)
+        for (i in list) {
+            val name = i["name"] as String
+            val script = i["script"] as String
+            val func = module!!.call(script)
+            JOB_MAP[name] = func
         }
     }
 
-    public static void destroy() {
-        JOB_MAP.clear();
+    @JvmStatic
+    fun destroy() {
+        JOB_MAP.clear()
     }
 
-    public static Map<String, PyObject> jobs() {
-        return JOB_MAP;
+    @JvmStatic
+    fun jobs(): Map<String, PyObject> {
+        return JOB_MAP
     }
 }

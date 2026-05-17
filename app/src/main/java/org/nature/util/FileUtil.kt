@@ -1,7 +1,7 @@
-package org.nature.util;
+package org.nature.util
 
-import java.io.File;
-import java.io.IOException;
+import java.io.File
+import java.io.IOException
 
 /**
  * 文件操作工具类
@@ -9,27 +9,26 @@ import java.io.IOException;
  * @version 1.0.0
  * @since 2019/11/21 16:36
  */
-public class FileUtil {
+object FileUtil {
 
     /**
      * 创建一个原本不存在的文件
      * @param file file
      */
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    public static void createIfNotExists(File file) {
+    @Suppress("ResultOfMethodCallIgnored")
+    fun createIfNotExists(file: File) {
         if (file.exists()) {
-            return;
+            return
         }
         try {
-            File parent = file.getParentFile();
-            assert parent != null;
+            val parent = file.parentFile
+            requireNotNull(parent)
             if (!parent.exists()) {
-                parent.mkdirs();
+                parent.mkdirs()
             }
-            file.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            file.createNewFile()
+        } catch (e: IOException) {
+            throw RuntimeException(e)
         }
     }
-
 }

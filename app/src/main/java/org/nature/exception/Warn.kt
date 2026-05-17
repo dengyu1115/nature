@@ -1,4 +1,4 @@
-package org.nature.exception;
+package org.nature.exception
 
 /**
  * 自定义异常
@@ -6,10 +6,4 @@ package org.nature.exception;
  * @version 1.0.0
  * @since 2024/1/6
  */
-public class Warn extends RuntimeException {
-
-    public Warn(String msg) {
-        super(msg);
-    }
-
-}
+class Warn(msg: String) : RuntimeException(msg)

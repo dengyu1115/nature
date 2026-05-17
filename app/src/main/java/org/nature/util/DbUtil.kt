@@ -1,59 +1,51 @@
-package org.nature.util;
+package org.nature.util
 
-import android.database.Cursor;
-import org.nature.db.DB;
+import android.database.Cursor
+import org.nature.db.DB
+import java.util.function.Function
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
+object DbUtil {
 
-public class DbUtil {
-
-    private static final Function<Cursor, Map<String, Object>> MAPPER = cursor -> {
-        Map<String, Object> map = new HashMap<>();
-        String[] columnNames = cursor.getColumnNames();
-        for (String columnName : columnNames) {
-            int columnIndex = cursor.getColumnIndex(columnName);
+    private val MAPPER = Function<Cursor, Map<String, Any>> { cursor ->
+        val map = HashMap<String, Any>()
+        val columnNames = cursor.columnNames
+        for (columnName in columnNames) {
+            val columnIndex = cursor.getColumnIndex(columnName)
             if (columnIndex == -1) {
-                continue;
+                continue
             }
-            switch (cursor.getType(columnIndex)) {
-                case Cursor.FIELD_TYPE_INTEGER:
-                    map.put(columnName, cursor.getInt(columnIndex));
-                    break;
-                case Cursor.FIELD_TYPE_FLOAT:
-                    map.put(columnName, cursor.getDouble(columnIndex));
-                    break;
-                case Cursor.FIELD_TYPE_NULL:
-                    map.put(columnName, null);
-                    break;
-                default:
-                    map.put(columnName, cursor.getString(columnIndex));
-                    break;
+            when (cursor.getType(columnIndex)) {
+                Cursor.FIELD_TYPE_INTEGER -> map[columnName] = cursor.getInt(columnIndex)
+                Cursor.FIELD_TYPE_FLOAT -> map[columnName] = cursor.getDouble(columnIndex)
+                Cursor.FIELD_TYPE_NULL -> map[columnName] = null!!
+                else -> map[columnName] = cursor.getString(columnIndex)
             }
         }
-        return map;
-    };
-
-    public static void refresh() {
-        DB.refresh();
+        map
     }
 
-    public static List<Map<String, Object>> list(String path, String sql) {
-        return DB.create(path).list(sql, new String[0], MAPPER);
+    @JvmStatic
+    fun refresh() {
+        DB.refresh()
     }
 
-    public static Map<String, Object> find(String path, String sql) {
-        return DB.create(path).find(sql, new String[0], MAPPER);
+    @JvmStatic
+    fun list(path: String, sql: String): List<Map<String, Any>> {
+        return DB.create(path).list(sql, arrayOf(), MAPPER)
     }
 
-    public static int update(String path, String sql) {
-        return DB.create(path).executeUpdate(sql, new String[0]);
+    @JvmStatic
+    fun find(path: String, sql: String): Map<String, Any>? {
+        return DB.create(path).find(sql, arrayOf(), MAPPER)
     }
 
-    public static int ddl(String path, String sql) {
-        return DB.create(path).executeSql(sql);
+    @JvmStatic
+    fun update(path: String, sql: String): Int {
+        return DB.create(path).executeUpdate(sql, arrayOf())
     }
 
+    @JvmStatic
+    fun ddl(path: String, sql: String): Int {
+        return DB.create(path).executeSql(sql)
+    }
 }

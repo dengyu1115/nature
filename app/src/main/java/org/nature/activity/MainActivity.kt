@@ -1,17 +1,16 @@
-package org.nature.activity;
+package org.nature.activity
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-import android.view.KeyEvent;
-import org.nature.util.CtxUtil;
-import org.nature.util.NotifyUtil;
-import org.nature.util.PythonUtil;
-
-import static android.Manifest.permission.*;
-import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Bundle
+import android.view.KeyEvent
+import android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+import org.nature.util.CtxUtil
+import org.nature.util.NotifyUtil
+import org.nature.util.PythonUtil
 
 /**
  * 应用入口（对其他组件使用单例模式加载）
@@ -19,58 +18,57 @@ import static android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS;
  * @version 1.0.0
  * @since 2024/1/5
  */
-public class MainActivity extends Activity {
+class MainActivity : Activity() {
     /**
      * 请求全局存储权限
      */
-    private static final int REQUEST_EXTERNAL_STORAGE = 1;
+    private val REQUEST_EXTERNAL_STORAGE = 1
 
     @SuppressLint("ResourceAsColor")
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         // 初始化处理
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState)
         //  请求全局存储权限
-        this.verifyStoragePermissions(this);
+        this.verifyStoragePermissions(this)
         // 启动组件（控制只执行一次）
-        if ((this.getIntent().getFlags() & Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT) != 0) {
-            return;
+        if (this.intent.flags and Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT != 0) {
+            return
         }
         // 单例组件加载
-        CtxUtil.init(this);
+        CtxUtil.init(this)
         // 初始化Python环境
-        PythonUtil.init();
+        PythonUtil.init()
         // 通知工具初始化
-        NotifyUtil.init();
+        NotifyUtil.init()
         // 全局页面初始化
-        this.getWindow().setFlags(FLAG_LAYOUT_NO_LIMITS, FLAG_LAYOUT_NO_LIMITS);
-        this.setContentView(CtxUtil.getView());
-        CtxUtil.show();
+        this.window.setFlags(FLAG_LAYOUT_NO_LIMITS, FLAG_LAYOUT_NO_LIMITS)
+        this.setContentView(CtxUtil.getView())
+        CtxUtil.show()
     }
 
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
+    override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         // 控制按返回时候让应用后台运行或者执行关闭当前操作页面回上个页面
-        if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
-            boolean back = CtxUtil.onBack();
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.action == KeyEvent.ACTION_DOWN) {
+            val back = CtxUtil.onBack()
             if (back) {
-                return this.moveTaskToBack(true);
+                return this.moveTaskToBack(true)
             }
-            return true;
+            return true
         }
-        return super.onKeyDown(keyCode, event);
+        return super.onKeyDown(keyCode, event)
     }
 
-    private void verifyStoragePermissions(Activity activity) {
+    private fun verifyStoragePermissions(activity: Activity) {
         // 检测是否有写的权限
-        int permission = activity.checkSelfPermission(MANAGE_EXTERNAL_STORAGE);
+        val permission = activity.checkSelfPermission(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
         if (permission != PackageManager.PERMISSION_GRANTED) {
             // 没有写的权限，去申请写的权限，会弹出对话框
-            String[] permissions = {MANAGE_EXTERNAL_STORAGE, WRITE_EXTERNAL_STORAGE, READ_EXTERNAL_STORAGE};
-            activity.requestPermissions(permissions, REQUEST_EXTERNAL_STORAGE);
+            val permissions = arrayOf(
+                Manifest.permission.MANAGE_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+            activity.requestPermissions(permissions, REQUEST_EXTERNAL_STORAGE)
         }
     }
-
-
 }

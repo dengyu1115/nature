@@ -1,22 +1,18 @@
-package org.nature.html;
+package org.nature.html
 
-import android.annotation.SuppressLint;
-import android.webkit.JavascriptInterface;
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.fastjson2.JSONWriter;
-import com.alibaba.fastjson2.TypeReference;
-import org.nature.exception.Warn;
-import org.nature.util.DbUtil;
-import org.nature.util.HttpUtil;
-import org.nature.util.Md5Util;
-import org.nature.util.PythonUtil;
-
-import java.util.List;
-import java.util.Map;
-
-import static org.nature.config.Config.DB_PATH_HTML;
-import static org.nature.config.Config.SQL_HTML;
+import android.annotation.SuppressLint
+import android.webkit.JavascriptInterface
+import com.alibaba.fastjson2.JSON
+import com.alibaba.fastjson2.JSONObject
+import com.alibaba.fastjson2.JSONWriter
+import com.alibaba.fastjson2.TypeReference
+import org.nature.config.Config.DB_PATH_HTML
+import org.nature.config.Config.SQL_HTML
+import org.nature.exception.Warn
+import org.nature.util.DbUtil
+import org.nature.util.HttpUtil
+import org.nature.util.Md5Util
+import org.nature.util.PythonUtil
 
 /**
  * 页面配置
@@ -25,87 +21,87 @@ import static org.nature.config.Config.SQL_HTML;
  * @since 2025/11/06
  */
 @SuppressLint("DefaultLocale")
-public class NativeManager {
+class NativeManager {
 
-    private static final TypeReference<Map<String, String>> TYPE_HEADERS = new TypeReference<>() {
-    };
+    private val TYPE_HEADERS = object : TypeReference<Map<String?, String?>>() {}
 
     @JavascriptInterface
-    public String invoke(String name, String param) {
-        JSONObject res = new JSONObject();
+    fun invoke(name: String, param: String): String {
+        val res = JSONObject()
         try {
-            res.put("code", "success");
-            res.put("data", this.doInvoke(name, param));
-        } catch (Warn e) {
-            res.put("code", "warn");
-            res.put("message", e.getMessage());
-        } catch (Exception e) {
-            res.put("code", "error");
-            res.put("message", "系统异常：" + e.getMessage());
+            res["code"] = "success"
+            res["data"] = doInvoke(name, param)
+        } catch (e: Warn) {
+            res["code"] = "warn"
+            res["message"] = e.message
+        } catch (e: Exception) {
+            res["code"] = "error"
+            res["message"] = "系统异常：" + e.message
         }
-        return res.toString(JSONWriter.Feature.WriteMapNullValue);
+        return res.toString(JSONWriter.Feature.WriteMapNullValue)
     }
 
-    private Object doInvoke(String name, String param) {
-        return switch (name) {
-            case "page" -> this.page(param);
-            case "md5" -> this.md5(param);
-            case "http" -> this.http(param);
-            case "sql" -> this.sql(param);
-            case "python" -> this.python(param);
-            default -> throw new Warn("未定义的接口：" + name);
-        };
-    }
-
-    private Object page(String param) {
-        String id = JSON.parseObject(param, String.class);
-        String sql = SQL_HTML + "'" + id + "'";
-        Map<String, Object> config = DbUtil.find(DB_PATH_HTML, sql);
-        return config == null ? null : JSON.parseObject((String) config.get("config"));
-    }
-
-    private Object md5(String param) {
-        List<String> list = JSON.parseArray(param, String.class);
-        return Md5Util.md5(list.toArray(new String[0]));
-    }
-
-    private Object http(String param) {
-        JSONObject json = JSON.parseObject(param);
-        String url = json.getString("url");
-        String method = json.getString("method");
-        Map<String, String> headers = json.getObject("headers", TYPE_HEADERS);
-        if ("POST".equals(method)) {
-            JSONObject data = json.getJSONObject("data");
-            return HttpUtil.post(url, headers, data);
+    private fun doInvoke(name: String, param: String): Any? {
+        return when (name) {
+            "page" -> page(param)
+            "md5" -> md5(param)
+            "http" -> http(param)
+            "sql" -> sql(param)
+            "python" -> python(param)
+            else -> throw Warn("未定义的接口：$name")
         }
-        Map<String, String> data = json.getObject("data", TYPE_HEADERS);
-        return HttpUtil.get(url, headers, data);
     }
 
-    private Object sql(String param) {
-        JSONObject json = JSON.parseObject(param);
-        String path = json.getString("path");
-        String type = json.getString("type");
-        String sql = json.getString("sql");
-        return switch (type) {
-            case "find" -> DbUtil.find(path, sql);
-            case "list" -> DbUtil.list(path, sql);
-            case "update" -> DbUtil.update(path, sql);
-            default -> DbUtil.ddl(path, sql);
-        };
+    private fun page(param: String): Any? {
+        val id = JSON.parseObject(param, String::class.java)
+        val sql = "$SQL_HTML'$id'"
+        val config = DbUtil.find(DB_PATH_HTML, sql)
+        return if (config == null) null else JSON.parseObject(config["config"] as String)
     }
 
-    private Object python(String param) {
-        JSONObject json = JSON.parseObject(param);
-        String module = json.getString("module");
-        String func = json.getString("func");
-        JSONObject args = json.getJSONObject("args");
-        if (module != null && func != null) {
-            return PythonUtil.execModule(module, func, args);
+    private fun md5(param: String): String {
+        val list = JSON.parseArray(param, String::class.java)
+        return Md5Util.md5(*list.toTypedArray())
+    }
+
+    private fun http(param: String): Any {
+        val json = JSON.parseObject(param)
+        val url = json.getString("url")
+        val method = json.getString("method")
+        val headers = json.getObject<Map<String, String>>("headers", TYPE_HEADERS.type)
+        return if ("POST" == method) {
+            val data = json.getJSONObject("data")
+            HttpUtil.post(url, headers, data)
+        } else {
+            val data = json.getObject<Map<String?, String?>>("data", TYPE_HEADERS.type)
+            HttpUtil.get(url, headers, data)
         }
-        String script = json.getString("script");
-        // 判断类型，分类型返回
-        return PythonUtil.execScript(script, args);
     }
 
+    private fun sql(param: String): Any? {
+        val json = JSON.parseObject(param)
+        val path = json.getString("path")
+        val type = json.getString("type")
+        val sql = json.getString("sql")
+        return when (type) {
+            "find" -> DbUtil.find(path, sql)
+            "list" -> DbUtil.list(path, sql)
+            "update" -> DbUtil.update(path, sql)
+            else -> DbUtil.ddl(path, sql)
+        }
+    }
+
+    private fun python(param: String): Any? {
+        val json = JSON.parseObject(param)
+        val module = json.getString("module")
+        val func = json.getString("func")
+        val args = json.getJSONObject("args")
+        return if (module != null && func != null) {
+            PythonUtil.execModule(module, func, args)
+        } else {
+            val script = json.getString("script")
+            // 判断类型，分类型返回
+            PythonUtil.execScript(script, args)
+        }
+    }
 }

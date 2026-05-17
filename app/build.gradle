@@ -1,6 +1,7 @@
 plugins {
     id "com.android.application"
     id "com.chaquo.python"
+    id "org.jetbrains.kotlin.android"
 }
 
 android {
@@ -23,6 +24,10 @@ android {
     compileOptions {
         sourceCompatibility 17
         targetCompatibility 17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
     }
 
 }

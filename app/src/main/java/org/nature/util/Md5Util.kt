@@ -1,7 +1,7 @@
-package org.nature.util;
+package org.nature.util
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 
 /**
  * md5工具类
@@ -9,15 +9,16 @@ import java.security.NoSuchAlgorithmException;
  * @version 1.0.0
  * @since 2024/1/15
  */
-public class Md5Util {
+object Md5Util {
 
     /**
      * 生成MD5字符串
      * @param input 输入
      * @return String
      */
-    public static String md5(String... input) {
-        return Md5Util.md5(String.join(":", input));
+    @JvmStatic
+    fun md5(vararg input: String): String {
+        return md5(input.joinToString(":"))
     }
 
     /**
@@ -25,18 +26,18 @@ public class Md5Util {
      * @param input 输入
      * @return String
      */
-    public static String md5(String input) {
+    @JvmStatic
+    fun md5(input: String): String {
         try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] messageDigest = md.digest(input.getBytes());
-            StringBuilder sb = new StringBuilder();
-            for (byte b : messageDigest) {
-                sb.append(String.format("%02x", b));
+            val md = MessageDigest.getInstance("MD5")
+            val messageDigest = md.digest(input.toByteArray())
+            val sb = StringBuilder()
+            for (b in messageDigest) {
+                sb.append(String.format("%02x", b))
             }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            return sb.toString()
+        } catch (e: NoSuchAlgorithmException) {
+            throw RuntimeException(e)
         }
     }
-
 }
