@@ -1,6 +1,12 @@
 package org.nature.config;
 
+import android.os.Environment;
+
+import java.io.File;
+
 public interface Config {
+
+    File INTERNAL = Environment.getExternalStorageDirectory();
 
     /**
      * 服务通道id

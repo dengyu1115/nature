@@ -3,7 +3,6 @@ package org.nature.db;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import android.os.Environment;
 import org.nature.util.FileUtil;
 
 import java.io.File;
@@ -14,6 +13,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+import static org.nature.config.Config.INTERNAL;
+
 /**
  * DB操作工具类
  * @author Nature
@@ -22,10 +23,6 @@ import java.util.function.Function;
  */
 public class DB {
 
-    /**
-     * 全局路径
-     */
-    private static final File INTERNAL = Environment.getExternalStorageDirectory();
     /**
      * DB实例map
      */

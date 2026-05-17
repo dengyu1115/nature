@@ -81,6 +81,11 @@ public class CtxUtil {
         view.loadUrl("file:///android_asset/index.html?id=main");
     }
 
+    public static void callback(String cript) {
+        WebView webView = viewStack.peek();
+        webView.post(() -> webView.evaluateJavascript(cript, null));
+    }
+
     public static void refresh() {
         view.post(() -> {
             viewStack.clear();
