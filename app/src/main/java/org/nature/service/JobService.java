@@ -163,7 +163,7 @@ public class JobService extends Service {
         PyObject date = date_module.callAttr("fromtimestamp", currTime / 1000.0d);
         Map<String, PyObject> jobMap = JobUtil.jobs();
         jobMap.forEach((name, func) -> {
-            String val = lockMap.computeIfAbsent(name, k -> name);
+            String val = lockMap.putIfAbsent(name, name);
             if (val == null) {
                 return;
             }
