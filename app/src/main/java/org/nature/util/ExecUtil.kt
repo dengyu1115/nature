@@ -1,6 +1,6 @@
 package org.nature.util
 
-import java.util.LinkedList
+import java.util.*
 import java.util.concurrent.*
 import java.util.function.Function
 import java.util.function.Supplier

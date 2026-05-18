@@ -6,7 +6,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.speech.tts.TextToSpeech
 import org.nature.R
-import java.util.Locale
+import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
@@ -21,12 +21,12 @@ object NotifyUtil {
      * 启动notification的id，两次启动应是同一个id
      */
     const val NOTIFICATION_ID = 1
-    
+
     /**
      * 消息发送管理器
      */
     private var manager: NotificationManager? = null
-    
+
     /**
      * ID计数器
      */
