@@ -127,7 +127,7 @@ class JobService : Service() {
             val currTime = now.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()
             val times = (currTime - startTime) / 1000
             val count = counter.getAndIncrement()
-            val s = String.format("时间:%s 成功:%s 失败:%s", date, count, times - count)
+            val s = "时间:$date 成功:$count 失败:${times - count}"
             NotifyUtil.notify("NATURE正在运行", s)
             this.exec(currTime)
         } catch (e: Exception) {

@@ -117,14 +117,18 @@ object PythonUtil {
 
     @JvmStatic
     fun post(url: String, headers: PyObject, data: PyObject): PyObject {
-        val hs = JSON.parseObject<Map<String, String>>(JSON.toJSONString(toJava(headers)), TYPE_HEADERS.type)
-        return toPython(HttpUtil.post(url, hs, JSON.parseObject(JSON.toJSONString(toJava(data)))))
+        val strHeaders = JSON.toJSONString(toJava(headers))
+        val hs = JSON.parseObject<Map<String?, String?>>(strHeaders, TYPE_HEADERS.type)
+        val d = JSON.parseObject(JSON.toJSONString(toJava(data)))
+        return toPython(HttpUtil.post(url, hs, d))
     }
 
     @JvmStatic
     fun get(url: String, headers: PyObject, data: PyObject): PyObject {
-        val hs = JSON.parseObject<Map<String, String>>(JSON.toJSONString(toJava(headers)), TYPE_HEADERS.type)
-        val d = JSON.parseObject<Map<String?, String?>>(JSON.toJSONString(toJava(data)), TYPE_HEADERS.type)
+        val strHeaders = JSON.toJSONString(toJava(headers))
+        val hs = JSON.parseObject<Map<String?, String?>>(strHeaders, TYPE_HEADERS.type)
+        val strData = JSON.toJSONString(toJava(data))
+        val d = JSON.parseObject<Map<String?, String?>>(strData, TYPE_HEADERS.type)
         return toPython(HttpUtil.get(url, hs, d))
     }
 

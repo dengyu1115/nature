@@ -68,7 +68,7 @@ class NativeManager {
         val json = JSON.parseObject(param)
         val url = json.getString("url")
         val method = json.getString("method")
-        val headers = json.getObject<Map<String, String>>("headers", TYPE_HEADERS.type)
+        val headers = json.getObject<Map<String?, String?>>("headers", TYPE_HEADERS.type)
         return if ("POST" == method) {
             val data = json.getJSONObject("data")
             HttpUtil.post(url, headers, data)

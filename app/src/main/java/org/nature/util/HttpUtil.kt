@@ -23,7 +23,7 @@ object HttpUtil {
      * @return 响应内容
      */
     @JvmStatic
-    fun get(url: String, headers: Map<String, String>?, params: Map<String?, String?>?): String {
+    fun get(url: String, headers: Map<String?, String?>?, params: Map<String?, String?>?): String {
         var conn: HttpURLConnection? = null
         return try {
             // 构建带参数的URL
@@ -71,7 +71,7 @@ object HttpUtil {
      * @return 响应内容
      */
     @JvmStatic
-    fun post(url: String, headers: Map<String, String>?, data: Map<String, Any>?): String {
+    fun post(url: String, headers: Map<String?, String?>?, data: Map<String, Any>?): String {
         var conn: HttpURLConnection? = null
         return try {
             // 建立连接
