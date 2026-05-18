@@ -80,17 +80,6 @@ class JobService : Service() {
     }
 
     /**
-     * 服务启动后执行逻辑
-     * @param intent  intent
-     * @param flags   flags
-     * @param startId startId
-     * @return int
-     */
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        return super.onStartCommand(intent, flags, startId)
-    }
-
-    /**
      * 服务终止调用
      */
     override fun onDestroy() {
