@@ -22,7 +22,7 @@ export default class Base {
     const element = document.createElement(tag || defaultTag);
     this.setProps(element, this.props);
     this.setStyles(element, this.styles);
-    this.renderred = true;
+    this.rendered = true;
     return element;
   }
 
@@ -113,7 +113,7 @@ export default class Base {
    * @param {*} path 数据路径
    */
   refresh(path) {
-    if (!this.renderred) {
+    if (!this.rendered) {
       return;
     }
     const callback = this.callbackMap[path];
