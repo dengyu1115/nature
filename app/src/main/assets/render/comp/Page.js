@@ -16,10 +16,10 @@ export default class Page extends Base {
         try {
           func.call(this);
         } catch (err) {
-          this.message.error(err.message);
+          message.error(err.message);
         }
       } catch (e) {
-        this.message.error("事件代码执行出错:" + e.message);
+        message.error("事件代码执行出错:" + e.message);
       }
     }
   }

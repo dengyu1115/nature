@@ -1,5 +1,3 @@
-import message from "../../util/Message.js";
-
 /**
  * 组件基类
  */

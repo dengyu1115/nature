@@ -83,14 +83,14 @@ export default class Table extends Base {
         try {
           col.clickFunc = new Function(["value", "datum"], col.click);
         } catch (e) {
-          this.message.error(col.label + "点击事件编译出错:" + e.message);
+          message.error(col.label + "点击事件编译出错:" + e.message);
         }
       }
       if (col.format) {
         try {
           col.formatFunc = new Function(["value", "datum"], col.format);
         } catch (e) {
-          this.message.error(col.label + "格式化编译出错:" + e.message);
+          message.error(col.label + "格式化编译出错:" + e.message);
         }
       }
     });
@@ -210,7 +210,7 @@ export default class Table extends Base {
         try {
           td.textContent = func.call(this, datum[prop], datum);
         } catch (err) {
-          this.message.error(err.message);
+          message.error(err.message);
         }
       } else {
         td.textContent = datum[prop];
@@ -227,7 +227,7 @@ export default class Table extends Base {
         try {
           func.call(this, datum[prop], datum);
         } catch (err) {
-          this.message.error(err.message);
+          message.error(err.message);
         }
       });
     }
@@ -587,11 +587,11 @@ export default class Table extends Base {
           try {
             func.call(this, datum);
           } catch (err) {
-            this.message.error(err.message);
+            message.error(err.message);
           }
         });
       } catch (e) {
-        this.message.error("事件代码执行出错:" + e.message);
+        message.error("事件代码执行出错:" + e.message);
       }
     }
     return btn;

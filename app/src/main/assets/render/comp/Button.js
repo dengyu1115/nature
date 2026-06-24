@@ -56,13 +56,13 @@ export default class Button extends Base {
           this.element.disabled = true;
           func.call(this);
         } catch (err) {
-          this.message.error(err.message);
+          message.error(err.message);
         } finally {
           this.element.disabled = false;
         }
       });
     } catch (err) {
-      this.message.error("事件编译出错:" + err.message);
+      message.error("事件编译出错:" + err.message);
     }
   }
 }
