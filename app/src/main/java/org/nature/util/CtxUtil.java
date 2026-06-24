@@ -1,6 +1,7 @@
 package org.nature.util;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
@@ -11,12 +12,10 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import org.nature.html.NativeManager;
 
 import java.util.List;
-import java.util.Stack;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
@@ -31,15 +30,12 @@ public class CtxUtil {
     @SuppressLint("StaticFieldLeak")
     private static Context context;
 
-    /**
-     * 全局页面对象
-     */
-    @SuppressLint("StaticFieldLeak")
-    private static LinearLayout view;
-
     private static final NativeManager manager = new NativeManager();
 
-    private static final Stack<WebView> viewStack = new Stack<>();
+    @SuppressLint("StaticFieldLeak")
+    private static WebView webview;
+
+    private static int pageSize = 0;
 
     /**
      * 初始化
@@ -47,7 +43,7 @@ public class CtxUtil {
      */
     public static void init(Context context) {
         CtxUtil.context = context;
-        view = new LinearLayout(context);
+        webview = buildWebview();
     }
 
     /**
@@ -59,34 +55,29 @@ public class CtxUtil {
     }
 
     public static View getView() {
-        return view;
+        return webview;
     }
 
-    public static boolean onBack() {
-        int size = viewStack.size();
-        if (size == 1) {
-            return true;
-        }
-        WebView view = viewStack.pop();
-        view.destroy();
-        CtxUtil.view.removeView(view);
-        CtxUtil.view.addView(viewStack.peek());
-        return false;
+    public static void onBack() {
+        webview.evaluateJavascript("closePage();", null);
+    }
+
+    public static void callback(String id, String res) {
+        webview.post(() -> {
+            webview.evaluateJavascript("asyncCallback('" + id + "', '" + res + "');", null);
+        });
+    }
+
+    public static void closePage() {
+        ((Activity) context).moveTaskToBack(true);
     }
 
     public static void show() {
-        WebView view = buildWebview();
-        viewStack.push(view);
-        CtxUtil.view.addView(view);
-        view.loadUrl("file:///android_asset/index.html?id=main");
+        webview.loadUrl("file:///android_asset/index.html?id=main");
     }
 
     public static void refresh() {
-        view.post(() -> {
-            viewStack.clear();
-            view.removeAllViews();
-            show();
-        });
+        webview.post(CtxUtil::show);
     }
 
     public static void startService(Class<?> clazz) {
@@ -119,7 +110,7 @@ public class CtxUtil {
         WebView webView = new WebView(context);
         webView.setLayoutParams(new LayoutParams(MATCH_PARENT, MATCH_PARENT));
         webView.setBackgroundColor(Color.TRANSPARENT);
-        webView.setWebViewClient(buildClient());
+        webView.setWebViewClient(new WebViewClient());
         webView.setWebChromeClient(new WebChromeClient());
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -132,23 +123,6 @@ public class CtxUtil {
         // 页面内容查询接口
         webView.addJavascriptInterface(manager, "native");
         return webView;
-    }
-
-    @SuppressWarnings("deprecation")
-    private static WebViewClient buildClient() {
-        return new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                WebView webview = buildWebview();
-                CtxUtil.view.removeView(view);
-                CtxUtil.view.addView(webview);
-                viewStack.push(webview);
-                webview.post(() -> {
-                    webview.loadUrl(url);
-                });
-                return true;
-            }
-        };
     }
 
 }

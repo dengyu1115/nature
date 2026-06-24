@@ -7,10 +7,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.TypeReference;
 import org.nature.exception.Warn;
-import org.nature.util.DbUtil;
-import org.nature.util.HttpUtil;
-import org.nature.util.Md5Util;
-import org.nature.util.PythonUtil;
+import org.nature.util.*;
 
 import java.util.List;
 import java.util.Map;
@@ -44,6 +41,19 @@ public class NativeManager {
             res.put("message", "系统异常：" + e.getMessage());
         }
         return res.toString(JSONWriter.Feature.WriteMapNullValue);
+    }
+
+    @JavascriptInterface
+    public void asyncInvoke(String name, String id, String param) {
+        ExecUtil.submit(() -> {
+            String res = this.invoke(name, param);
+            CtxUtil.callback(id, res);
+        });
+    }
+
+    @JavascriptInterface
+    public void closePage() {
+        CtxUtil.closePage();
     }
 
     private Object doInvoke(String name, String param) {

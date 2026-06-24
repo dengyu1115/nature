@@ -53,10 +53,7 @@ public class MainActivity extends Activity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         // 控制按返回时候让应用后台运行或者执行关闭当前操作页面回上个页面
         if (keyCode == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
-            boolean back = CtxUtil.onBack();
-            if (back) {
-                return this.moveTaskToBack(true);
-            }
+            CtxUtil.onBack();
             return true;
         }
         return super.onKeyDown(keyCode, event);

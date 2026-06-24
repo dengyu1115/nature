@@ -17,7 +17,6 @@ export default class Base {
       }
       return map;
     }, {});
-    this.message = message;
   }
 
   // 通用的元素创建方法
