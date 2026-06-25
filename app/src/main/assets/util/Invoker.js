@@ -1,4 +1,5 @@
 import Id from "./Id.js";
+import message from "./Message.js"
 
 export default class Invoker {
 
@@ -14,7 +15,7 @@ export default class Invoker {
     throw new Error(res.message);
   }
 
-  asyncInvoke(name, param, success, fail) {
+  asyncInvoke(name, param, success, fail=message.error.bind(message)) {
     const id = Id.random();
     this.map.set(id, { success, fail });
     setTimeout(() => {

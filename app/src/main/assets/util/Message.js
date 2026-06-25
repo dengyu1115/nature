@@ -91,19 +91,14 @@ class Message {
       div.style.opacity = "1";
       div.style.transform = "translateY(0)";
     }, 10);
-    // 设置自动关闭计时器
-    if (duration > 0) {
-      div.timer = setTimeout(() => this.removeMessage(messageId), duration);
-    } else {
-      div.timer = setTimeout(() => this.removeMessage(messageId), 3000);
-    }
+    div.timer = setTimeout(() => this.removeMessage(messageId), duration);
     return this;
   }
 
   // 移除消息
   removeMessage(id) {
     // 先从数组中找到消息对象
-    const msgIndex = this.messages.findIndex(m => m.id === id);
+    const msgIndex = this.messages.findIndex((m) => m.id === id);
     if (msgIndex === -1) return;
 
     const el = this.messages[msgIndex];
@@ -118,10 +113,17 @@ class Message {
     // 动画结束后移除
     setTimeout(() => {
       el.remove();
-      this.messages.splice(msgIndex, 1);  // 从数组中移除
+      const currentIndex = this.messages.indexOf(el);
+      if (currentIndex !== -1) {
+        this.messages.splice(currentIndex, 1);
+      }
 
       // 无消息时移除容器
-      if (this.messages.length === 0 && this.container && this.container.parentElement) {
+      if (
+        this.messages.length === 0 &&
+        this.container &&
+        this.container.parentElement
+      ) {
         this.container.remove();
         this.container = null;
       }
