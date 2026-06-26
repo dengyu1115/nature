@@ -3,6 +3,7 @@ class Message {
     if (Message.instance) return Message.instance;
     Message.instance = this;
     this.messages = [];
+    this.count = 0;
   }
 
   // 获取或创建消息容器
@@ -26,7 +27,10 @@ class Message {
 
   // 生成唯一ID
   generateId() {
-    return "message_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+    if (this.count === 99999) {
+      this.count = 0;
+    }
+    return `M${this.count++}`.padStart(5, "0");
   }
 
   // 核心方法：显示消息
