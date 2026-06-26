@@ -5,6 +5,6 @@ export default class Id {
     if (Id.count == 99999) {
       Id.count = 0;
     }
-    return `I${Id.count++}`.toString().padStart(5, "0");
+    return `I${String(this.count++).padStart(5, "0")}`;
   }
 }
