@@ -1,26 +1,19 @@
+import Chartable from "./Chartable.js";
 import Base from "./Base.js";
 
 import Chart from "../../chart/LineChart.js";
-import Reactive from "../../util/Reactive.js";
 import Val from "../../util/Val.js";
 
-/**
- * 图形
- */
-export default class LineChart extends Base {
+export default class LineChart extends Chartable(Base) {
   render() {
     const element = this.createElement("canvas");
     this.element = element;
     element.width = Val.extract(this.styles.width)[1];
     element.height = Val.extract(this.styles.height)[1];
     this.config = {
-      // 图表标题
       title: this.props.title,
-      // 数据点间距
       spacing: 40,
-      // 缩放
       scale: 1,
-      // 平移
       transX: 0,
     };
     this.config.yAxis = this.props.yIndices.reduce((map, i) => {
@@ -55,65 +48,16 @@ export default class LineChart extends Base {
     return element;
   }
 
-  refreshConfig() {
-    this.updateConfig();
-    this.updateData();
-    this.initChart();
-  }
-
-  refreshData() {
-    this.updateData();
-    this.initChart();
-  }
-
-  updateConfig() {
-    const path = this.data.config?.path;
-    const config = path ? Reactive.get(data, path) : this.data.config?.data;
-    if (config) {
-      this.config = { ...this.config, ...config };
-    }
-  }
-
-  updateData() {
-    const path = this.data.data?.path;
-    const chart = path ? Reactive.get(data, path) : this.data.data?.data;
-    if (chart) {
-      this.config.data = chart.data || [];
-      this.config.labels = chart.labels || [];
-    } else {
-      this.config.data = [];
-      this.config.labels = [];
-    }
-  }
-
-  buildFormatter(formatter) {
-    if (!formatter) {
-      return null;
-    }
-    return new Function(["value", "datum"], formatter);
-  }
-
-  /**
-   * 获取Y轴下标
-   * @param {*} yAxis
-   * @param {*} prop
-   * @returns
-   */
   getYAxisIndex(yAxis, prop) {
     for (const [k, v] of Object.entries(yAxis)) {
       const idx = v.findIndex((i) => i.id === prop);
       if (idx !== -1) {
-        return {
-          position: k,
-          index: idx,
-        };
+        return { position: k, index: idx };
       }
     }
-    return {
-      position: "left",
-      index: 0,
-    };
+    return { position: "left", index: 0 };
   }
+
   getVal(val, defVal) {
     return val ? parseFloat(Val.extract(val)[1]) : defVal;
   }

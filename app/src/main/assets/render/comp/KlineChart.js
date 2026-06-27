@@ -1,13 +1,10 @@
+import Chartable from "./Chartable.js";
 import Base from "./Base.js";
 
 import Chart from "../../chart/KlineChart.js";
-import Reactive from "../../util/Reactive.js";
 import Val from "../../util/Val.js";
 
-/**
- * 图形
- */
-export default class KlineChart extends Base {
+export default class KlineChart extends Chartable(Base) {
   render() {
     const element = this.createElement("canvas");
     this.element = element;
@@ -22,55 +19,15 @@ export default class KlineChart extends Base {
         amount: this.buildFormatter(this.props.amountFormatter),
       },
     };
-    this.config.maList = this.props.maList.map((item) => {
-      return {
-        key: item.prop,
-        name: item.title,
-        color: item.color,
-      };
-    });
+    this.config.maList = this.props.maList.map((item) => ({
+      key: item.prop,
+      name: item.title,
+      color: item.color,
+    }));
     this.updateConfig();
     this.updateData();
     this.initChart();
     return element;
-  }
-
-  refreshConfig() {
-    this.updateConfig();
-    this.updateData();
-    this.initChart();
-  }
-
-  refreshData() {
-    this.updateData();
-    this.initChart();
-  }
-
-  updateConfig() {
-    const path = this.data.config?.path;
-    const config = path ? Reactive.get(data, path) : this.data.config?.data;
-    if (config) {
-      this.config = { ...this.config, ...config };
-    }
-  }
-
-  updateData() {
-    const path = this.data.data?.path;
-    const chart = path ? Reactive.get(data, path) : this.data.data?.data;
-    if (chart) {
-      this.config.data = chart.data;
-      this.config.labels = chart.labels;
-    } else {
-      this.config.data = [];
-      this.config.labels = [];
-    }
-  }
-
-  buildFormatter(formatter) {
-    if (!formatter) {
-      return null;
-    }
-    return new Function(["value", "datum"], formatter);
   }
 
   initChart() {

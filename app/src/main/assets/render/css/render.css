@@ -1,17 +1,21 @@
-html,
-body {
+.component {
   margin: 0;
   padding: 0;
-  font-family: sans-serif-thin;
-  box-sizing: border-box;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   overscroll-behavior: none;
   font-size: 14px;
+  color: #333;
+  line-height: 1.5;
 }
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+button {
+  cursor: pointer;
 }
 
 textarea {
@@ -97,27 +101,9 @@ textarea {
 
 .component.radio label {
   min-width: 45px;
-}
-
-.component.checkbox input {
   vertical-align: middle;
-}
-
-.component.radio input {
-  vertical-align: middle;
-}
-
-table td {
-  padding: 0 2px;
 }
 
 .menu {
   background-color: transparent;
-}
-
-button{
-  color: inherit;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: normal;
 }

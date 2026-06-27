@@ -17,17 +17,17 @@ export default class TabHeader extends Base {
     this.tabs.forEach((tab, index) => {
       const btn = document.createElement("button");
       btn.textContent = tab.label || "";
-      if (tab.disable === "true") {
-        btn.disable = true;
+      if (tab.disabled === "true") {
+        btn.disabled = true;
       }
       this.setWidthHeight(btn);
       // 添加点击事件
       btn.addEventListener("click", () => {
         // 如果按钮被禁用，不执行任何操作
-        if (tab.disable === "true") {
+        if (tab.disabled === "true") {
           return;
         }
-        if (this.active == index) {
+        if (this.active === index) {
           return;
         }
         this.active = index;
@@ -63,7 +63,7 @@ export default class TabHeader extends Base {
     // 更新按钮状态
     Array.from(this.element.children).forEach((btn, idx) => {
       btn.classList.remove("active");
-      if (idx == this.active) {
+      if (idx === this.active) {
         btn.classList.add("active");
       }
     });
@@ -78,12 +78,18 @@ export default class TabHeader extends Base {
    * @param {*} element
    */
   setWidthHeight(element) {
-    if (this.styles.gridAutoFlow == "column") {
-      element.style.height = this.styles.height;
-      element.style.width = Val.extract(this.styles.width)[1] * 0.1 + "px";
+    if (this.styles.gridAutoFlow === "column") {
+      const v = Val.extract(this.styles.width);
+      if (v) {
+        element.style.height = this.styles.height;
+        element.style.width = parseFloat(v[1]) * 0.1 + "px";
+      }
     } else {
-      element.style.height = Val.extract(this.styles.height)[1] * 0.1 + "px";
-      element.style.width = this.styles.width;
+      const v = Val.extract(this.styles.height);
+      if (v) {
+        element.style.height = parseFloat(v[1]) * 0.1 + "px";
+        element.style.width = this.styles.width;
+      }
     }
   }
 }

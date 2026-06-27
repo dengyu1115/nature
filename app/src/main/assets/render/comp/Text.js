@@ -1,8 +1,8 @@
-import Reactive from "../../util/Reactive.js";
+import Bindable from "./Bindable.js";
+import Showable from "./Showable.js";
 import Base from "./Base.js";
 
-// 文本组件
-export default class Text extends Base {
+export default class Text extends Bindable(Showable(Base)) {
   render() {
     const element = this.createElement(this.props.tag);
     this.element = element;
@@ -12,19 +12,6 @@ export default class Text extends Base {
   }
 
   refreshText() {
-    const path = this.data.text?.path;
-    if (path) {
-      const text = Reactive.get(data, path);
-      this.element.textContent = text;
-    } else {
-      this.element.textContent = this.props.text;
-    }
-  }
-
-  refreshShow() {
-    const path = this.data.show?.path;
-    if (path) {
-      this.element.style.display = Reactive.get(data, path) ? "grid" : "none";
-    }
+    this.refreshProp("text", "textContent");
   }
 }

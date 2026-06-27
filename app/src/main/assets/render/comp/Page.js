@@ -1,5 +1,5 @@
-import Base from "./Base.js";
 import Reactive from "../../util/Reactive.js";
+import Base from "./Base.js";
 
 /**
  * Page 页面组件
@@ -19,7 +19,7 @@ export default class Page extends Base {
           message.error(err.message);
         }
       } catch (e) {
-        message.error("事件代码执行出错:" + e.message);
+        message.error("事件代码编译出错:" + e.message);
       }
     }
   }

@@ -42,8 +42,7 @@ export default class Base {
   setStyles(element, styles) {
     element.style.display = "grid";
 
-    // 直接设置的样式属性
-    const directStyleProps = [
+    const styleProps = [
       "width",
       "height",
       "borderWidth",
@@ -56,21 +55,6 @@ export default class Base {
       "color",
       "backgroundColor",
       "fontWeight",
-    ];
-
-    directStyleProps.forEach((prop) => {
-      if (styles[prop] !== undefined) {
-        element.style[prop] = styles[prop];
-      }
-    });
-
-    // 处理内容排布属性
-    const alignH = styles.alignH || "start";
-    const alignV = styles.alignV || "start";
-    element.style.placeContent = alignV + " " + alignH;
-
-    // 处理内外边距属性
-    const spacingProps = [
       "margin",
       "marginTop",
       "marginRight",
@@ -83,11 +67,15 @@ export default class Base {
       "paddingLeft",
     ];
 
-    spacingProps.forEach((prop) => {
+    styleProps.forEach((prop) => {
       if (styles[prop] !== undefined) {
         element.style[prop] = styles[prop];
       }
     });
+
+    const alignH = styles.alignH || "start";
+    const alignV = styles.alignV || "start";
+    element.style.placeContent = alignV + " " + alignH;
   }
 
   // 通用的渲染子组件方法
@@ -121,5 +109,4 @@ export default class Base {
       this[callback]();
     }
   }
-
 }

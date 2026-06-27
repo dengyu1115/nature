@@ -20,6 +20,28 @@ import DatePicker from "./comp/DatePicker.js";
 import TimePicker from "./comp/TimePicker.js";
 import TextUtil from "../util/TextUtil.js";
 
+const COMP_MAP = {
+  page: Page,
+  container: Container,
+  modal: Modal,
+  panel: Panel,
+  text: Text,
+  input: Input,
+  textarea: TextArea,
+  button: Button,
+  select: Select,
+  date: DatePicker,
+  time: TimePicker,
+  table: Table,
+  radio: Radio,
+  checkbox: Checkbox,
+  tree: Tree,
+  linechart: LineChart,
+  klinechart: KlineChart,
+  tabheader: TabHeader,
+  tabbody: TabBody,
+};
+
 // DSL解析器
 export default class DslParser {
   constructor(dsl) {
@@ -30,48 +52,9 @@ export default class DslParser {
   }
 
   create(type, props, styles, events, data) {
-    switch (type) {
-      case "page":
-        return new Page(props, styles, events, data);
-      case "container":
-        return new Container(props, styles, events, data);
-      case "modal":
-        return new Modal(props, styles, events, data);
-      case "panel":
-        return new Panel(props, styles, events, data);
-      case "text":
-        return new Text(props, styles, events, data);
-      case "input":
-        return new Input(props, styles, events, data);
-      case "textarea":
-        return new TextArea(props, styles, events, data);
-      case "button":
-        return new Button(props, styles, events, data);
-      case "select":
-        return new Select(props, styles, events, data);
-      case "date":
-        return new DatePicker(props, styles, events, data);
-      case "time":
-        return new TimePicker(props, styles, events, data);
-      case "table":
-        return new Table(props, styles, events, data);
-      case "radio":
-        return new Radio(props, styles, events, data);
-      case "checkbox":
-        return new Checkbox(props, styles, events, data);
-      case "tree":
-        return new Tree(props, styles, events, data);
-      case "linechart":
-        return new LineChart(props, styles, events, data);
-      case "klinechart":
-        return new KlineChart(props, styles, events, data);
-      case "tabheader":
-        return new TabHeader(props, styles, events, data);
-      case "tabbody":
-        return new TabBody(props, styles, events, data);
-      default:
-        throw new Error(`Unknown component type: ${type}`);
-    }
+    const Comp = COMP_MAP[type];
+    if (!Comp) throw new Error(`Unknown component type: ${type}`);
+    return new Comp(props, styles, events, data);
   }
 
   // 递归处理DSL对象
@@ -118,7 +101,7 @@ export default class DslParser {
     if (child.styles.width && parent.styles.width) {
       const cvu = Val.extract(child.styles.width);
       const pvu = Val.extract(parent.styles.width);
-      if (cvu[2] == "%" && pvu[2] != "%") {
+      if (cvu && pvu && cvu[2] === "%" && pvu[2] !== "%") {
         child.styles.width =
           (parseFloat(pvu[1]) * parseFloat(cvu[1])) / 100 + pvu[2];
       }
@@ -127,7 +110,7 @@ export default class DslParser {
     if (child.styles.height && parent.styles.height) {
       const cvu = Val.extract(child.styles.height);
       const pvu = Val.extract(parent.styles.height);
-      if (cvu[2] == "%" && pvu[2] != "%") {
+      if (cvu && pvu && cvu[2] === "%" && pvu[2] !== "%") {
         child.styles.height =
           (parseFloat(pvu[1]) * parseFloat(cvu[1])) / 100 + pvu[2];
       }

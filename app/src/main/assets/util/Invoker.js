@@ -1,8 +1,7 @@
 import Id from "./Id.js";
-import message from "./Message.js"
+import message from "./Message.js";
 
 export default class Invoker {
-
   constructor() {
     this.map = new Map();
   }
@@ -15,9 +14,9 @@ export default class Invoker {
     throw new Error(res.message);
   }
 
-  asyncInvoke(name, param, success, fail=message.error.bind(message)) {
+  asyncInvoke(name, param, success) {
     const id = Id.random();
-    this.map.set(id, { success, fail });
+    this.map.set(id, success);
     setTimeout(() => {
       native.asyncInvoke(name, id, JSON.stringify(param));
     }, 0);
@@ -25,11 +24,13 @@ export default class Invoker {
 
   asyncCallback(id, param) {
     const res = JSON.parse(param);
-    const { success, fail } = this.map.get(id);
+    const success = this.map.get(id);
     if (res.code === "success") {
       success(res.data);
+    } else if (res.code === "warn") {
+      message.warning(res.message);
     } else {
-      fail(res.message);
+      message.error(res.message);
     }
   }
 }

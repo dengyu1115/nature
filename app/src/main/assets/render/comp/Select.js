@@ -207,8 +207,8 @@ export default class Select extends Base {
     }
     const path = this.data.value?.path;
     if (path) {
-      const v = multiple ? val : val.length > 0 ? val[0] : null;
-      Reactive.set(data, path, v, this);
+      const v = multiple ? val : (val.length > 0 ? val[0] : null);
+      Reactive.set(window.data, path, v, this);
     }
   }
 
@@ -229,15 +229,11 @@ export default class Select extends Base {
     const multiple = this.props.multiple === "true";
     const path = this.data.value?.path;
 
-    if (multiple) {
-      this.value = [];
-    } else {
-      this.value = [];
-    }
+    this.value = [];
 
     if (path) {
       const v = multiple ? [] : null;
-      Reactive.set(data, path, v, this);
+      Reactive.set(window.data, path, v, this);
     }
 
     this.updateUI();

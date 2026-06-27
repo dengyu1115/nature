@@ -3,7 +3,6 @@ import Base from "./Base.js";
 
 export default class Tree extends Base {
   render() {
-    // 创建容器元素
     const element = this.createElement("div");
     this.element = element;
     const tree = document.createElement("ul");
@@ -11,6 +10,8 @@ export default class Tree extends Base {
     this.tree = tree;
     tree.style.paddingLeft = "0";
     tree.style.margin = "0";
+    this.updateNodes();
+    this.buildTree();
     return element;
   }
 
@@ -29,9 +30,24 @@ export default class Tree extends Base {
     }
   }
 
-  buildTree() {
+  buildTree(nodes) {
+    // 未传参时使用顶层节点
+    const targetNodes = nodes || this.nodes;
+    if (!targetNodes) return;
+
+    if (nodes) {
+      // 子节点递归：创建子树 ul 并返回
+      const ul = document.createElement("ul");
+      ul.style.paddingLeft = "20px";
+      targetNodes.forEach((node) => {
+        ul.appendChild(this.renderNode(node));
+      });
+      return ul;
+    }
+
+    // 顶层渲染：清空并重建
     this.tree.innerHTML = "";
-    this.nodes.forEach((node) => {
+    targetNodes.forEach((node) => {
       this.tree.appendChild(this.renderNode(node));
     });
   }
@@ -56,21 +72,18 @@ export default class Tree extends Base {
     // 如果有子节点，添加事件
     if (node.children && node.children.length > 0) {
       icon.textContent = "▶";
-      // 创建子节点列表
-      const element = document.createElement("div");
       icon.style.transform = "rotate(90deg)";
-      element.style.paddingLeft = "20px";
-      const ul = this.buildTree(node.children);
-      element.appendChild(ul);
-      li.appendChild(element);
+      // 递归创建子节点
+      const childUl = this.buildTree(node.children);
+      li.appendChild(childUl);
       // 添加展开/收起功能
       item.addEventListener("click", (e) => {
         if (e.target !== icon) return;
-        if (ul.style.display === "none") {
-          ul.style.display = "";
+        if (childUl.style.display === "none") {
+          childUl.style.display = "";
           icon.style.transform = "rotate(90deg)";
         } else {
-          ul.style.display = "none";
+          childUl.style.display = "none";
           icon.style.transform = "rotate(0deg)";
         }
       });

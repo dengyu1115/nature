@@ -1,77 +1,22 @@
-import Reactive from "../../util/Reactive.js";
+import Optionable from "./Optionable.js";
 import Base from "./Base.js";
 
-export default class Checkbox extends Base {
+export default class Checkbox extends Optionable(Base) {
+  _inputType = "checkbox";
+  _defaultValue = [];
+
+  _getValue() {
+    this.value = this.inputs.filter((i) => i.checked).map((i) => i.value);
+  }
+
+  _isChecked(input) {
+    return this.value.includes(input.value);
+  }
+
   render() {
     const container = this.createElement("div");
     this.container = container;
     this.refreshOptions();
     return container;
-  }
-
-  refreshOptions() {
-    this.updateOptions();
-    this.buildOptions();
-    this.refreshValue();
-  }
-
-  refreshValue() {
-    this.updateValue();
-    this.updateUI();
-  }
-
-  buildOptions() {
-    this.container.innerHTML = "";
-    this.inputs = [];
-    this.options.forEach((option) => {
-      const label = document.createElement("label");
-      const input = document.createElement("input");
-      input.type = "checkbox";
-      input.value = option.value;
-      input.disabled = option.disabled === "true";
-      input.checked = option.checked === "true";
-      if (this.props.name) {
-        input.name = this.props.name;
-      }
-      input.addEventListener("input", (e) => {
-        this.value = this.inputs.filter((i) => i.checked).map((i) => i.value);
-        const path = this.data.value?.path;
-        if (path) {
-          Reactive.set(data, path, this.value, this);
-        }
-      });
-      const text = document.createTextNode(option.label);
-      label.appendChild(input);
-      label.appendChild(text);
-      this.container.appendChild(label);
-      this.inputs.push(input);
-    });
-  }
-
-  updateOptions() {
-    const path = this.data.options?.path;
-    // 如果有数据属性绑定input事件
-    if (path) {
-      const value = Reactive.get(data, path);
-      this.options = value || [];
-    } else {
-      this.options = this.data.options?.data || this.props.options || [];
-    }
-  }
-
-  updateValue() {
-    const path = this.data.value?.path;
-    if (path) {
-      const value = Reactive.get(data, path);
-      this.value = value || [];
-    } else {
-      this.value = this.data.value?.data || [];
-    }
-  }
-
-  updateUI() {
-    this.inputs.forEach((input) => {
-      input.checked = this.value.includes(input.value);
-    });
   }
 }

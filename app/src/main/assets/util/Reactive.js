@@ -6,14 +6,14 @@ export default class Reactive {
    * @returns
    */
   static proxy(obj, pk = "") {
-    if (obj == null || typeof obj != "object") {
+    if (obj == null || typeof obj !== "object") {
       return obj;
     }
     if (pk) {
       pk = pk + ".";
     }
-    for (let k in obj) {
-      if (obj[k] == null || typeof obj[k] == "object") {
+    for (const k of Object.keys(obj)) {
+      if (obj[k] == null || typeof obj[k] === "object") {
         obj[k] = Reactive.proxy(obj[k], pk + k);
       }
     }
@@ -42,8 +42,9 @@ export default class Reactive {
   static refresh(path) {
     const components = window.mountedCompMap[path];
     if (components) {
+      const trigger = Reactive.trigger;
       components.forEach((component) => {
-        if (Reactive.trigger && Reactive.trigger === component) {
+        if (trigger && trigger === component) {
           return;
         }
         component.refresh(path);
@@ -64,7 +65,7 @@ export default class Reactive {
     }
     const keys = key.split(".");
     for (let i = 0; i < keys.length; i++) {
-      if (data[keys[i]] != null && data[keys[i]] != undefined) {
+      if (data[keys[i]] != null) {
         data = data[keys[i]];
       } else {
         return null;
@@ -86,7 +87,7 @@ export default class Reactive {
     }
     const keys = key.split(".");
     for (let i = 0; i < keys.length - 1; i++) {
-      if (data[keys[i]]) {
+      if (data[keys[i]] != null) {
         data = data[keys[i]];
       } else {
         return;
