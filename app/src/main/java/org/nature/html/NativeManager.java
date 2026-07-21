@@ -1,6 +1,5 @@
 package org.nature.html;
 
-import android.annotation.SuppressLint;
 import android.webkit.JavascriptInterface;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
@@ -20,7 +19,6 @@ import static org.nature.config.Config.SQL_HTML;
  * @version 1.0.0
  * @since 2025/11/06
  */
-@SuppressLint("DefaultLocale")
 public class NativeManager {
 
     @JavascriptInterface
