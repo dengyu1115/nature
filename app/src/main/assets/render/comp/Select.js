@@ -1,3 +1,4 @@
+import EventUtil from "../../util/EventUtil.js";
 import Reactive from "../../util/Reactive.js";
 import Base from "./Base.js";
 
@@ -9,6 +10,7 @@ export default class Select extends Base {
       display: "block",
       overflow: "visible",
     });
+    this.changeFunc = EventUtil.compileAsync(this.events.change);
     this.buildStructure();
     container.append(this.selector, this.dropdown);
     this.refreshOptions();
@@ -207,7 +209,7 @@ export default class Select extends Base {
     }
     const path = this.data.value?.path;
     if (path) {
-      const v = multiple ? val : (val.length > 0 ? val[0] : null);
+      const v = multiple ? val : val.length > 0 ? val[0] : null;
       Reactive.set(window.data, path, v, this);
     }
   }
@@ -216,12 +218,9 @@ export default class Select extends Base {
     if (this.props.multiple !== "true") {
       this.close();
     }
-    if (this.events.change) {
-      try {
-        new Function(this.events.change).call(this);
-      } catch (error) {
-        console.error(error);
-      }
+    const func = this.changeFunc;
+    if (func) {
+      func.call(this);
     }
   }
 
@@ -238,12 +237,9 @@ export default class Select extends Base {
 
     this.updateUI();
 
-    if (this.events.change) {
-      try {
-        new Function(this.events.change).call(this);
-      } catch (error) {
-        console.error(error);
-      }
+    const func = this.changeFunc;
+    if (func) {
+      func.call(this);
     }
   }
 

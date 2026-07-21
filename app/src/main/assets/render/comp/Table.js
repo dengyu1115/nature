@@ -1,3 +1,4 @@
+import EventUtil from "../../util/EventUtil.js";
 import Reactive from "../../util/Reactive.js";
 import Val from "../../util/Val.js";
 import Base from "./Base.js";
@@ -79,20 +80,16 @@ export default class Table extends Base {
     // 处理点击和格式化函数
     const columns = this.columns[this.columns.length - 1];
     columns.forEach((col) => {
-      if (col.click) {
-        try {
-          col.clickFunc = new Function(["value", "datum"], col.click);
-        } catch (e) {
-          message.error(col.label + "点击事件编译出错:" + e.message);
-        }
-      }
-      if (col.format) {
-        try {
-          col.formatFunc = new Function(["value", "datum"], col.format);
-        } catch (e) {
-          message.error(col.label + "格式化编译出错:" + e.message);
-        }
-      }
+      col.clickFunc = EventUtil.compileAsync(
+        col.click,
+        ["value", "datum"],
+        col.label + "点击",
+      );
+      col.formatFunc = EventUtil.compileNormal(
+        col.format,
+        ["value", "datum"],
+        col.label + "格式化",
+      );
     });
     this.calcSticky();
   }
@@ -131,7 +128,7 @@ export default class Table extends Base {
     this.startIndex = Math.max(newIndex - cacheRows, 0);
     this.endIndex = Math.min(
       this.startIndex + this.bodyRows + cacheRows * 2,
-      dataLength
+      dataLength,
     );
     this.updateTbody();
   }
@@ -207,11 +204,7 @@ export default class Table extends Base {
     } else {
       const func = column.formatFunc;
       if (func) {
-        try {
-          td.textContent = func.call(this, datum[prop], datum);
-        } catch (err) {
-          message.error(err.message);
-        }
+        td.textContent = func.call(this, datum[prop], datum);
       } else {
         td.textContent = datum[prop];
       }
@@ -221,16 +214,13 @@ export default class Table extends Base {
   setCellClick(td, column, datum) {
     const prop = column.prop;
     const func = column.clickFunc;
-    if (func) {
-      td.style.cursor = "pointer";
-      td.addEventListener("click", (e) => {
-        try {
-          func.call(this, datum[prop], datum);
-        } catch (err) {
-          message.error(err.message);
-        }
-      });
+    if (!func) {
+      return;
     }
+    td.style.cursor = "pointer";
+    td.addEventListener("click", (e) => {
+      func.call(this, e, td, datum[prop], datum);
+    });
   }
 
   /**
@@ -571,6 +561,7 @@ export default class Table extends Base {
       if (!i.prop) {
         return;
       }
+      i.clickFunc = EventUtil.compileAsync(i.click, ["datum"]);
       buttonMap[i.prop] = i;
     });
     return buttonMap;
@@ -580,19 +571,11 @@ export default class Table extends Base {
     const btn = document.createElement("button");
     btn.classList.add("component", "table-btn", button.style);
     btn.textContent = button.label;
-    if (button.click) {
-      try {
-        const func = new Function(["datum"], button.click);
-        btn.addEventListener("click", (e) => {
-          try {
-            func.call(this, datum);
-          } catch (err) {
-            message.error(err.message);
-          }
-        });
-      } catch (e) {
-        message.error("事件代码执行出错:" + e.message);
-      }
+    const func = button.clickFunc;
+    if (func) {
+      btn.addEventListener("click", (e) => {
+        func.call(this, e, btn, datum);
+      });
     }
     return btn;
   }

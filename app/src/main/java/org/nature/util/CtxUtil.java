@@ -35,8 +35,6 @@ public class CtxUtil {
     @SuppressLint("StaticFieldLeak")
     private static WebView webview;
 
-    private static int pageSize = 0;
-
     /**
      * 初始化
      * @param context 上下文
@@ -64,7 +62,8 @@ public class CtxUtil {
 
     public static void callback(String id, String res) {
         webview.post(() -> {
-            webview.evaluateJavascript("asyncCallback('" + id + "', '" + res + "');", null);
+            String res_str = res.replace("\\", "\\\\").replace("'", "\\'");
+            webview.evaluateJavascript("asyncCallback('" + id + "', '" + res_str + "');", null);
         });
     }
 
@@ -73,7 +72,8 @@ public class CtxUtil {
     }
 
     public static void show() {
-        webview.loadUrl("file:///android_asset/index.html?id=main");
+        webview.loadUrl("file:///android_asset/index.html");
+        webview.clearHistory();
     }
 
     public static void refresh() {

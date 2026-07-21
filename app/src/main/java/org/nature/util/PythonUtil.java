@@ -1,14 +1,11 @@
 package org.nature.util;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
 import com.alibaba.fastjson2.TypeReference;
-import com.chaquo.python.PyException;
 import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 import com.chaquo.python.android.AndroidPlatform;
-import org.nature.exception.Warn;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -24,8 +21,7 @@ public class PythonUtil {
 
     private static PyObject builtins_module;
 
-    private static PyObject script_module;
-    private static PyObject func_module;
+    private static PyObject exec_module;
     private static PyObject json_obj_module;
     private static PyObject json_str_module;
 
@@ -35,8 +31,7 @@ public class PythonUtil {
                 Python.start(new AndroidPlatform(CtxUtil.get()));
                 Python instance = Python.getInstance();
                 builtins_module = instance.getModule("builtins");
-                script_module = instance.getModule("nature").get("dynamic_exec");
-                func_module = instance.getModule("nature").get("module_func_exec");
+                exec_module = instance.getModule("nature").get("do_exec");
                 json_str_module = instance.getModule("nature").get("to_json");
                 json_obj_module = Python.getInstance().getModule("json").get("loads");
                 instance.getModule("module_script");
@@ -50,28 +45,9 @@ public class PythonUtil {
         CtxUtil.refresh();
     }
 
-    public static Object execScript(String script, JSONObject args) {
-        try {
-            return toJava(script_module.call(script, toPython(args)));
-        } catch (PyException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof Warn) {
-                throw (Warn) cause;
-            }
-            throw e;
-        }
-    }
-
-    public static Object execModule(String module, String func, JSONObject args) {
-        try {
-            return toJava(func_module.call(module, func, toPython(args)));
-        } catch (PyException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof Warn) {
-                throw (Warn) cause;
-            }
-            throw e;
-        }
+    public static String exec(String param) {
+        PyObject res = exec_module.call(param);
+        return res.toString();
     }
 
     public static PyObject multiThread(PyObject items, PyObject run) {

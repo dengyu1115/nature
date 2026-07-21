@@ -31,6 +31,22 @@ def module_func_exec(module, func, params):
     return func_obj(**args)
 
 
+def do_exec(param):
+    try:
+        param_obj = json.loads(param)
+        module = param_obj.get("module")
+        func = param_obj.get("func")
+        args = param_obj.get("args")
+        if module and func:
+            return to_json({"code": "success", "data": module_func_exec(module, func, args)})
+        script = param_obj.get("script")
+        return to_json({"code": "success", "data": dynamic_exec(script, args)})
+    except Warning as e:
+        return to_json({"code": "warning", "message": str(e)})
+    except Exception as e:
+        return to_json({"code": "error", "message": str(e)})
+
+
 def to_json(obj):
     return json.dumps(obj, ensure_ascii=False, default=lambda o: float(o))
 

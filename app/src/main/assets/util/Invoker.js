@@ -6,31 +6,29 @@ export default class Invoker {
     this.map = new Map();
   }
 
-  invoke(name, param) {
-    const res = JSON.parse(native.invoke(name, JSON.stringify(param)));
-    if (res.code === "success") {
-      return res.data;
-    }
-    throw new Error(res.message);
+  page(pageId) {
+    return new Promise((resolve, reject) => {
+      const id = Id.random();
+      this.map.set(id, { resolve, reject });
+      native.page(id, pageId);
+    });
   }
 
-  asyncInvoke(name, param, success) {
-    const id = Id.random();
-    this.map.set(id, success);
-    setTimeout(() => {
-      native.asyncInvoke(name, id, JSON.stringify(param));
-    }, 0);
+  asyncInvoke(param) {
+    return new Promise((resolve, reject) => {
+      const id = Id.random();
+      this.map.set(id, { resolve, reject });
+      native.asyncInvoke(id, JSON.stringify(param));
+    });
   }
 
   asyncCallback(id, param) {
     const res = JSON.parse(param);
-    const success = this.map.get(id);
+    const { resolve, reject } = this.map.get(id);
     if (res.code === "success") {
-      success(res.data);
-    } else if (res.code === "warn") {
-      message.warning(res.message);
+      resolve(res.data);
     } else {
-      message.error(res.message);
+      reject(res);
     }
   }
 }

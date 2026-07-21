@@ -2,7 +2,6 @@ import importlib.util
 import sys, gc
 from sql_builder import sql_one, sql_each
 from org.nature.util import PythonUtil
-from org.nature.exception import Warn
 
 
 sql_ddl_create_table = """
@@ -98,15 +97,15 @@ def delete_from_db(datum):
 
 def do_validate(datum):
     if "module" not in datum or not datum["module"]:
-        raise Warn("模块不可为空")
+        raise Warning("模块不可为空")
     if "script" not in datum or not datum["script"]:
-        raise Warn("脚本内容不可为空")
+        raise Warning("脚本内容不可为空")
     if "status" not in datum or not datum["status"]:
-        raise Warn("状态不可为空")
+        raise Warning("状态不可为空")
     if datum["status"] not in ["0", "1"]:
-        raise Warn("状态只能为启用或暂停")
+        raise Warning("状态只能为启用或暂停")
     if "seq" not in datum or not datum["seq"]:
-        raise Warn("序号不可为空")
+        raise Warning("序号不可为空")
 
 
 def do_save(datum):
@@ -116,7 +115,7 @@ def do_save(datum):
 
 def do_delete(datum):
     if "module" not in datum or not datum["module"]:
-        raise Warn("模块不可为空")
+        raise Warning("模块不可为空")
     return delete_from_db(datum)
 
 
@@ -124,5 +123,5 @@ def do_update(datum):
     do_validate(datum)
     exists = find_by_module(datum["module"])
     if not exists:
-        raise Warn(f"模块{datum["module"]}不存在")
+        raise Warning(f"模块{datum["module"]}不存在")
     return update_to_db(datum)

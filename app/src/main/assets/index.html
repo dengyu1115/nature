@@ -1,44 +1,38 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0" />
+<head>
+    <meta charset="UTF-8"/>
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0"
+    />
     <title>DSL布局测试</title>
-    <link rel="stylesheet" href="render/css/render.css" />
+    <link rel="stylesheet" href="render/css/render.css"/>
     <style>
-      body {
-        width: 100vw;
-        height: 100vh;
-      }
+        body {
+          width: 100vw;
+          height: 100vh;
+        }
     </style>
-  </head>
-  <body>
-  </body>
+</head>
+<body></body>
 </html>
 <script type="module">
     import DslParser from "./render/DslParser.js";
     import Invoker from "./util/Invoker.js";
     import message from "./util/Message.js";
     const invoker = new Invoker();
-    window.invoke = invoker.invoke.bind(invoker);
     window.asyncInvoke = invoker.asyncInvoke.bind(invoker);
     window.asyncCallback = invoker.asyncCallback.bind(invoker);
     window.message = message;
     const pageStack = [];
     // 应用启动函数
     function startApp() {
-      // 获取地址栏页面ID参数
-      const urlParams = new URLSearchParams(window.location.search);
-      const pageId = urlParams.get('id');
-      if (!pageId) {
-        message.error("页面ID不能为空");
-        return;
-      }
-      openPage(pageId, null);
+      openPage("main", null);
     }
 
-    function openPage(pageId, param) {
-      const config = invoke("page", pageId);
+    async function openPage(pageId, param) {
+      const config = JSON.parse(await invoker.page(pageId));
       if (!config) {
         message.error("页面不存在");
         return;
@@ -53,7 +47,7 @@
       document.body.appendChild(page);
       const data = window.data;
       const comps = window.mountedCompMap;
-      pageStack.push({page, data, comps, param});
+      pageStack.push({ page, data, comps, param });
     }
 
     function closePage() {

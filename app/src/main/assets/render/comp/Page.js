@@ -1,3 +1,4 @@
+import EventUtil from "../../util/EventUtil.js";
 import Reactive from "../../util/Reactive.js";
 import Base from "./Base.js";
 
@@ -10,17 +11,9 @@ export default class Page extends Base {
     const globalData = this.data.global?.data || {};
     // 数据绑定至window对象
     window.data = Reactive.proxy(globalData);
-    if (this.events && this.events.load) {
-      try {
-        const func = new Function(this.events.load);
-        try {
-          func.call(this);
-        } catch (err) {
-          message.error(err.message);
-        }
-      } catch (e) {
-        message.error("事件代码编译出错:" + e.message);
-      }
+    const func = EventUtil.compileAsync(this.events.load);
+    if (func) {
+      func.call(this);
     }
   }
 
