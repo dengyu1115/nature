@@ -17,7 +17,7 @@ public class JobUtil {
     public static void init() {
         JOB_MAP.clear();
         Python instance = Python.getInstance();
-        PyObject module = instance.getModule("nature").get("get_job_func");
+        PyObject module = instance.getModule("nature_main").get("get_job_func");
         List<Map<String, Object>> list = DbUtil.list(DB_PATH_JOB, SQL_JOB);
         for (Map<String, Object> i : list) {
             String name = (String) i.get("name");

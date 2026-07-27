@@ -31,8 +31,8 @@ public class PythonUtil {
                 Python.start(new AndroidPlatform(CtxUtil.get()));
                 Python instance = Python.getInstance();
                 builtins_module = instance.getModule("builtins");
-                exec_module = instance.getModule("nature").get("do_exec");
-                json_str_module = instance.getModule("nature").get("to_json");
+                exec_module = instance.getModule("nature_main").get("do_exec");
+                json_str_module = instance.getModule("nature_main").get("to_json");
                 json_obj_module = Python.getInstance().getModule("json").get("loads");
                 instance.getModule("module_script");
             }
