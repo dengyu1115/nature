@@ -1,5 +1,5 @@
-import Chartable from "./Chartable.js";
 import Base from "./Base.js";
+import Chartable from "./Chartable.js";
 
 import Chart from "../../chart/KlineChart.js";
 import Val from "../../util/Val.js";
@@ -19,12 +19,8 @@ export default class KlineChart extends Chartable(Base) {
         amount: this.buildFormatter(this.props.amountFormatter),
       },
     };
-    this.config.maList = this.props.maList.map((item) => ({
-      key: item.prop,
-      name: item.title,
-      color: item.color,
-    }));
     this.updateConfig();
+    this.updateMaList();
     this.updateData();
     this.initChart();
     return element;

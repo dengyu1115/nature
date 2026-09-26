@@ -1,5 +1,5 @@
-import Chartable from "./Chartable.js";
 import Base from "./Base.js";
+import Chartable from "./Chartable.js";
 
 import Chart from "../../chart/LineChart.js";
 import Val from "../../util/Val.js";
@@ -16,33 +16,9 @@ export default class LineChart extends Chartable(Base) {
       scale: 1,
       transX: 0,
     };
-    this.config.yAxis = this.props.yIndices.reduce((map, i) => {
-      if (map[i.position] == null) {
-        map[i.position] = [];
-      }
-      map[i.position].push({
-        id: i.prop,
-        visible: true,
-        label: i.title,
-        unit: i.unit,
-        width: this.getVal(i.width, 80),
-        formatter: this.buildFormatter(i.formatter),
-      });
-      return map;
-    }, {});
-    this.config.series = this.props.legends.map((i) => {
-      const yIndex = this.getYAxisIndex(this.config.yAxis, i.yIndex);
-      return {
-        prop: i.prop,
-        name: i.label,
-        type: i.type,
-        yAxis: yIndex.position,
-        yAxisIndex: yIndex.index,
-        color: i.color,
-        visible: true,
-      };
-    });
     this.updateConfig();
+    this.updateYIndices();
+    this.updateLegends();
     this.updateData();
     this.initChart();
     return element;

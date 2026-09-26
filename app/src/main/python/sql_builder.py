@@ -4,8 +4,11 @@ from decimal import Decimal
 
 
 def sql_one(template, obj):
-    if not template or not obj:
+    if not template:
         return ""
+
+    if not obj:
+        return template
 
     regex = r"\{(\w+)\}"
     sql = template

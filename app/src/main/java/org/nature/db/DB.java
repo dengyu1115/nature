@@ -77,30 +77,6 @@ public class DB {
     }
 
     /**
-     * 获取String类型值
-     * @param c   行
-     * @param col 字段
-     * @return String
-     */
-    public static String getString(Cursor c, String col) {
-        int i = c.getColumnIndex(col);
-        if (i == -1) {
-            return null;
-        }
-        return c.getString(i);
-    }
-
-    /**
-     * 获取值，如果为空则返回默认值
-     * @param s    字符串
-     * @param func 值转换方法
-     * @return T
-     */
-    private static <T> T getVal(String s, Function<String, T> func) {
-        return s == null ? null : func.apply(s);
-    }
-
-    /**
      * 查询列表数据
      * @param sql    sql
      * @param args   参数

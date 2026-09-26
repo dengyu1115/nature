@@ -105,6 +105,7 @@ textarea {
 
 .component.radio input {
   vertical-align: middle;
+  margin: 0px 3px 0px 5px;
 }
 
 table td {
