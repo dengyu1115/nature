@@ -29,10 +29,17 @@ export default class ChartBase {
   }
 
   initTransX() {
-    // 设置默认显示末端数据
     const width = this.chartArea.width || 0;
     const maxIndex = (this.config.data?.length || 0) - 1;
-    const spacing = this.config.spacing * this.config.scale;
+    const baseSpacing = this.config.spacing;
+
+    const initialCount = this.config.initialCount;
+    if (initialCount && initialCount > 0 && initialCount <= maxIndex + 1) {
+      const totalWidth = width - baseSpacing;
+      this.config.scale = totalWidth / (initialCount * baseSpacing);
+    }
+
+    const spacing = baseSpacing * this.config.scale;
     this.config.transX = width - maxIndex * spacing;
   }
 

@@ -1,8 +1,9 @@
+import gc
 import importlib.util
-import sys, gc
-from sql_builder import sql_one, sql_each
-from org.nature.util import PythonUtil
+import sys
 
+from org.nature.util import PythonUtil
+from sql_builder import sql_one, sql_each
 
 sql_ddl_create_table = """
 create table if not exists module_script(
@@ -14,26 +15,40 @@ create table if not exists module_script(
 )
 """
 
-PythonUtil.ddl(
-    "nature/common.db",
-    sql_ddl_create_table,
-)
+PythonUtil.ddl("nature/common.db", sql_ddl_create_table)
 
 
-def load(module, script):
-    spec = importlib.util.spec_from_loader(module, loader=None)
-    module_obj = importlib.util.module_from_spec(spec)
-    sys.modules[module] = module_obj
-    exec(script, module_obj.__dict__)
+def do_load(datum=None, status=None):
+    if datum:
+        rows = [datum]
+    else:
+        rows = do_list(status=status or "1")
+    for row in rows:
+        module = row["module"]
+        script = row["script"]
+        if not module or not script:
+            raise Warning("模块或脚本不可为空")
+        spec = importlib.util.spec_from_loader(module, loader=None)
+        module_obj = importlib.util.module_from_spec(spec)
+        sys.modules[module] = module_obj
+        exec(script, module_obj.__dict__)
+    return len(rows)
 
 
-def load_all():
-    module_script_list = list_valid()
-    for i in module_script_list:
-        load(i["module"], i["script"])
+def do_list(status=None, keyword=None):
+    sql = "select module,script,status,seq from module_script where 1=1"
+    param = {}
+    if status:
+        sql += " and status={status}"
+        param.update({"status": status})
+    if keyword:
+        sql += " and module like {keyword}"
+        param.update({"keyword": "%" + keyword + "%"})
+    sql += " order by seq"
+    return PythonUtil.list("nature/common.db", sql_one(sql, param))
 
 
-def unload(module):
+def do_unload(module):
     del sys.modules[module]
     if module in sys.modules:
         del sys.modules[module]
@@ -41,61 +56,46 @@ def unload(module):
     gc.collect()
 
 
-def find_by_module(moduel):
-    return PythonUtil.list(
-        "nature/common.db",
-        sql_one(
-            "select module,script,status,seq from module_script where module={module}",
-            {"module": moduel},
-        ),
-    )
+def do_find(module):
+    sql = "select module,script,status,seq from module_script where module={module}"
+    return PythonUtil.list("nature/common.db", sql_one(sql, {"module": module}))
 
 
-def list_all():
-    return PythonUtil.list(
-        "nature/common.db",
-        "select module,script,status,seq from module_script order by seq",
-    )
+def do_save(datum):
+    _validate(datum)
+    return _save([datum])
 
 
-def list_valid():
-    return PythonUtil.list(
-        "nature/common.db",
-        "select module,script,status,seq from module_script where status='1' order by seq",
-    )
+def do_delete(datum):
+    if "module" not in datum or not datum["module"]:
+        raise Warning("模块不可为空")
+    return _delete(datum)
 
 
-def save_to_db(data):
-    return PythonUtil.update(
-        "nature/common.db",
-        sql_each(
-            "insert into module_script(module,script,status,seq) values[({module},{script},{status},{seq})]",
-            data,
-        ),
-    )
+def do_update(datum):
+    _validate(datum)
+    exists = do_find(datum["module"])
+    if not exists:
+        raise Warning(f"模块{datum['module']}不存在")
+    return _update(datum)
 
 
-def update_to_db(datum):
-    return PythonUtil.update(
-        "nature/common.db",
-        sql_one(
-            "update module_script set script={script},status={status},seq={seq} where module={module}",
-            datum,
-        ),
-    )
+def _save(data):
+    sql = "insert into module_script(module,script,status,seq) values[({module},{script},{status},{seq})]"
+    return PythonUtil.update("nature/common.db", sql_each(sql, data))
 
 
-def delete_from_db(datum):
-    return PythonUtil.update(
-        "nature/common.db",
-        sql_one(
-            "delete from module_script where module={module}",
-            datum,
-        ),
-    )
+def _update(datum):
+    sql = "update module_script set script={script},status={status},seq={seq} where module={module}"
+    return PythonUtil.update("nature/common.db", sql_one(sql, datum))
 
 
-def do_validate(datum):
+def _delete(datum):
+    sql = "delete from module_script where module={module}"
+    return PythonUtil.update("nature/common.db", sql_one(sql, datum))
+
+
+def _validate(datum):
     if "module" not in datum or not datum["module"]:
         raise Warning("模块不可为空")
     if "script" not in datum or not datum["script"]:
@@ -106,22 +106,3 @@ def do_validate(datum):
         raise Warning("状态只能为启用或暂停")
     if "seq" not in datum or not datum["seq"]:
         raise Warning("序号不可为空")
-
-
-def do_save(datum):
-    do_validate(datum)
-    return save_to_db([datum])
-
-
-def do_delete(datum):
-    if "module" not in datum or not datum["module"]:
-        raise Warning("模块不可为空")
-    return delete_from_db(datum)
-
-
-def do_update(datum):
-    do_validate(datum)
-    exists = find_by_module(datum["module"])
-    if not exists:
-        raise Warning(f"模块{datum["module"]}不存在")
-    return update_to_db(datum)
