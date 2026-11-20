@@ -17,6 +17,8 @@ export default class KlineChart extends Chartable(Base) {
         kline: this.buildFormatter(this.props.klineFormatter),
         share: this.buildFormatter(this.props.shareFormatter),
         amount: this.buildFormatter(this.props.amountFormatter),
+        change: this.buildFormatter(this.props.changeFormatter),
+        amplitude: this.buildFormatter(this.props.amplitudeFormatter),
       },
     };
     this.updateConfig();

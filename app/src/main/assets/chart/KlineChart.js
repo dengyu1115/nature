@@ -29,8 +29,8 @@ export default class KlineChart extends ChartBase {
     const { width, height } = this.canvas;
     const ys = (this.config.title ? 40 * this.dpr : 0) + 30 * this.dpr; // 标题+图例高度
     const ye = 50 * this.dpr; // X轴标签高度
-    const xs = 100 * this.dpr; // Y轴宽度
-    const xe = 100 * this.dpr;
+    const xs = 80 * this.dpr; // Y轴宽度
+    const xe = 80 * this.dpr;
 
     // 计算上下两个图表区域
     const chartHeight = height - ye - ys;
@@ -205,7 +205,7 @@ export default class KlineChart extends ChartBase {
     const { vy, vHeight } = this.chartArea;
     const labels = this.config.labels || [];
     for (let i = start; i <= end; i++) {
-      if (i % Math.max(1, Math.ceil((5 * this.dpr) / scale)) === 0) {
+      if (i % Math.max(1, Math.floor((5 * this.dpr) / scale)) === 0) {
         const xi = this.calcDatumIndex(i);
         const yi = vy + vHeight + 20 * this.dpr;
         super.drawAxisLabel(xi, yi, labels[i] || `数据${i + 1}`);
@@ -547,6 +547,27 @@ export default class KlineChart extends ChartBase {
         seriesName: "交易金额",
         value: af ? af(datum.amount) : datum.amount,
         color: this.config.colors.amount,
+      });
+    }
+    // 收集涨幅
+    if (datum.change_pct !== undefined && datum.change_pct !== null) {
+      const cf = this.config.formatter?.change;
+      const v = cf ? cf(datum.change_pct) : datum.change_pct.toFixed(2) + '%';
+      const isRise = Number(datum.change_pct) >= 0;
+      points.push({
+        seriesName: "涨幅",
+        value: v,
+        color: this.config.colors[isRise ? "rising" : "falling"],
+      });
+    }
+    // 收集振幅
+    if (datum.amplitude_pct !== undefined && datum.amplitude_pct !== null) {
+      const amf = this.config.formatter?.amplitude;
+      const v = amf ? amf(datum.amplitude_pct) : datum.amplitude_pct.toFixed(2) + '%';
+      points.push({
+        seriesName: "振幅",
+        value: v,
+        color: this.config.colors.axis,
       });
     }
     return points;
